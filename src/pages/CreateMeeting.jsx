@@ -100,16 +100,6 @@ function CreateMeeting() {
         isPasswordProtected: formData.isPasswordProtected,
         password: formData.isPasswordProtected ? formData.password : "",
       };
-      console.log("Payload gửi đi:", {
-        title: formData.title,
-        description: formData.description,
-        hostName: user.email,
-        scheduledDate: formData.scheduledDate,
-        scheduledTime: formData.scheduledTime,
-        duration: Number(formData.duration),
-        isPasswordProtected: formData.isPasswordProtected,
-        password: formData.isPasswordProtected ? formData.password : "",
-      });
 
       const response = await fetch("http://localhost:5110/api/Meeting", {
         method: "POST",
@@ -446,112 +436,6 @@ function CreateMeeting() {
                   )}
                 </div>
               )}
-            </div>
-
-            {/* Advanced Settings */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Settings className="w-5 h-5 mr-2" />
-                Cài đặt nâng cao
-              </h3>
-
-              <div className="space-y-3">
-                {/* Host Required - ALWAYS TRUE */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <label className="flex items-start space-x-3">
-                    <input
-                      type="checkbox"
-                      name="requireHostToStart"
-                      checked={formData.requireHostToStart}
-                      onChange={handleChange}
-                      disabled
-                      className="w-5 h-5 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500 mt-0.5 cursor-not-allowed"
-                    />
-                    <div className="flex-1">
-                      <span className="text-sm font-medium text-yellow-900 flex items-center">
-                        <Shield className="w-4 h-4 mr-2" />
-                        Yêu cầu Host tham gia trước (Bắt buộc)
-                      </span>
-                      <p className="text-xs text-yellow-700 mt-1">
-                        Cuộc họp chỉ bắt đầu khi bạn (Host) tham gia. Người khác
-                        sẽ chờ trong phòng chờ.
-                      </p>
-                    </div>
-                  </label>
-                </div>
-
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    name="allowGuestJoin"
-                    checked={formData.allowGuestJoin}
-                    onChange={handleChange}
-                    className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mt-0.5"
-                  />
-                  <div>
-                    <span className="text-sm font-medium text-gray-700">
-                      Cho phép khách tham gia
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Người không có tài khoản có thể tham gia
-                    </p>
-                  </div>
-                </label>
-
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    name="enableWaitingRoom"
-                    checked={formData.enableWaitingRoom}
-                    onChange={handleChange}
-                    className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mt-0.5"
-                  />
-                  <div>
-                    <span className="text-sm font-medium text-gray-700">
-                      Bật phòng chờ
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Host phải chấp thuận người tham gia mới vào được
-                    </p>
-                  </div>
-                </label>
-
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    name="enableRecording"
-                    checked={formData.enableRecording}
-                    onChange={handleChange}
-                    className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mt-0.5"
-                  />
-                  <div>
-                    <span className="text-sm font-medium text-gray-700">
-                      Cho phép ghi âm
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Cho phép ghi lại cuộc họp
-                    </p>
-                  </div>
-                </label>
-
-                <label className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    name="muteParticipantsOnEntry"
-                    checked={formData.muteParticipantsOnEntry}
-                    onChange={handleChange}
-                    className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mt-0.5"
-                  />
-                  <div>
-                    <span className="text-sm font-medium text-gray-700">
-                      Tắt micro khi vào
-                    </span>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Tự động tắt micro của người tham gia mới
-                    </p>
-                  </div>
-                </label>
-              </div>
             </div>
 
             {/* Submit Button */}
