@@ -96,16 +96,13 @@ const LoginPage = () => {
           return;
         }
         const role = payload.Role || payload.role || "User";
-        console.log("👤 Extracted role:", role);
+
         const userInfo = {
           userId: payload.userId,
           name: payload.Name || payload.name || result.data.name,
           email: payload.Email || payload.email || result.data.email,
           role: role,
         };
-
-        console.log("💾 Saving to localStorage:", userInfo);
-
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(userInfo));
 
