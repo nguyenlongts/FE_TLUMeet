@@ -78,7 +78,7 @@ const LoginPage = () => {
 
     try {
       const response = await fetch(
-        "http://kiritsu2210-001-site1.rtempurl.com/api/Auth/login",
+        "https://kiritsu2210-001-site1.rtempurl.com/api/Auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
