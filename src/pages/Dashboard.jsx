@@ -140,7 +140,7 @@ function DashboardPage() {
       }
 
       const statusRes = await fetch(
-        `httpss://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${quickJoinCode}/status`,
+        `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${quickJoinCode}/status`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const statusData = await statusRes.json();
