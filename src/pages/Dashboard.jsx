@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+
+import WaitingRoom from "./WaitingRoom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -24,7 +26,8 @@ function DashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [meetings, setMeetings] = useState([]);
-
+  const [showWaitingRoom, setShowWaitingRoom] = useState(false);
+  const [waitingRoomData, setWaitingRoomData] = useState(null);
   const [quickJoinCode, setQuickJoinCode] = useState("");
   const [quickJoinError, setQuickJoinError] = useState("");
 
@@ -160,12 +163,16 @@ function DashboardPage() {
             },
           }
         );
+        navigate(`/meeting/${quickJoinCode}`);
       } else if (!statusData.data.canJoin) {
-        alert("Phòng họp chưa bắt đầu, vui lòng chờ host.");
-        return;
+        setWaitingRoomData({
+          roomCode: quickJoinCode,
+          userName: user.name || user.email,
+        });
+        setShowWaitingRoom(true);
+      } else {
+        navigate(`/meeting/${quickJoinCode}`);
       }
-
-      navigate(`/meeting/${quickJoinCode}`);
     } catch (error) {
       console.error(error);
       setQuickJoinError("Không thể tham gia cuộc họp. Vui lòng thử lại.");
@@ -275,13 +282,16 @@ function DashboardPage() {
 
         if (!startRes.ok) throw new Error("Không thể bắt đầu phòng họp.");
 
-        console.log("✅ Host đã bắt đầu phòng họp");
+        navigate(`/meeting/${meeting.roomCode}`);
       } else if (!roomStatus.canJoin) {
-        alert("Phòng họp chưa bắt đầu, vui lòng chờ host.");
-        return;
+        setWaitingRoomData({
+          roomCode: meeting.roomCode,
+          userName: user.name || user.email,
+        });
+        setShowWaitingRoom(true);
+      } else {
+        navigate(`/meeting/${meeting.roomCode}`);
       }
-
-      navigate(`/meeting/${meeting.roomCode}`);
     } catch (error) {
       console.error(error);
       alert("Không thể tham gia cuộc họp.");
@@ -411,9 +421,136 @@ function DashboardPage() {
       <MeetingCard key={m.id} meeting={m} type={activeTab} />
     ));
   };
+  // ✅ Add this component inside DashboardPage, before the return statement
+  const WaitingRoomOverlay = () => {
+    const [waitingTime, setWaitingTime] = useState(0);
 
+    useEffect(() => {
+      if (!waitingRoomData?.roomCode) return;
+
+      const checkHostStatus = async () => {
+        try {
+          const response = await fetch(
+            `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${waitingRoomData.roomCode}/status`
+          );
+
+          if (!response.ok) return;
+
+          const result = await response.json();
+
+          if (result.returnCode === 200 && result.data.isStarted) {
+            setShowWaitingRoom(false);
+            navigate(`/meeting/${waitingRoomData.roomCode}`);
+          }
+        } catch (error) {
+          console.error("Error checking host status:", error);
+        }
+      };
+
+      checkHostStatus();
+      const interval = setInterval(checkHostStatus, 3000);
+
+      return () => clearInterval(interval);
+    }, [waitingRoomData]);
+
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setWaitingTime((prev) => prev + 1);
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }, []);
+
+    const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, "0")}`;
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="max-w-md w-full mx-4">
+          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-center">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <Clock className="w-10 h-10 text-indigo-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Đang chờ host...
+              </h2>
+              <p className="text-indigo-100">
+                Cuộc họp sẽ bắt đầu khi host tham gia
+              </p>
+            </div>
+
+            <div className="p-8 space-y-6">
+              <div className="bg-indigo-50 rounded-lg p-6 text-center">
+                <p className="text-sm text-indigo-600 font-medium mb-2">
+                  Thời gian chờ
+                </p>
+                <p className="text-4xl font-bold text-indigo-900">
+                  {formatTime(waitingTime)}
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600">Mã phòng</span>
+                  <code className="font-mono font-bold text-indigo-600">
+                    {waitingRoomData?.roomCode}
+                  </code>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600">Tên của bạn</span>
+                  <span className="font-medium text-gray-900">
+                    {waitingRoomData?.userName}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm text-blue-800">
+                    Bạn sẽ tự động vào phòng khi host bắt đầu cuộc họp. Vui lòng
+                    không tắt trang này.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-4">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                >
+                  Làm mới trang
+                </button>
+                <button
+                  onClick={() => setShowWaitingRoom(false)}
+                  className="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+                >
+                  Rời khỏi phòng chờ
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
   return (
     <div className="min-h-screen bg-gray-50">
+      {showWaitingRoom && waitingRoomData && (
+        <WaitingRoom
+          roomCode={waitingRoomData.roomCode}
+          userName={waitingRoomData.userName}
+          onHostJoined={() => {
+            setShowWaitingRoom(false);
+            navigate(`/meeting/${waitingRoomData.roomCode}`);
+          }}
+          onCancel={() => setShowWaitingRoom(false)}
+        />
+      )}
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
@@ -492,10 +629,10 @@ function DashboardPage() {
                 <Video className="w-8 h-8 text-indigo-600" />
               </div>
             </div>
-            <div className="mt-4 flex items-center text-sm text-green-600">
+            {/* <div className="mt-4 flex items-center text-sm text-green-600">
               <TrendingUp className="w-4 h-4 mr-1" />
               <span>+12% so với tháng trước</span>
-            </div>
+            </div> */}
           </div>
 
           <div className="bg-white rounded-xl shadow-md p-6">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Clock, Users, AlertCircle } from "lucide-react";
+import { Clock, AlertCircle } from "lucide-react";
 
-function WaitingRoom({ roomCode, userName, onHostJoined }) {
+function WaitingRoom({ roomCode, userName, onHostJoined, onCancel }) {
   const [waitingTime, setWaitingTime] = useState(0);
   const [hostStatus, setHostStatus] = useState("waiting");
 
@@ -11,9 +11,12 @@ function WaitingRoom({ roomCode, userName, onHostJoined }) {
         const response = await fetch(
           `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${roomCode}/status`
         );
-        const data = await response.json();
 
-        if (data.isStarted) {
+        if (!response.ok) return;
+
+        const result = await response.json();
+
+        if (result.returnCode === 200 && result.data.isStarted) {
           onHostJoined();
         }
       } catch (error) {
@@ -42,7 +45,7 @@ function WaitingRoom({ roomCode, userName, onHostJoined }) {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100">
+    <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
       <div className="max-w-md w-full mx-4">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
@@ -97,14 +100,14 @@ function WaitingRoom({ roomCode, userName, onHostJoined }) {
 
             {/* Action Buttons */}
             <div className="space-y-3 pt-4">
-              <button
+              {/* <button
                 onClick={() => window.location.reload()}
                 className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
               >
                 Làm mới trang
-              </button>
+              </button> */}
               <button
-                onClick={() => window.history.back()}
+                onClick={onCancel}
                 className="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
               >
                 Rời khỏi phòng chờ

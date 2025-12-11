@@ -61,15 +61,7 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
-
-          {/* ========================================
-           * MEETING ROUTES - Public (cho guests)
-           * ======================================== */}
           <Route path="/meeting/:roomName" element={<MeetingRoom />} />
-
-          {/* ========================================
-           * FALLBACK - 404 Not Found
-           * ======================================== */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AuthProvider>
