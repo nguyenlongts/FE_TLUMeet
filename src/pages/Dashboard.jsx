@@ -154,7 +154,7 @@ function DashboardPage() {
         !statusData.data.isStarted
       ) {
         await fetch(
-          `httpss://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${quickJoinCode}/start`,
+          `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${quickJoinCode}/start`,
           {
             method: "POST",
             headers: {
@@ -189,7 +189,7 @@ function DashboardPage() {
 
     try {
       const response = await fetch(
-        `httpss://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${id}`,
+        `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${id}`,
         {
           method: "DELETE",
         }
