@@ -53,12 +53,15 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
+
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+
           <Route
             path="/change-password"
             element={
-              // <ProtectedRoute requiredRole="User">
-              <ChangePasswordPage />
-              // </ProtectedRoute>
+              <ProtectedRoute requiredRole="User">
+                <ChangePasswordPage />
+              </ProtectedRoute>
             }
           />
           <Route path="/meeting/:roomName" element={<MeetingRoom />} />
