@@ -1,7 +1,6 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { Lock, Eye, EyeOff, ArrowLeft, AlertCircle } from "lucide-react";
-import { useState } from "react";
 
 function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
