@@ -38,14 +38,13 @@ function DashboardPage() {
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [completedMeetings, setCompletedMeetings] = useState([]);
   const [activeTab, setActiveTab] = useState("upcoming");
-
   const [stats, setStats] = useState({
     totalMeetings: 0,
     upcomingMeetings: 0,
     totalParticipants: 0,
     avgDuration: "0h",
   });
-
+  const token = localStorage.getItem("token");
   const formatDuration = (duration) => {
     if (!duration || duration === 0) return "0 phút";
     const h = Math.floor(duration / 60);
@@ -57,7 +56,8 @@ function DashboardPage() {
     const fetchMeetings = async () => {
       try {
         const response = await fetch(
-          `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/by-email?email=${user.email}`
+          `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/by-email?email=${user.email}`,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = await response.json();
         if (!data.data) return;
@@ -68,7 +68,6 @@ function DashboardPage() {
         let totalDuration = 0;
 
         data.data.forEach((m) => {
-          // Tạo datetime đầy đủ từ scheduledDate + scheduledTime
           let meetingDate = new Date(m.scheduledDate);
           if (m.scheduledTime) {
             const [hours, minutes] = m.scheduledTime.split(":").map(Number);
@@ -137,64 +136,6 @@ function DashboardPage() {
     return true;
   };
 
-  // const handleQuickJoin = async () => {
-  //   if (!validateJoin()) return;
-
-  //   try {
-  //     setQuickJoinError("");
-  //     const res = await fetch(
-  //       `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/check/${quickJoinCode}`
-  //     );
-  //     const data = await res.json();
-  //     if (data.data === false) {
-  //       setQuickJoinError("Mã phòng không tồn tại");
-  //       return;
-  //     }
-
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       alert("Vui lòng đăng nhập lại.");
-  //       navigate("/login");
-  //       return;
-  //     }
-
-  //     const statusRes = await fetch(
-  //       `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${quickJoinCode}/status`,
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-  //     const statusData = await statusRes.json();
-  //     const isHost = statusData.data.hostName === user.email;
-
-  //     if (
-  //       isHost &&
-  //       statusData.data.requireHostToStart &&
-  //       !statusData.data.isStarted
-  //     ) {
-  //       await fetch(
-  //         `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${quickJoinCode}/start`,
-  //         {
-  //           method: "POST",
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       );
-  //       navigate(`/meeting/${quickJoinCode}`);
-  //     } else if (!statusData.data.canJoin) {
-  //       setWaitingRoomData({
-  //         roomCode: quickJoinCode,
-  //         userName: user.name || user.email,
-  //       });
-  //       setShowWaitingRoom(true);
-  //     } else {
-  //       navigate(`/meeting/${quickJoinCode}`);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     setQuickJoinError("Không thể tham gia cuộc họp. Vui lòng thử lại.");
-  //   }
-  // };
   const handleQuickJoin = async () => {
     if (!validateJoin()) return;
 
@@ -233,7 +174,8 @@ function DashboardPage() {
 
       if (result.data) {
         const resMeetings = await fetch(
-          `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/by-email?email=${user.email}`
+          `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/by-email?email=${user.email}`,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         const dataMeetings = await resMeetings.json();
 
@@ -280,54 +222,8 @@ function DashboardPage() {
     }
   };
 
-  // const handleJoinMeeting = async (meeting) => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       alert("Vui lòng đăng nhập lại.");
-  //       navigate("/login");
-  //       return;
-  //     }
-
-  //     const res = await fetch(
-  //       `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${meeting.roomCode}/status`,
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-  //     const data = await res.json();
-
-  //     if (data.returnCode !== 200) {
-  //       alert("Không thể lấy trạng thái phòng họp.");
-  //       return;
-  //     }
-
-  //     const roomStatus = data.data;
-  //     const isHost = roomStatus.hostName === user.email;
-
-  //     if (isHost && roomStatus.requireHostToStart && !roomStatus.isStarted) {
-  //       const startRes = await fetch(
-  //         `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${meeting.roomCode}/start`,
-  //         {
-  //           method: "POST",
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       );
-  //       if (!startRes.ok) throw new Error("Không thể bắt đầu phòng họp.");
-  //     }
-
-  //     navigate(`/meeting/${meeting.roomCode}`);
-  //   } catch (error) {
-  //     console.error(error);
-  //     alert("Không thể tham gia cuộc họp.");
-  //   }
-  // };
   const handleJoinMeeting = async (meeting) => {
     try {
-      // ❌ XÓA toàn bộ logic check status và start meeting
-
-      // ✅ CHỈ navigate
       navigate(`/meeting/${meeting.roomCode}`);
     } catch (error) {
       console.error(error);
