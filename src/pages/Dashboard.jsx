@@ -155,6 +155,7 @@ function DashboardPage() {
       );
       const statusData = await statusRes.json();
       const isHost = statusData.data.hostName === user.email;
+
       if (
         isHost &&
         statusData.data.requireHostToStart &&
@@ -286,19 +287,10 @@ function DashboardPage() {
             },
           }
         );
-
         if (!startRes.ok) throw new Error("Không thể bắt đầu phòng họp.");
-
-        navigate(`/meeting/${meeting.roomCode}`);
-      } else if (!roomStatus.canJoin) {
-        setWaitingRoomData({
-          roomCode: meeting.roomCode,
-          userName: user.name || user.email,
-        });
-        setShowWaitingRoom(true);
-      } else {
-        navigate(`/meeting/${meeting.roomCode}`);
       }
+
+      navigate(`/meeting/${meeting.roomCode}`);
     } catch (error) {
       console.error(error);
       alert("Không thể tham gia cuộc họp.");

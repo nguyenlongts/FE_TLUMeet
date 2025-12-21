@@ -360,12 +360,18 @@ function MeetingRoom() {
                     "Content-Type": "application/json",
                   },
                 });
-              } catch (error) {
-                // Silent fail - still proceed to end meeting
-              }
+              } catch (error) {}
             }
+          } else {
           }
-
+          const joinToken = sessionStorage.getItem("joinToken");
+          if (joinToken) {
+            await fetch(`${JAAS_CONFIG.meetingStatusUrl}/leave`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ joinToken }),
+            });
+          }
           handleMeetingEnd();
         });
 
@@ -405,7 +411,6 @@ function MeetingRoom() {
     }, 1000);
   };
 
-  // Host ended meeting screen
   if (hostEndedMeeting) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-50">
@@ -433,7 +438,6 @@ function MeetingRoom() {
     );
   }
 
-  // Use WaitingRoom component
   if (
     meetingStatus.requireHostToStart &&
     !meetingStatus.isStarted &&
@@ -444,7 +448,6 @@ function MeetingRoom() {
         roomCode={roomName}
         userName={userName || guestName}
         onHostJoined={() => {
-          // Meeting will auto-start via polling, just update state
           setMeetingStatus((prev) => ({ ...prev, isStarted: true }));
         }}
         onCancel={() => {
@@ -455,7 +458,6 @@ function MeetingRoom() {
     );
   }
 
-  // Error screen
   if (loadError) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-900">
@@ -487,7 +489,6 @@ function MeetingRoom() {
     );
   }
 
-  // Main meeting room
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-900 overflow-hidden">
       <div className="flex-1 relative">

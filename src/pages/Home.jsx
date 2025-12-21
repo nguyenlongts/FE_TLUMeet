@@ -33,23 +33,47 @@ function HomePage() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(
+      const checkResponse = await fetch(
         `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/check/${encodeURIComponent(
           roomCode
         )}`
       );
-      const result = await response.json();
+      const checkResult = await checkResponse.json();
 
-      if (result.data) {
-        sessionStorage.setItem("guestName", guestName.trim() || "Guest");
-        navigate(
-          `/meeting/${roomCode}?guest=${encodeURIComponent(guestName.trim())}`
-        );
-      } else {
+      if (!checkResult.data) {
         setErrors({ ...errors, roomCode: "Phòng họp không tồn tại" });
+        return;
       }
+
+      const joinResponse = await fetch(
+        `https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/${encodeURIComponent(
+          roomCode
+        )}/join`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userEmail: null,
+            guestName: guestName.trim(),
+          }),
+        }
+      );
+
+      const joinResult = await joinResponse.json();
+      if (joinResult.returnCode !== 200) {
+        setErrors({
+          ...errors,
+          roomCode: joinResult.message || "Lỗi khi tham gia",
+        });
+        return;
+      }
+      sessionStorage.setItem("guestName", guestName.trim());
+      sessionStorage.setItem("joinToken", joinResult.data.joinToken);
+      navigate(`/meeting/${roomCode}`);
     } catch (error) {
-      console.error("Lỗi khi kiểm tra phòng:", error);
+      console.error("Lỗi khi tham gia phòng họp:", error);
       setErrors({ ...errors, roomCode: "Không thể kết nối tới server" });
     } finally {
       setIsLoading(false);
@@ -186,7 +210,6 @@ function HomePage() {
         </div>
       </main>
 
-      {/* Footer with spacing */}
       <footer className="w-full mt-12 py-6 text-center text-gray-500 text-sm border-t border-gray-200 bg-white/80 backdrop-blur-sm">
         <p>
           &copy; 2025 TLU Meeting. Nền tảng họp trực tuyến đơn giản và hiệu quả.
