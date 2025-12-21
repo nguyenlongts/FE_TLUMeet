@@ -111,13 +111,13 @@ const LoginPage = () => {
           email: payload.Email || payload.email || result.data.email,
           role: role,
         };
+
+        // Lưu token và user riêng biệt
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(userInfo));
 
-        login({
-          ...userInfo,
-          token: token,
-        });
+        // Pass token riêng để AuthContext xử lý
+        login(userInfo, token); // ⬅️ Thay đổi ở đây
 
         if (from) {
           sessionStorage.removeItem("redirectAfterLogin");

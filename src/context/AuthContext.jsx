@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
 
     if (savedUser && token) {
       const parsed = JSON.parse(savedUser);
-
       const decoded = decodeJWT(token);
 
       if (!decoded || decoded.exp * 1000 < Date.now()) {
@@ -39,12 +38,13 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  const login = (userInfo) => {
-    if (!userInfo?.token) {
-      console.error("login() requires token in userInfo");
+  const login = (userInfo, token) => {
+    // ⬅️ Thêm tham số token
+    if (!token) {
+      console.error("login() requires token");
       return;
     }
-    localStorage.setItem("token", userInfo.token);
+    localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userInfo));
     setUser(userInfo);
   };

@@ -15,7 +15,7 @@ import NotFoundPage from "../pages/NotFound";
 import MeetingRoom from "../pages/Meeting";
 import AdminPanel from "../pages/admin/AdminPanel";
 import ChangePasswordPage from "../pages/ChangePasswordPage.jsx";
-
+import ProfilePage from "../pages/ProfilePage.jsx";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -26,6 +26,8 @@ function AppRoutes() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Route>
+
+          <Route path="/profile" element={<ProfilePage />} />
 
           <Route
             path="/admin"
