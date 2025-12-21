@@ -68,8 +68,16 @@ function DashboardPage() {
         let totalDuration = 0;
 
         data.data.forEach((m) => {
-          const scheduledDate = new Date(m.scheduledDate);
+          // Tạo datetime đầy đủ từ scheduledDate + scheduledTime
+          let meetingDate = new Date(m.scheduledDate);
+          if (m.scheduledTime) {
+            const [hours, minutes] = m.scheduledTime.split(":").map(Number);
+            meetingDate.setHours(hours, minutes, 0, 0);
+          }
+
           const now = new Date();
+          const status = meetingDate > now ? "upcoming" : "completed";
+
           const meeting = {
             id: m.id,
             title: m.title,
@@ -77,27 +85,25 @@ function DashboardPage() {
             roomCode: m.roomCode,
             hostName: m.hostName,
             isPasswordProtected: m.isPasswordProtected,
-
             scheduledDateRaw: m.scheduledDate,
             scheduledTimeRaw: m.scheduledTime,
             durationRaw: m.duration,
-
-            date: scheduledDate.toLocaleDateString(),
+            date: meetingDate.toLocaleDateString(),
             time:
               m.scheduledTime ||
-              scheduledDate.toLocaleTimeString([], {
+              meetingDate.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               }),
             duration: formatDuration(m.duration),
             participants: m.participants || 0,
-            status: scheduledDate > now ? "upcoming" : "completed",
+            status: status,
           };
 
           totalParticipants += meeting.participants;
           totalDuration += m.duration || 0;
 
-          if (meeting.status === "upcoming") upcoming.push(meeting);
+          if (status === "upcoming") upcoming.push(meeting);
           else completed.push(meeting);
         });
 
