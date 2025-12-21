@@ -27,7 +27,7 @@ function EditMeetingModal({ meeting, onClose, onUpdated }) {
 
     try {
       const res = await fetch(
-        "https://kiritsu2210-001-site1.rtempurl.com/api/Meeting/update",
+        "https://kiritsu2210-001-site1.rtempurl.com/api/Meeting",
         {
           method: "PUT",
           headers: {
