@@ -1,6 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 
 const AuthContext = createContext(null);
+const token = localStorage.getItem("token");
+
 function decodeJWT(token) {
   try {
     if (!token) return null;
@@ -22,7 +24,6 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
 
     if (savedUser && token) {
       const parsed = JSON.parse(savedUser);
@@ -59,6 +60,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        token,
         isAuthenticated: !!user,
         isLoading,
         login,

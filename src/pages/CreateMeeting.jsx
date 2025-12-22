@@ -15,6 +15,7 @@ import {
   EyeOff,
   Plus,
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 function CreateMeeting() {
   const [formData, setFormData] = useState({
@@ -37,7 +38,7 @@ function CreateMeeting() {
   const [showPassword, setShowPassword] = useState(false);
   const [createdMeeting, setCreatedMeeting] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const { user, token, isAuthenticated } = useAuth();
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -95,22 +96,19 @@ function CreateMeeting() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      alert("Bạn cần đăng nhập để tạo phòng họp");
+      return;
+    }
+
     if (!validateForm()) return;
 
     setIsLoading(true);
 
     try {
-      const userStr = localStorage.getItem("user");
-      let hostEmail = "host@example.com";
+      const hostEmail = user?.email || user?.userName || "host@example.com";
 
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          hostEmail = user.email || user.userName || "host@example.com";
-        } catch (parseError) {
-          console.warn("Could not parse user from localStorage:", parseError);
-        }
-      }
       const payload = {
         title: formData.title,
         description: formData.description,
@@ -125,6 +123,7 @@ function CreateMeeting() {
         {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
@@ -137,10 +136,10 @@ function CreateMeeting() {
         setCreatedMeeting(result.data);
         setShowSuccess(true);
       } else {
-        alert("Tạo phòng họp thất bại: " + result.message);
+        alert(result.message || "Tạo phòng họp thất bại");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       alert("Đã có lỗi xảy ra khi tạo phòng họp");
     } finally {
       setIsLoading(false);
