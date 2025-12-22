@@ -5,6 +5,7 @@ import UpdateProfile from "./UpdateProfile";
 import { useNavigate } from "react-router-dom";
 import DashboardHeader from "../components/DashboardHeader";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 import {
   Video,
   Plus,
@@ -157,7 +158,7 @@ function DashboardPage() {
   };
   const handleCopyRoomCode = (code) => {
     navigator.clipboard.writeText(code);
-    alert(`Đã copy mã phòng: ${code}`);
+    toast.success(`Đã copy mã phòng: ${code}`);
   };
 
   const handleDeleteMeeting = async (id) => {
@@ -212,13 +213,13 @@ function DashboardPage() {
         setUpcomingMeetings(upcoming);
         setCompletedMeetings(completed);
 
-        alert("Xóa phòng họp thành công!");
+        toast.success("Xóa phòng họp thành công!");
       } else {
-        alert("Xóa thất bại. Vui lòng thử lại.");
+        toast.error("Xóa thất bại. Vui lòng thử lại.");
       }
     } catch (error) {
       console.error(error);
-      alert("Có lỗi xảy ra. Vui lòng thử lại.");
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
     }
   };
 
@@ -227,7 +228,7 @@ function DashboardPage() {
       navigate(`/meeting/${meeting.roomCode}`);
     } catch (error) {
       console.error(error);
-      alert("Không thể tham gia cuộc họp.");
+      toast.error("Không thể tham gia cuộc họp.");
     }
   };
   const MeetingCard = ({ meeting, type }) => {

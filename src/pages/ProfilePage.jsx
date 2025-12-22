@@ -1,7 +1,7 @@
 import React from "react";
 import UpdateProfile from "./UpdateProfile";
 import { useAuth } from "../context/AuthContext";
-import DashboardHeader from "./DashboardHeader";
+import DashboardHeader from "../components/DashboardHeader";
 
 function ProfilePage() {
   const { user } = useAuth();

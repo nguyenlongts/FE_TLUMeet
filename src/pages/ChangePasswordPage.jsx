@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Lock, Eye, EyeOff, ArrowLeft, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import DashboardHeader from "./DashboardHeader"; // Header đã tách ra
+import DashboardHeader from "../components/DashboardHeader";
 
 function ChangePasswordPage() {
   const navigate = useNavigate();
