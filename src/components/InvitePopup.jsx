@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNotification } from "../context/NotificationContext";
 import { acceptInvite, rejectInvite } from "../api/notificationApi";
@@ -12,38 +12,52 @@ export default function InvitePopup() {
   const token = useSelector(selectAccessToken);
   const navigate = useNavigate();
 
-  // Stack tất cả invite chưa xử lý (chưa đọc + type MeetingInvite)
   const [handledIds, setHandledIds] = useState(new Set());
 
-  const pendingInvites = notifications
-    .filter(
-      (n) =>
-        n.type === "MeetingInvite" &&
-        !n.isRead &&
-        !handledIds.has(n.notificationId)
-    )
-    .map((n) => ({
-      ...n,
-      parsedPayload: (() => {
-        try {
-          return typeof n.payload === "string" ? JSON.parse(n.payload) : n.payload;
-        } catch {
-          return {};
-        }
-      })(),
-    }));
+  const dismiss = useCallback((id) => {
+    setHandledIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
 
-  const dismiss = (id) =>
-    setHandledIds((prev) => new Set([...prev, id]));
+  const pendingInvites = useMemo(
+    () =>
+      notifications
+        .filter(
+          (n) =>
+            n.type === "MeetingInvite" &&
+            !n.isRead &&
+            !handledIds.has(n.notificationId),
+        )
+        .map((n) => ({
+          ...n,
+          parsedPayload: (() => {
+            try {
+              return typeof n.payload === "string"
+                ? JSON.parse(n.payload)
+                : n.payload;
+            } catch {
+              return {};
+            }
+          })(),
+        })),
+    [notifications, handledIds],
+  );
 
-  // Auto-dismiss sau 15 giây
+  const pendingIds = useMemo(
+    () => pendingInvites.map((inv) => inv.notificationId).join(","),
+    [pendingInvites],
+  );
+
   useEffect(() => {
     if (pendingInvites.length === 0) return;
     const timers = pendingInvites.map((inv) =>
-      setTimeout(() => dismiss(inv.notificationId), 15000)
+      setTimeout(() => dismiss(inv.notificationId), 15000),
     );
     return () => timers.forEach(clearTimeout);
-  }, [pendingInvites.length]);
+  }, [pendingIds, dismiss]);
 
   const handleAccept = async (inv) => {
     dismiss(inv.notificationId);
@@ -51,8 +65,8 @@ export default function InvitePopup() {
       const res = await acceptInvite(inv.parsedPayload.inviteId, token);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       toast.success("Đã chấp nhận! Đang vào phòng...");
-      // joinLink ví dụ: "/meet/ABC123" hoặc full URL
-      const link = inv.parsedPayload.joinLink || `/meet/${inv.parsedPayload.roomCode}`;
+      const link =
+        inv.parsedPayload.joinLink || `/meet/${inv.parsedPayload.roomCode}`;
       navigate(link);
     } catch (err) {
       toast.error("Không thể chấp nhận lời mời: " + err.message);
@@ -75,10 +89,16 @@ export default function InvitePopup() {
         {pendingInvites.map((inv) => (
           <motion.div
             key={inv.notificationId}
+            layout
             initial={{ opacity: 0, x: 300 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 300 }}
-            transition={{ duration: 0.25 }}
+            transition={{
+              duration: 0.25,
+              type: "spring",
+              stiffness: 520,
+              damping: 40,
+            }}
             className="pointer-events-auto w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden"
           >
             {/* Header */}
@@ -92,7 +112,10 @@ export default function InvitePopup() {
                   Lời mời họp
                 </p>
                 <p className="text-white/70 text-xs truncate">
-                  Từ: {inv.parsedPayload.hostName || inv.parsedPayload.hostEmail || "—"}
+                  Từ:{" "}
+                  {inv.parsedPayload.hostName ||
+                    inv.parsedPayload.hostEmail ||
+                    "—"}
                 </p>
               </div>
               <button
@@ -103,7 +126,6 @@ export default function InvitePopup() {
               </button>
             </div>
 
-            {/* Body */}
             <div className="px-4 py-3 flex flex-col gap-1">
               <p className="text-sm font-medium text-gray-800 line-clamp-2">
                 {inv.parsedPayload.title || inv.title}
@@ -117,7 +139,9 @@ export default function InvitePopup() {
               {inv.parsedPayload.expiresAt && (
                 <p className="text-xs text-gray-400">
                   Hết hạn:{" "}
-                  {new Date(inv.parsedPayload.expiresAt).toLocaleTimeString("vi-VN")}
+                  {new Date(inv.parsedPayload.expiresAt).toLocaleTimeString(
+                    "vi-VN",
+                  )}
                 </p>
               )}
             </div>
@@ -133,7 +157,9 @@ export default function InvitePopup() {
               <button
                 onClick={() => handleAccept(inv)}
                 className="flex-[1.4] py-1.5 rounded-lg text-sm font-medium text-white transition"
-                style={{ background: "linear-gradient(135deg,#a855f7,#7c3aed)" }}
+                style={{
+                  background: "linear-gradient(135deg,#a855f7,#7c3aed)",
+                }}
               >
                 ✔ Chấp nhận
               </button>

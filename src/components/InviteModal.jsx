@@ -5,14 +5,8 @@ import { sendInvites } from "../api/notificationApi";
 import { useSelector } from "react-redux";
 import { selectAccessToken } from "../redux/features/auth/authSlice";
 import toast from "react-hot-toast";
+import { createPortal } from "react-dom";
 
-/**
- * Modal để HOST invite nhiều người vào meeting.
- * Props:
- *   open: boolean
- *   onClose: () => void
- *   roomCode: string  ← dùng roomCode (không phải meetingId)
- */
 export default function InviteModal({ open, onClose, roomCode }) {
   const token = useSelector(selectAccessToken);
   const [input, setInput] = useState("");
@@ -70,19 +64,21 @@ export default function InviteModal({ open, onClose, roomCode }) {
     onClose();
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        onClick={handleClose}
       >
         <motion.div
           initial={{ scale: 0.9, y: 40 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 40 }}
           className="w-full max-w-md bg-[#1e2235] rounded-2xl shadow-xl p-5 text-white"
+          onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
@@ -159,6 +155,7 @@ export default function InviteModal({ open, onClose, roomCode }) {
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
