@@ -1,9 +1,19 @@
-import { Search, Bell } from 'lucide-react'
+import { Search, Bell } from "lucide-react";
+import NotificationBell from "../../components/NotificationBell";
 
-const  Header=() =>{
-  const now = new Date()
-  const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
-  const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })
+const Header = () => {
+  const now = new Date();
+  const time = now.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const date = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
     <div className="w-full px-8 py-6 border-b bg-gradient-to-b from-slate-900 to-slate-950 border-slate-800">
@@ -30,7 +40,7 @@ const  Header=() =>{
 
           {/* Notification */}
           <button className="relative p-2 transition-colors text-slate-400 hover:text-white">
-            <Bell className="w-6 h-6" />
+            <NotificationBell />
             <span className="absolute w-2 h-2 bg-red-500 rounded-full top-1 right-1" />
           </button>
 
@@ -41,6 +51,6 @@ const  Header=() =>{
         </div>
       </div>
     </div>
-  )
-}
-export default Header
+  );
+};
+export default Header;

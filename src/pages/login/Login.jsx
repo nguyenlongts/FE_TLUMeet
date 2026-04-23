@@ -17,7 +17,7 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [message, setMessage] = useState(null);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
@@ -35,7 +35,12 @@ const LoginPage = () => {
     location.state?.from ||
     sessionStorage.getItem("redirectAfterLogin") ||
     null;
-
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
   const decodeJwt = (token) => {
     try {
       const base64Url = token.split(".")[1];
@@ -78,9 +83,7 @@ const LoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin()=async ()=>{
-    
-  }
+  const handleLogin = async () => {};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,6 +121,7 @@ const LoginPage = () => {
         localStorage.setItem("user", JSON.stringify(userInfo));
 
         login(userInfo, token);
+        setMessage({ type: "success", text: "Đăng nhập thành công 🎉" });
 
         if (from) {
           sessionStorage.removeItem("redirectAfterLogin");
@@ -224,13 +228,29 @@ const LoginPage = () => {
 
         {/* Login Form */}
         <div className="p-8 bg-white border border-gray-200 shadow-xl rounded-2xl">
-          {loginError && (
-            <div className="flex items-start p-4 mb-6 space-x-3 border border-red-200 rounded-lg bg-red-50">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{loginError}</p>
+          {message && (
+            <div
+              className={`flex items-start p-4 mb-6 space-x-3 border rounded-lg ${
+                message.type === "error"
+                  ? "border-red-200 bg-red-50"
+                  : "border-green-200 bg-green-50"
+              }`}
+            >
+              {message.type === "error" ? (
+                <AlertCircle className="w-5 h-5 text-red-600" />
+              ) : (
+                <Check className="w-5 h-5 text-green-600" />
+              )}
+
+              <p
+                className={`text-sm ${
+                  message.type === "error" ? "text-red-700" : "text-green-700"
+                }`}
+              >
+                {message.text}
+              </p>
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div>

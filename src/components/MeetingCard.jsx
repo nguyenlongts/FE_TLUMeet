@@ -1,10 +1,19 @@
-
 import { useState } from "react";
-import { Search, Video, Calendar, Clock, Pencil, Trash2, Plus, Users } from "lucide-react";
+import {
+  Search,
+  Video,
+  Calendar,
+  Clock,
+  Pencil,
+  Trash2,
+  Plus,
+  Users,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import WaitingRoom from "../pages/meetings/WaitingRoom";
-
+import InviteModal from "./InviteModal";
+import { UserPlus } from "lucide-react";
 const AVATAR_COLORS = [
   "from-purple-500 to-violet-600",
   "from-orange-400 to-red-500",
@@ -14,7 +23,11 @@ const AVATAR_COLORS = [
 
 const formatDate = (dt) => {
   const d = new Date(dt);
-  return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  return d.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 };
 
 const formatTime = (dt) => {
@@ -22,34 +35,47 @@ const formatTime = (dt) => {
   return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 };
 const MeetingCard = ({ meeting, onEdit, onDelete }) => {
-  const navigate=useNavigate()
-  const handleJoinMeeting=()=>{
-    navigate(`${meeting.meetingLink}`)
-  }
-  console.log(meeting, 'mtmtmtm');
+  const navigate = useNavigate();
+  const [inviteOpen, setInviteOpen] = useState(false);
+
+  const handleJoinMeeting = () => {
+    navigate(`${meeting.meetingLink}`);
+  };
+  console.log(meeting, "mtmtmtm");
   const canModify = meeting.status !== "started";
 
   return (
-    <div className="rounded-2xl border border-white/8 overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5"
-      style={{ background: "#1e2235" }}>
+    <div
+      className="rounded-2xl border border-white/8 overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5"
+      style={{ background: "#1e2235" }}
+    >
       {/* Card top accent */}
-      <div className="h-1 w-full" style={{ background: "linear-gradient(90deg, #a855f7, #7c3aed)" }} />
+      <div
+        className="h-1 w-full"
+        style={{ background: "linear-gradient(90deg, #a855f7, #7c3aed)" }}
+      />
 
       <div className="flex flex-col gap-3 p-5 flex-1">
         {/* Title + Status */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-white text-sm font-medium leading-snug flex-1">{meeting.title}</h3>
-          <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full font-medium ${
-            canModify
-              ? "text-purple-300 bg-purple-500/15"
-              : "text-emerald-300 bg-emerald-500/15"
-          }`}>
+          <h3 className="text-white text-sm font-medium leading-snug flex-1">
+            {meeting.title}
+          </h3>
+          <span
+            className={`shrink-0 text-xs px-2.5 py-1 rounded-full font-medium ${
+              canModify
+                ? "text-purple-300 bg-purple-500/15"
+                : "text-emerald-300 bg-emerald-500/15"
+            }`}
+          >
             {canModify ? "Upcoming" : "Live"}
           </span>
         </div>
 
         {/* Description */}
-        <p className="text-white/50 text-xs leading-relaxed line-clamp-2">{meeting.description}</p>
+        <p className="text-white/50 text-xs leading-relaxed line-clamp-2">
+          {meeting.description}
+        </p>
 
         {/* Meta */}
         <div className="flex flex-col gap-1.5 mt-1">
@@ -71,15 +97,19 @@ const MeetingCard = ({ meeting, onEdit, onDelete }) => {
           <Users size={12} className="text-white/30" />
           <div className="flex items-center">
             {meeting?.participants?.slice(0, 3).map((p, i) => (
-              <div key={i}
+              <div
+                key={i}
                 className={`w-6 h-6 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center text-white text-xs font-medium border-2 border-[#1e2235]`}
-                style={{ marginLeft: i > 0 ? "-6px" : "0" }}>
+                style={{ marginLeft: i > 0 ? "-6px" : "0" }}
+              >
                 {p}
               </div>
             ))}
             {meeting?.participants?.length > 3 && (
-              <div className="w-6 h-6 rounded-full flex items-center justify-center text-white/50 text-xs border-2 border-[#1e2235] -ml-1.5"
-                style={{ background: "rgba(255,255,255,0.1)" }}>
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center text-white/50 text-xs border-2 border-[#1e2235] -ml-1.5"
+                style={{ background: "rgba(255,255,255,0.1)" }}
+              >
                 +{meeting.participants?.length - 3}
               </div>
             )}
@@ -92,26 +122,43 @@ const MeetingCard = ({ meeting, onEdit, onDelete }) => {
 
       {/* Actions */}
       <div className="flex items-center gap-2 px-5 py-3.5">
-        <button onClick={handleJoinMeeting}
+        <button
+          onClick={handleJoinMeeting}
           className="flex-1 py-2 rounded-lg text-xs font-medium text-white flex items-center justify-center gap-1.5"
-          style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)" }}>
+          style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)" }}
+        >
           <Video size={13} /> Join Now
         </button>
-
+        <button
+          onClick={() => setInviteOpen(true)}
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-purple-400 hover:bg-purple-500/10 transition-colors border border-white/8"
+          title="Invite people"
+        >
+          <UserPlus size={13} />
+        </button>
         {canModify && (
           <>
-            <button onClick={() => onEdit(meeting)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-purple-400 hover:bg-purple-500/10 transition-colors border border-white/8">
+            <button
+              onClick={() => onEdit(meeting)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-purple-400 hover:bg-purple-500/10 transition-colors border border-white/8"
+            >
               <Pencil size={13} />
             </button>
-            <button onClick={() => onDelete(meeting)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-white/8">
+            <button
+              onClick={() => onDelete(meeting)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-white/8"
+            >
               <Trash2 size={13} />
             </button>
           </>
         )}
       </div>
+      <InviteModal
+        open={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+        roomCode={meeting.roomCode}
+      />
     </div>
   );
 };
-export default MeetingCard
+export default MeetingCard;

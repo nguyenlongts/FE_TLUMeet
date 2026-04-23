@@ -1,20 +1,74 @@
-// const API_BASE = import.meta.env.VITE_API_BASE_URL
-//   ? `${import.meta.env.VITE_API_BASE_URL}/api/Notification`
-//   : "https://localhost:7285/api/Notification";
+// Notification Service chạy ở port 5262 (từ launchSettings.json)
+const NOTI_BASE = import.meta.env.VITE_NOTI_API_URL
+  ? `${import.meta.env.VITE_NOTI_API_URL}/api/notification`
+  : "http://localhost:5555/api/notification";
 
-// export const getNotifications = (email, token) =>
-//   fetch(`${API_BASE}?email=${encodeURIComponent(email)}`, {
-//     headers: { Authorization: `Bearer ${token}` },
-//   });
+// Meeting Service chạy ở port 5555
+const MEETING_BASE = import.meta.env.VITE_MEETING_API_URL
+  ? `${import.meta.env.VITE_MEETING_API_URL}/api/meeting`
+  : "http://localhost:5555/api/meeting";
 
-// export const markAllAsRead = (email, token) =>
-//   fetch(`${API_BASE}/read-all?email=${encodeURIComponent(email)}`, {
-//     method: "PUT",
-//     headers: { Authorization: `Bearer ${token}` },
-//   });
+// ── Notification API ─────────────────────────────────────────────────────────
 
-// export const markOneAsRead = (id, token) =>
-//   fetch(`${API_BASE}/${id}/read`, {
-//     method: "PUT",
-//     headers: { Authorization: `Bearer ${token}` },
-//   });
+/** GET /api/notification — lấy tất cả notification của user hiện tại (email lấy từ JWT) */
+export const getNotifications = (token) =>
+  fetch(NOTI_BASE, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+/** PUT /api/notification/read-all */
+export const markAllAsRead = (token) =>
+  fetch(`${NOTI_BASE}/read-all`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+/** PUT /api/notification/{id}/read */
+export const markOneAsRead = (id, token) =>
+  fetch(`${NOTI_BASE}/${id}/read`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+// ── Meeting Invite API ────────────────────────────────────────────────────────
+
+
+export const sendInvites = (roomCode, inviteeEmails, token) =>
+  fetch(`${MEETING_BASE}/${roomCode}/invite`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ inviteeEmails }),
+  });
+
+/**
+ * Invitee chấp nhận lời mời.
+ * POST /api/meeting/invite/{inviteId}/respond
+ * body: { status: "Accepted" }
+ */
+export const acceptInvite = (inviteId, token) =>
+  fetch(`${MEETING_BASE}/invite/${inviteId}/respond`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status: "Accepted" }),
+  });
+
+/**
+ * Invitee từ chối lời mời.
+ * POST /api/meeting/invite/{inviteId}/respond
+ * body: { status: "Rejected" }
+ */
+export const rejectInvite = (inviteId, token) =>
+  fetch(`${MEETING_BASE}/invite/${inviteId}/respond`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status: "Rejected" }),
+  });
