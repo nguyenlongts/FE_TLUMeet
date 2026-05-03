@@ -10,6 +10,8 @@ import MeetingPage from "../pages/meetings/MeetingPage";
 import MeetingRoom from "../pages/meetings/MeetingRoom";
 import Dashboard from "../pages/dashboard/Dashboard";
 import ProfilePage from "../pages/profile/ProfileModal";
+import PublicRoute from "./PublicRote";
+import ForgotPasswordPage from "../components/ForgotPasswordPage";
 const router =createBrowserRouter([
     {
     element: <ProtectedRoute />,      
@@ -26,20 +28,27 @@ const router =createBrowserRouter([
     ],
     },
     {
+      element:<PublicRoute/>,
+      children:[
+        {
         path:"/",
         element:<Home/>
-    },
-    {
+        },
+        {
         path:"/login",
         element:<LoginForm/>
+        },
+        {path:"/register",
+        element:<Register/>
+        },
+        {path:"/forgot-password",
+          element:<ForgotPasswordPage/>
+        }
+      ]
     },
     {
         path:"/waiting-room",
         element:<WaitingRoom/>
-    },
-    {
-        path:"/register",
-        element:<Register/>
     },
     {
       path:"/meet/:roomName",

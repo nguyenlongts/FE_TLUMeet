@@ -4,11 +4,12 @@ import StatCard from '../../components/StatCard'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../redux/features/auth/authSlice'
 import { use, useEffect, useState } from 'react'
-import { useGetAllMeetingByEmailQuery, useJoinMeetingMutation, useLazyCheckRoomCodeQuery } from '../../redux/features/meetings/meetingsApi'
+import { useDeleteMeetingApiMutation, useGetAllMeetingByEmailQuery, useJoinMeetingMutation, useLazyCheckRoomCodeQuery } from '../../redux/features/meetings/meetingsApi'
 import ScheduleMeetingModal from '../meetings/ScheduleMeetingModal'
 import {Form,Input,Button,} from 'antd'
 import WaitingRoom from '../meetings/WaitingRoom'
 import { useNavigate } from 'react-router-dom'
+import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 const JoinLinkModal = ({ isOpen, onClose,pushRoomCode,handleWaiting }) => {
   const [form] = Form.useForm()
   const [roomCode, setRoomCode] = useState()
@@ -133,6 +134,11 @@ const  Dashboard=()=> {
   const [isJoinLinkModalOpen,setIsJoinLinkModalOpen]=useState(false)
   const [isWaitingRoomOpen,setIsWaitingRoomOpen]=useState(false)
   const [roomCode,setRoomCode]=useState()
+  const [editMeeeting,setEditMeeting]=useState()
+
+  const [deleteMeeting,setDeleteMeeting]=useState()
+  const [isDeleteConfirmModalOpen,setIsDeleteConfirmModalOpen]=useState(false)
+  const [deleteMeetingApi, {isLoading:deleteLoading}]=useDeleteMeetingApiMutation()
   const handleJoinLink =async()=>{
     setIsJoinLinkModalOpen(true)
   }
@@ -140,7 +146,23 @@ const  Dashboard=()=> {
       setIsWaitingRoomOpen(false)
       navigate(`/meet/${roomCode}`);    
   }
-  console.log(isWaitingRoomOpen,'iswaitingroomopen');
+  const handleEdit=(meeting)=>{
+    setEditMeeting(meeting)
+    setType("edit")
+    setIsScheduleMeetingModalOpen(true)
+  }
+  // const handleDelete=(meeting)=>{
+  //   setDeleteMeeting(meeting)
+  //   setIsDeleteConfirmModalOpen(true)
+  // }
+  // const confirmDeleteMeeting= async(meeting)=>{
+  //   try {
+  //     const res=await deleteMeetingApi(meeting)
+  //     console.log(res)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-8 mx-auto max-w-7xl">
@@ -217,14 +239,15 @@ const  Dashboard=()=> {
         {/* Meetings Grid */}
         <div className="grid grid-cols-3 gap-6">
           {meetings.map((meeting) => (
-            <MeetingCard key={meeting.id} meeting={meeting} />
+            <MeetingCard key={meeting.id} meeting={meeting} onEdit={handleEdit}/>
           ))}
         </div>
       </div>
       {isScheduleMeetingModalOpen&&<ScheduleMeetingModal isOpen={isScheduleMeetingModalOpen} 
         onClose={()=>setIsScheduleMeetingModalOpen(false)}
         hostEmail={user?.email}
-        type={type}/>
+        type={type}
+        meeting={editMeeeting}/>
       }
       {
         isJoinLinkModalOpen&&<JoinLinkModal isOpen={isJoinLinkModalOpen} onClose={()=>setIsJoinLinkModalOpen(false)}
@@ -233,6 +256,9 @@ const  Dashboard=()=> {
       {
         isWaitingRoomOpen&&<WaitingRoom roomCode={roomCode} userName={user.name} onCancel={()=>setIsWaitingRoomOpen(false)} onHostJoined={onHostJoined}/>
       }
+      {/* {
+        isDeleteConfirmModalOpen&&<DeleteConfirmModal isOpen={isDeleteConfirmModalOpen} onClose={()=>setIsDeleteConfirmModalOpen(false)} meeting={deleteMeeting} onConfirm={confirmDeleteMeeting}/>
+      } */}
     </div>
   )
 }

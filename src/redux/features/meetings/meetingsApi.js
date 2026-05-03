@@ -64,6 +64,13 @@ const meetingsApi = createApi({
         }
       })
     }),
+    deleteMeetingApi: builders.mutation({
+      query: (id)=>({
+        url: `/${id}`,
+        method: "DELETE"
+      }),
+      invalidatesTags:["Meetings"]
+    })
 
   }),
 });
@@ -72,6 +79,7 @@ export const { useScheduleMeetingMutation,useGetAllMeetingByEmailQuery,
   useCheckRoomCodeQuery,useGetStatusMeetingQuery,useEndMeetingMutation,
   useJoinMeetingMutation,useStartMeetingMutation,
   useLazyCheckRoomCodeQuery,
-  useLazyGetStatusMeetingQuery
+  useLazyGetStatusMeetingQuery,
+  useDeleteMeetingApiMutation
 } = meetingsApi;
 export default meetingsApi;

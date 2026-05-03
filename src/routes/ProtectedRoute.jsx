@@ -8,8 +8,6 @@ const ProtectedRoute = () => {
   const refreshToken=useSelector(selectRefreshToken)
     const isStoring=useSelector(selectIsRestoring)
     
-  // Còn refreshToken nghĩa là đang trong quá trình restore session (F5)
-  // → chưa có accessToken nhưng chưa hẳn là chưa đăng nhập
   if(isStoring) return <>Đang tải</>
   if (!refreshToken) {
     return <Navigate to="/login"  />;

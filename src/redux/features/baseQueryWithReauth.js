@@ -29,7 +29,6 @@ export const baseQueryWithReauth=async(args,api,extraOptions)=>{
         )
         if (refreshResult?.data) {
           api.dispatch(setCredentials(refreshResult.data));
-          // Retry lại request gốc với accessToken mới
           result = await baseQuery(args, api, extraOptions);
         } else {
           api.dispatch(logout());

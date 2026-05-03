@@ -4,6 +4,7 @@ import { Search, Video, Calendar, Clock, Pencil, Trash2, Plus, Users } from "luc
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import WaitingRoom from "../pages/meetings/WaitingRoom";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 const AVATAR_COLORS = [
   "from-purple-500 to-violet-600",
@@ -23,12 +24,15 @@ const formatTime = (dt) => {
 };
 const MeetingCard = ({ meeting, onEdit, onDelete }) => {
   const navigate=useNavigate()
+  const [isDeleteConfirmModalOpen,setIsDeleteConfirmModalOpen]=useState(false)
   const handleJoinMeeting=()=>{
     navigate(`${meeting.meetingLink}`)
   }
   console.log(meeting, 'mtmtmtm');
   const canModify = meeting.status !== "started";
-
+  const handleDelete=()=>{
+    setIsDeleteConfirmModalOpen(true)
+  }
   return (
     <div className="rounded-2xl border border-white/8 overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5"
       style={{ background: "#1e2235" }}>
@@ -111,6 +115,9 @@ const MeetingCard = ({ meeting, onEdit, onDelete }) => {
           </>
         )}
       </div>
+      {
+        isDeleteConfirmModalOpen&&<DeleteConfirmModal isOpen={isDeleteConfirmModalOpen} onClose={()=>setIsDeleteConfirmModalOpen(false)} meetingId={meeting?.id} />
+      }
     </div>
   );
 };

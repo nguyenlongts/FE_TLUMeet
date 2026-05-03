@@ -10,7 +10,7 @@ const  ProfilePage=()=> {
   const [saved, setSaved] = useState(false);
   const data=useSelector(selectCurrentUser)
   const {data:user,isLoading,isSuccess}=useGetProfileQuery(data.id)
-  
+  console.log(user)
   const handleSave = () => {
     form.validateFields().then(() => {
       setSaved(true);
