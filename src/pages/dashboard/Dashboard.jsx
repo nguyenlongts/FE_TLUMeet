@@ -286,7 +286,7 @@ const Dashboard = () => {
             <div className="text-left">
               <div>Join Meeting</div>
               <div className="text-xs font-normal text-slate-400">
-                Via Invitation Link
+                Via Room Code
               </div>
             </div>
           </button>
