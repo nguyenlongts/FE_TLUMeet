@@ -6,9 +6,11 @@ import router from "./routes/router.jsx";
 import { Provider } from 'react-redux'
 import {store} from './redux/store.js'
 import AuthProvider from "./components/AuthProvider.jsx";
+import { Toaster } from "react-hot-toast";
 createRoot(document.getElementById('root')).render(
   <Provider store={store} >
     <AuthProvider>
+      <Toaster position="top-right" reverseOrder={false} />
       <RouterProvider router={router}/>
     </AuthProvider>
   </Provider>

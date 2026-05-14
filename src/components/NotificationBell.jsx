@@ -55,10 +55,10 @@ export default function NotificationBell() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={handleOpen}
-        className="relative flex items-center justify-center w-11 h-11 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+        className="relative flex cursor-pointer transform hover:scale-120 items-center justify-center w-11 h-11  text-gray-700 rounded-lg hover:text-white transition"
         aria-label="Thông báo"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
             {unreadCount > 99 ? "99+" : unreadCount}

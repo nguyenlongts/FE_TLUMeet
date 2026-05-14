@@ -64,7 +64,6 @@ const CalendarPage = () => {
     currentYear === today.getFullYear();
 
   const selectedMeetings = selectedDate ? getMeetingsForDay(selectedDate) : [];
-
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-8 mx-auto max-w-7xl flex gap-6">

@@ -12,14 +12,14 @@ const authApi = createApi({
   endpoints: (builders) => ({
     registerNewUser: builders.mutation({
       query: (newUser) => ({
-        url: `/register`,
+        url: `/Auth/register`,
         method: "POST",
         body: newUser,
       }),
     }),
     loginUser: builders.mutation({
       query: (data) => ({
-        url: `/login`,
+        url: `/Auth/login`,
         method: "POST",
         body: data,
       }),
@@ -27,7 +27,7 @@ const authApi = createApi({
 
     logoutUser: builders.mutation({
       query: () => ({
-        url: "/logout",
+        url: `/Auth/logout`,
         method: "POST",
       }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {

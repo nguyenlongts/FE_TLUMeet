@@ -88,7 +88,7 @@ function MeetingsPage() {
   );
 
   const totalPages = Math.ceil(filteredMeetings.length / pageSize);
-  const paginatedMeetings = filteredMeetings.slice(
+  const paginatedMeetings = filteredMeetings?.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );

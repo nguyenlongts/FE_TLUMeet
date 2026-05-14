@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { Search, Bell } from 'lucide-react'
-
-const  Header=() =>{
-  const now = new Date()
-  const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
-  const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })
-=======
 import { Search, Bell } from "lucide-react";
 import NotificationBell from "../../components/NotificationBell";
 
@@ -22,7 +14,6 @@ const Header = () => {
     day: "numeric",
     year: "numeric",
   });
->>>>>>> 36a6b7d8809e4371d7c74f682a251b448c7a0b80
 
   return (
     <div className="w-full px-8 py-6 border-b bg-gradient-to-b from-slate-900 to-slate-950 border-slate-800">

@@ -146,11 +146,11 @@ const  Dashboard=()=> {
       setIsWaitingRoomOpen(false)
       navigate(`/meet/${roomCode}`);    
   }
-  const handleEdit=(meeting)=>{
-    setEditMeeting(meeting)
-    setType("edit")
-    setIsScheduleMeetingModalOpen(true)
-  }
+  // const handleEdit=(meeting)=>{
+  //   setEditMeeting(meeting)
+  //   setType("edit")
+  //   setIsScheduleMeetingModalOpen(true)
+  // }
   // const handleDelete=(meeting)=>{
   //   setDeleteMeeting(meeting)
   //   setIsDeleteConfirmModalOpen(true)
@@ -163,6 +163,7 @@ const  Dashboard=()=> {
   //     console.log(error)
   //   }
   // }
+  console.log(user, "ú")
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-8 mx-auto max-w-7xl">
@@ -239,7 +240,7 @@ const  Dashboard=()=> {
         {/* Meetings Grid */}
         <div className="grid grid-cols-3 gap-6">
           {meetings.map((meeting) => (
-            <MeetingCard key={meeting.id} meeting={meeting} onEdit={handleEdit}/>
+            <MeetingCard key={meeting.id} meeting={meeting}/>
           ))}
         </div>
       </div>

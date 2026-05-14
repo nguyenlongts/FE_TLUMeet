@@ -1,24 +1,82 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Form, Input, DatePicker, Button, ConfigProvider, theme } from "antd";
 import { Camera, CheckCircle2, Save } from "lucide-react";
 import dayjs from "dayjs";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../redux/features/auth/authSlice";
-import {useGetProfileQuery} from '../../redux/features/user/userApi'
+import {useGetProfileQuery, useUpdateUserMutation, useUploadAvatarMutation} from '../../redux/features/user/userApi'
+import { resizeImage } from "../../utils/resizeImage";
+import toast from "react-hot-toast";
 const  ProfilePage=()=> {
   const [form] = Form.useForm();
   const [saved, setSaved] = useState(false);
   const data=useSelector(selectCurrentUser)
-  const {data:user,isLoading,isSuccess}=useGetProfileQuery(data.id)
-  console.log(user)
-  const handleSave = () => {
-    form.validateFields().then(() => {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
-    });
-  };
 
-  return (
+  const {data:user,isLoading,isSuccess}=useGetProfileQuery(data.id)
+  const [uploadAvatar, {isLoading:isUploadAvatarLoading}] = useUploadAvatarMutation()
+  const [updateProfile] =useUpdateUserMutation()
+
+
+  const [pendingAvatar, setPendingAvatar] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState(null)
+  const fileInputRef = useRef(null)
+
+  
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const resizedImage= await resizeImage(file,400,400)
+    const previewUrl= URL.createObjectURL(resizedImage)
+    setPreviewUrl(URL.createObjectURL(resizedImage))
+    setPendingAvatar({file:resizedImage,previewUrl})
+
+    // const formData = new FormData()
+    // formData.append('avatar', resizedImage)
+
+    // try {
+    //   await uploadAvatar(formData).unwrap()
+    //   toast.success('Cập nhật ảnh thành công!')
+    // } catch (err) {
+    //   toast.error(err?.data?.message || 'Upload thất bại')
+    //   setPreviewUrl(null)
+    // }
+  }
+  const handleSave =async () => {
+    try {
+      await form.validateFields()
+      const values= form.getFieldsValue()
+      let avatarUrlUp = user?.avatar;
+      if (pendingAvatar) {
+        const fd = new FormData();
+        fd.append("avatar", pendingAvatar.file);
+        const result = await uploadAvatar(fd).unwrap();
+        avatarUrlUp = result.avatarUrl;
+      }
+      await updateProfile({
+        userId: data.id,
+        ...values,
+        avatarUrl: avatarUrlUp
+      }).unwrap
+      toast.success("Cập nhật thành công!")
+    } catch (error) {
+      toast.error(error?.data?.message || "Cập nhật thất bại")
+    }
+  };
+  useEffect(() => {
+  if (user) {
+    form.setFieldsValue({
+      name: user.name,
+      email: user.email,
+      birthday: user.birthday ? dayjs(user.birthday) : null,
+      address: user.address,
+    })
+  }
+  }, [user])
+
+  const avatarSrc = previewUrl ?? user.avatarUrl ?? null  
+  return(
     <ConfigProvider
       theme={{
         algorithm: theme.darkAlgorithm,
@@ -59,15 +117,33 @@ const  ProfilePage=()=> {
             <p className="text-sm text-[#5a5478] mt-1">Cập nhật ảnh và thông tin của bạn</p>
           </div>
 
-          {/* Avatar row */}
+
           <div className="flex items-center gap-5">
             <div className="relative shrink-0">
-              <div className="flex items-center justify-center w-20 h-20 text-2xl font-semibold text-white rounded-full select-none bg-gradient-to-br from-violet-400 to-pink-500">
-                AN
-              </div>
-              <button className="absolute bottom-0.5 right-0.5 w-6 h-6 rounded-full bg-violet-600 border-2 border-[#150f2a] flex items-center justify-center hover:bg-violet-500 transition-colors">
+                {avatarSrc ? (
+                  <img
+                      src={avatarSrc}
+                      className="w-20 h-20 rounded-full object-cover"
+                      alt="avatar"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-20 h-20 text-2xl font-semibold text-white rounded-full select-none bg-gradient-to-br from-violet-400 to-pink-500">
+                      {user?.name?.[0]?.toUpperCase() ?? "U"}
+                    </div>
+                  )}
+              <button
+                onClick={()=> fileInputRef.current.click()}
+               className="absolute bottom-0.5 right-0.5 w-6 h-6 rounded-full bg-violet-600 border-2 border-[#150f2a] flex items-center justify-center hover:bg-violet-500 transition-colors">
                 <Camera size={11} className="text-white" />
               </button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </div>
 
             <div>
@@ -78,7 +154,7 @@ const  ProfilePage=()=> {
               </span>
             </div>
 
-            <button className="ml-auto text-xs text-violet-400 border border-[#3a2f6a] rounded-full px-4 py-1.5 hover:bg-violet-900/30 transition-colors">
+            <button onClick={() => fileInputRef.current.click()} className="ml-auto text-xs text-violet-400 border border-[#3a2f6a] rounded-full px-4 py-1.5 hover:bg-violet-900/30 transition-colors">
               Đổi ảnh
             </button>
           </div>
@@ -142,7 +218,7 @@ const  ProfilePage=()=> {
               <div className="flex items-center justify-end gap-3">
                 <Button
                   onClick={handleSave}
-                  className="flex items-center gap-2 !bg-gradient-to-r !from-violet-600 !to-purple-500 !border-0 !text-white !rounded-xl !font-medium !px-6 !h-[42px] hover:!opacity-90"
+                  className="flex items-center gap-2 !bg-violet-500 !border-0 !text-white !rounded-xl  !px-6 !h-[42px] hover:!opacity-90 hover:!scale-105"
                   icon={<Save size={15} />}
                 >
                   Lưu thay đổi
@@ -152,7 +228,7 @@ const  ProfilePage=()=> {
           </Form>
 
         </div>
-      {/* </div> */}
+
     </ConfigProvider>
   );
 }

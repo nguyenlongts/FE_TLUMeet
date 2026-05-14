@@ -6,7 +6,7 @@ import { selectAccessToken, selectIsRestoring, selectRefreshToken } from "../red
 const ProtectedRoute = () => {
   const accessToken = useSelector(selectAccessToken);
   const refreshToken=useSelector(selectRefreshToken)
-    const isStoring=useSelector(selectIsRestoring)
+  const isStoring=useSelector(selectIsRestoring)
     
   if(isStoring) return <>Đang tải</>
   if (!refreshToken) {

@@ -50,6 +50,7 @@ export const endMeeting = (roomCode, token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
+  //1
 export const sendInvites = (roomCode, emails, token) =>
   fetch(`${API_BASE}/${roomCode}/invite`, {
     method: "POST",
@@ -60,6 +61,8 @@ export const sendInvites = (roomCode, emails, token) =>
     body: JSON.stringify({ inviteeEmails: emails }),
   });
 
+
+  //2
 export const acceptInvite = (inviteId, token) =>
   fetch(`${API_BASE}/invite/${inviteId}/respond`, {
     method: "POST",
@@ -70,6 +73,7 @@ export const acceptInvite = (inviteId, token) =>
     body: JSON.stringify({ status: "Accepted" }),
   });
 
+  //2
 export const rejectInvite = (inviteId, token) =>
   fetch(`${API_BASE}/invite/${inviteId}/respond`, {
     method: "POST",

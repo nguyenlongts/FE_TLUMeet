@@ -8,12 +8,14 @@ import {
   Trash2,
   Plus,
   Users,
+  Edit,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import WaitingRoom from "../pages/meetings/WaitingRoom";
 import InviteModal from "./InviteModal";
 import { UserPlus } from "lucide-react";
+import ScheduleMeetingModal from "../pages/meetings/ScheduleMeetingModal";
 const AVATAR_COLORS = [
   "from-purple-500 to-violet-600",
   "from-orange-400 to-red-500",
@@ -34,40 +36,43 @@ const formatTime = (dt) => {
   const d = new Date(dt);
   return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 };
-const MeetingCard = ({ meeting, onEdit, onDelete }) => {
+const MeetingCard = ({ meeting, onDelete }) => {
   const navigate=useNavigate()
+  const user=useSelector((state)=>state.auth.user)
+  const [isEdit,setIsEdit]=useState(false)
   const [isDeleteConfirmModalOpen,setIsDeleteConfirmModalOpen]=useState(false)
-  const handleJoinMeeting=()=>{
-    navigate(`${meeting.meetingLink}`)
-  }
-  console.log(meeting, 'mtmtmtm');
-  const canModify = meeting.status !== "started";
   const handleDelete=()=>{
     setIsDeleteConfirmModalOpen(true)
   }
-  // return (
-  //   <div className="rounded-2xl border border-white/8 overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5"
-  //     style={{ background: "#1e2235" }}>
-  //     {/* Card top accent */}
-  //     <div className="h-1 w-full" style={{ background: "linear-gradient(90deg, #a855f7, #7c3aed)" }} />
-  const navigate = useNavigate();
   const [inviteOpen, setInviteOpen] = useState(false);
 
   const handleJoinMeeting = () => {
     navigate(`${meeting.meetingLink}`);
   };
-  console.log(meeting, "mtmtmtm");
   const canModify = meeting.status !== "started";
-
-  return (
+  const statusColor = {
+    Scheduled: "text-purple-300 bg-purple-500/15",
+    Live: "text-emerald-300 bg-emerald-500/15",
+    Ended: "text-red-300 bg-red-500/15",
+    WaitingForHost: "text-yellow-300 bg-yellow-500/15",
+  };
+  const onEdit = () => {
+    setIsEdit(true);
+  }
+  return (  
     <div
-      className="rounded-2xl border border-white/8 overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5"
+      className="rounded-2xl border border-white/8 overflow-hidden flex flex-col transition-transform
+       hover:-translate-y-0.5"
       style={{ background: "#1e2235" }}
     >
-      {/* Card top accent */}
       <div
         className="h-1 w-full"
-        style={{ background: "linear-gradient(90deg, #a855f7, #7c3aed)" }}
+        style={{
+          background:
+            meeting.hostName === user?.email
+              ? "linear-gradient(90deg, #a855f7, #7c3aed)"
+              : "linear-gradient(90deg, #60a5fa, #60a5fa)",
+        }}
       />
 
       <div className="flex flex-col gap-3 p-5 flex-1">
@@ -78,12 +83,10 @@ const MeetingCard = ({ meeting, onEdit, onDelete }) => {
           </h3>
           <span
             className={`shrink-0 text-xs px-2.5 py-1 rounded-full font-medium ${
-              canModify
-                ? "text-purple-300 bg-purple-500/15"
-                : "text-emerald-300 bg-emerald-500/15"
+              statusColor[meeting.status] || "text-white/50 bg-white/10"
             }`}
           >
-            {canModify ? "Upcoming" : "Live"}
+            {meeting.status.toUpperCase()}
           </span>
         </div>
 
@@ -95,20 +98,20 @@ const MeetingCard = ({ meeting, onEdit, onDelete }) => {
         {/* Meta */}
         <div className="flex flex-col gap-1.5 mt-1">
           <div className="flex items-center gap-2 text-white/40 text-xs">
-            <Calendar size={12} className="text-purple-400" />
+            <Calendar size={12} className="text-cyan-400" />
             <span>{formatDate(meeting.scheduledDateTime)}</span>
             <span className="text-white/20">•</span>
-            <Clock size={12} className="text-purple-400" />
+            <Clock size={12} className="text-cyan-400" />
             <span>{formatTime(meeting.scheduledDateTime)}</span>
           </div>
           <div className="flex items-center gap-2 text-white/40 text-xs">
-            <Clock size={12} className="text-purple-400" />
+            <Clock size={12} className="text-cyan-400" />
             <span>{meeting.duration} minutes</span>
           </div>
         </div>
 
         {/* Participants */}
-        <div className="flex items-center gap-2 mt-1">
+        {/* <div className="flex items-center gap-2 mt-1">
           <Users size={12} className="text-white/30" />
           <div className="flex items-center">
             {meeting?.participants?.slice(0, 3).map((p, i) => (
@@ -129,7 +132,7 @@ const MeetingCard = ({ meeting, onEdit, onDelete }) => {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Divider */}
@@ -155,13 +158,13 @@ const MeetingCard = ({ meeting, onEdit, onDelete }) => {
           <>
             <button
               onClick={() => onEdit(meeting)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-purple-400 hover:bg-purple-500/10 transition-colors border border-white/8"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-sky-400/50 hover:text-sky-600 hover:bg-purple-500/10 transition-colors border border-white/8"
             >
               <Pencil size={13} />
             </button>
             <button
               onClick={() => onDelete(meeting)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-white/8"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-400/50 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-white/8"
             >
               <Trash2 size={13} />
             </button>
@@ -173,6 +176,13 @@ const MeetingCard = ({ meeting, onEdit, onDelete }) => {
         onClose={() => setInviteOpen(false)}
         roomCode={meeting.roomCode}
       />
+      {isEdit&&<ScheduleMeetingModal isOpen={isEdit} 
+        onClose={()=>setIsEdit(false)}
+        hostEmail={user?.email}
+        type={"edit"}
+        meeting={meeting}/>
+      }
+
       {
       isDeleteConfirmModalOpen&&<DeleteConfirmModal isOpen={isDeleteConfirmModalOpen} onClose={()=>setIsDeleteConfirmModalOpen(false)} meetingId={meeting?.id} />
       }

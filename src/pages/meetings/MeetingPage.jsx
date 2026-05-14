@@ -13,7 +13,6 @@ const AVATAR_COLORS = [
 const MeetingPage = () => {
   const user=useSelector(selectCurrentUser)
   const {data,isLoading:isDataLoading}=useGetAllMeetingByEmailQuery(user.email)
-  console.log(data,"mtmtmtmtm");
   const meetings=data?.data;
   // const [meetings, setMeetings] = useState(MOCK_MEETINGS);
   const [search, setSearch] = useState("");
@@ -23,7 +22,7 @@ const MeetingPage = () => {
   const filtered = meetings?.filter((m) =>
     m.title.toLowerCase().includes(search.toLowerCase())
   );
-
+  console.log(filtered,"filttt");
   const handleSave = (form) => {
     // setMeetings((prev) =>
     //   prev.map((m) => (m.id === editTarget.id ? { ...m, ...form, duration: Number(form.duration) } : m))
@@ -82,7 +81,6 @@ const MeetingPage = () => {
             <MeetingCard
               key={m.id}
               meeting={m}
-              onEdit={setEditTarget}
               onDelete={setDeleteTarget}
             />
           ))}

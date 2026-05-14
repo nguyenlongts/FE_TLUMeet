@@ -29,10 +29,13 @@ const  NavItem=({
   )
 }
 
-
 const Sidebar=()=> {
   const [activeView,setActiveView]=useState("home")
   const navigate=useNavigate()
+  const handleLogout=()=>{
+    localStorage.removeItem("refreshToken")
+    navigate("/login")
+  }
   return (
     <div className="flex flex-col items-center w-56 h-screen gap-12 py-8 border-r bg-linear-to-b from-slate-900 to-slate-950 border-slate-800">
       {/* Logo */}
@@ -83,13 +86,12 @@ const Sidebar=()=> {
         
       </nav>
 
-      {/* Log Out */}
       <div className="flex items-center justify-start gap-2 px-4 py-2 mt-auto transition transform border cursor-pointer rounded-xl hover:bg-slate-800 hover:scale-105">
         <LogOut className='text-white'/>
         <button
           icon={LogOut}
           active={false}
-          onClick={() => console.log('Logout')}
+          onClick={() => handleLogout()}
           className="cursor-pointer text-slate-300 hover:text-red-400 hover:bg-red-900/20">
             Log out
         </button>

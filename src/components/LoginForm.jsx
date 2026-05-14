@@ -6,47 +6,46 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectAccessToken, setCredentials } from '../redux/features/auth/authSlice'
 import toast from 'react-hot-toast'
 const  LoginForm=()=> {
-    const navigate =useNavigate()
-    const location=useLocation()
-    const from=location.state?.from?.pathname?? "/dashboard"
-    const dispatch=useDispatch()
-    const [shouldNavigate,setShouldNavigate]=useState(false)
-    const accessToken=useSelector(selectAccessToken)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const dispatch = useDispatch()
+  const from = location.state?.from?.pathname ?? "/dashboard"
+
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-    const [loginUser,{isLoading,isSuccess}]=useLoginUserMutation()
-  const handleSubmit =async (e) => {
-    e.preventDefault()
-    try {
-        const res=await loginUser({
-            email:email,
-            password:password
-        }).unwrap()
+  const [loginUser, { isLoading }] = useLoginUserMutation()
 
-        dispatch(
-            setCredentials({
-              user: {
-                id:res.data.id,
-                email:res.data.email,
-                name:res.data.name,
-              },
-              accessToken: res.data.token,
-              refreshToken: res.data.refreshToken,
-            }),
-          );
-        setShouldNavigate(true)
-        toast.success('Đăng nhập thành công')
-    } catch (error) {
-        toast.error('Đăng nhập thất bại', error)
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await loginUser({ email, password }).unwrap()
+
+            // Decode JWT để lấy role
+            const payload = JSON.parse(atob(res.data.token.split('.')[1]))
+
+            dispatch(setCredentials({
+            user: {
+                id: res.data.id,
+                email: res.data.email,
+                name: res.data.name,
+                role: payload.role, // ✅ lấy từ JWT payload
+            },
+            accessToken: res.data.token,
+            refreshToken: res.data.refreshToken,
+            }))
+
+            toast.success(res.message)
+            navigate(payload?.role?.toLowerCase() === 'admin' ? '/admin' : from, { replace: true })
+
+        } catch (error) {
+            const message =
+            error?.data?.message ||  
+            error?.message ||         
+            'Đã xảy ra lỗi khi đăng nhập, thử lại sau' 
+            toast.error(message,{position: 'top-center'})
+        }
     }
-  }
-
-  useEffect(() => {
-  if (shouldNavigate && accessToken) {
-    navigate(from, { replace: true })
-  }
-    }, [accessToken, shouldNavigate])
   return (
     <div className='flex items-center justify-center h-screen  bg-[#0b0919]'>
         <div className="p-8 bg-[#150f2a] border border-[#2a2245] rounded-lg w-lg">
@@ -56,7 +55,7 @@ const  LoginForm=()=> {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
-                    {/* Email Input */}
+
                     <div className="relative">
                     <label className="block mb-2 text-sm font-medium text-white">
                         Email Address
@@ -68,12 +67,11 @@ const  LoginForm=()=> {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter your email"
-                        className="w-full py-3 pl-12 pr-4  border  rounded-xl tracking-widest text-[#5a5478] placeholder-slate-500 focus:border-black"
+                        className="w-full py-3 pl-12 pr-4 outline-none focus:border-purple-500  border  rounded-xl tracking-widest text-[#5a5478] placeholder-slate-500"
                         />
                     </div>
                     </div>
 
-                    {/* Password Input */}
                     <div className="relative">
                     <label className="block mb-2 text-sm font-medium text-white">
                         Password
@@ -85,7 +83,7 @@ const  LoginForm=()=> {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter your password"
-                        className="w-full py-3 pl-12 pr-4 border tracking-widest text-[#5a5478]  rounded-xl placeholder-slate-500 focus:border-black "
+                        className="w-full py-3 pl-12 pr-4 focus:border-purple-500 outline-none border tracking-widest text-[#5a5478]  rounded-xl placeholder-slate-500  "
                         />
                         <button
                         type="button"
@@ -101,7 +99,6 @@ const  LoginForm=()=> {
                     </div>
                     </div>
 
-                    {/* Remember Me & Forgot Password */}
                     <div className="flex items-center justify-between text-sm">
                     <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -115,15 +112,19 @@ const  LoginForm=()=> {
                     </a>
                     </div>
 
-                    {/* Submit Button */}
+
                     <button
                     type="submit"
-                    className="w-full py-3 font-semibold text-white transition-all duration-300 shadow-lg !bg-gradient-to-r !from-violet-600 !to-purple-500 rounded-xl hover:shadow-blue-500/50 hover:shadow-2xl cursor-pointer  transform hover:scale-105"
+                    disabled={isLoading}
+                    className={`w-full py-3 font-semibold text-white transition-all duration-300 shadow-lg !bg-gradient-to-r !from-violet-600 !to-purple-500 
+                        rounded-xl hover:shadow-blue-500/50 hover:shadow-2xl cursor-pointer 
+                         transform hover:scale-105
+                         ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                     Sign In
                     </button>
 
-                    {/* Divider */}
+  
                     <div className="relative py-4">
                     <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-slate-700/50"></div>
@@ -152,7 +153,6 @@ const  LoginForm=()=> {
                     </div>
                 </form>
 
-                {/* Toggle to Register */}
                 <p className="mt-6 text-center text-slate-400">
                     Don&apos;t have an account?{' '}
                     <button
