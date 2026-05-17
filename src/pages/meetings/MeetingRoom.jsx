@@ -178,9 +178,17 @@ export default function MeetingRoom() {
           roomFullName = `${res.appId}/${res.roomName}`;
           jaasToken = res.token;
         } else {
-          // Guest / participant: vào thẳng không cần JWT
-          roomFullName = `${import.meta.env.VITE_JAAS_APP_ID}/${roomName}`;
-          jaasToken = null;
+          // Guest: lấy JWT từ backend với isModerator: false để có đúng appId
+          const res = await generateJaasToken({
+            roomName,
+            userName: userName || "Guest",
+            email: userEmail,
+            isModerator: false,
+            avatarUrl: "",
+            expiresInMinutes: 120,
+          }).unwrap();
+          roomFullName = `${res.appId}/${res.roomName}`;
+          jaasToken = res.token;
         }
 
         // Khởi tạo Jitsi
@@ -227,7 +235,8 @@ export default function MeetingRoom() {
         apiRef.current.addEventListener("readyToClose", goHome);
 
       } catch (err) {
-        setStatus(s => ({ ...s, error: err.message }));
+        const msg = err?.data?.error || err?.data?.message || err?.message || "Không thể khởi tạo phòng họp";
+        setStatus(s => ({ ...s, error: msg }));
         console.log(err);
       }
     };
