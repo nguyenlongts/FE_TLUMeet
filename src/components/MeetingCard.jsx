@@ -16,6 +16,7 @@ import WaitingRoom from "../pages/meetings/WaitingRoom";
 import InviteModal from "./InviteModal";
 import { UserPlus } from "lucide-react";
 import ScheduleMeetingModal from "../pages/meetings/ScheduleMeetingModal";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 const AVATAR_COLORS = [
   "from-purple-500 to-violet-600",
   "from-orange-400 to-red-500",
@@ -163,7 +164,7 @@ const MeetingCard = ({ meeting, onDelete }) => {
               <Pencil size={13} />
             </button>
             <button
-              onClick={() => onDelete(meeting)}
+              onClick={() => setIsDeleteConfirmModalOpen(true)}
               className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-400/50 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-white/8"
             >
               <Trash2 size={13} />
@@ -180,7 +181,7 @@ const MeetingCard = ({ meeting, onDelete }) => {
         onClose={()=>setIsEdit(false)}
         hostEmail={user?.email}
         type={"edit"}
-        meeting={meeting}/>
+        editMeeting={meeting}/>
       }
 
       {

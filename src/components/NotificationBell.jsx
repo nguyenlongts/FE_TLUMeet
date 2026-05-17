@@ -47,7 +47,7 @@ export default function NotificationBell() {
   };
 
   const handleClickNoti = (noti) => {
-    if (!noti.isRead) markOneRead(noti.notificationId); // ← field BE trả về
+    if (!noti.isRead) markOneRead(noti.notificationId);
     setOpen(false);
   };
 

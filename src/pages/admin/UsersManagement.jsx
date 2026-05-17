@@ -400,10 +400,10 @@ export default function UsersManagement() {
   const [page, setPage] = useState(1)
   const [modal, setModal] = useState(null) 
 
-  const {data:usersData, isLoading:isUsersLoading} =  useGetUsersQuery()
+  const {data:usersDataRaw, isLoading:isUsersLoading} =  useGetUsersQuery()
+  const usersData=usersDataRaw?.data
   const [deleteUser, {isLoading:isDeleteUserLoading}] = useDeleteUserMutation()
-  console.log(usersData, "usersData")
-  const filtered = usersData?.filter(u => {
+  const filtered = (usersData??[]).filter(u => {
     const q = search.toLowerCase()
     const matchQ = !q || u.userName.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
     const matchR = roleFilter   === 'all' || u.role   === roleFilter

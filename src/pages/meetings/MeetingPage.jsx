@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Search, Video, Calendar, Clock, Pencil, Trash2, Plus, Users } from "lucide-react";
-import { useGetAllMeetingByEmailQuery } from "../../redux/features/meetings/meetingsApi";
+import { useDeleteMeetingApiMutation, useGetAllMeetingByEmailQuery, useGetMeetingInvitedQuery } from "../../redux/features/meetings/meetingsApi";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../redux/features/auth/authSlice";
 import MeetingCard from "../../components/MeetingCard";
+import DeleteModal from "../../components/DeleteModal";
+import toast from "react-hot-toast";
 const AVATAR_COLORS = [
   "from-purple-500 to-violet-600",
   "from-orange-400 to-red-500",
@@ -12,28 +14,49 @@ const AVATAR_COLORS = [
 ];
 const MeetingPage = () => {
   const user=useSelector(selectCurrentUser)
-  const {data,isLoading:isDataLoading}=useGetAllMeetingByEmailQuery(user.email)
-  const meetings=data?.data;
-  // const [meetings, setMeetings] = useState(MOCK_MEETINGS);
+  const {data:meetingsDataRaw,isLoading:isDataLoading}=useGetAllMeetingByEmailQuery(user.email)
+  const {data:invitedDataRaw, isLoading: isInvitedDataLoading} = useGetMeetingInvitedQuery();
+  const [deleteMeeting, {isLoading}]=useDeleteMeetingApiMutation()
   const [search, setSearch] = useState("");
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
+  const meetings = useMemo(() => {
+    const owned = meetingsDataRaw?.data ?? [];
+    const invited = invitedDataRaw?.data ?? [];
+    const merged = [...owned, ...invited];
+    const seen = new Set();
+    return merged.filter((m) => {
+      if (seen.has(m._id)) return false;
+      seen.add(m._id);
+      return true;
+    });
+  }, [meetingsDataRaw, invitedDataRaw]);
+
   const filtered = meetings?.filter((m) =>
     m.title.toLowerCase().includes(search.toLowerCase())
   );
-  console.log(filtered,"filttt");
+  console.log(editTarget,"edt")
   const handleSave = (form) => {
     // setMeetings((prev) =>
     //   prev.map((m) => (m.id === editTarget.id ? { ...m, ...form, duration: Number(form.duration) } : m))
     // );
     // setEditTarget(null);
+    console.log(form)
   };
 
-  const handleDelete = () => {
-    // setMeetings((prev) => prev.filter((m) => m.id !== deleteTarget.id));
-    // setDeleteTarget(null);
-  };
+  // const handleDelete =async () => {
+  //   setMeetings((prev) => prev.filter((m) => m.id !== deleteTarget.id));
+  //   setDeleteTarget(null);
+  //   try {
+  //     const res= await deleteMeeting(deleteTarget?.id).unwrap()
+  //     setDeleteTarget(null)
+  //     toast.success("Đã xóa phòng thành công")
+  //   } catch (error) {
+  //     console.log(error)
+  //     toast.error("Xảy ra lỗi khi xóa phòng")
+  //   }
+  // };
   console.log(isDataLoading);
   
   if(isDataLoading) return <p className="text-white">Đang tải...</p>
@@ -95,20 +118,20 @@ const MeetingPage = () => {
       )}
 
       {/* Modals */}
-      {editTarget && (
+      {/* {editTarget && (
         <EditModal
           meeting={editTarget}
           onClose={() => setEditTarget(null)}
           onSave={handleSave}
         />
-      )}
-      {deleteTarget && (
+      )} */}
+      {/* {deleteTarget && (
         <DeleteModal
           meeting={deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
         />
-      )}
+      )} */}
     </div>
   );
 };

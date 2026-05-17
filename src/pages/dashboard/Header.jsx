@@ -1,7 +1,13 @@
 import { Search, Bell } from "lucide-react";
 import NotificationBell from "../../components/NotificationBell";
+import { useSelector } from "react-redux";
+import { useGetProfileQuery } from "../../redux/features/user/userApi";
+import { selectCurrentUser } from "../../redux/features/auth/authSlice";
 
 const Header = () => {
+  const data=useSelector(selectCurrentUser)
+  const {data:userData,isLoading}=useGetProfileQuery(data?.id)
+  const avatarSrc=userData?.avatarUrl ?? null;
   const now = new Date();
   const time = now.toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -41,13 +47,20 @@ const Header = () => {
           {/* Notification */}
           <div className="relative p-2 transition-colors text-slate-400 hover:text-white">
             <NotificationBell />
-            <span className="absolute w-2 h-2 bg-red-500 rounded-full top-1 right-1" />
+            {/* <span className="absolute w-2 h-2 bg-red-500 rounded-full top-1 right-1" /> */}
           </div>
 
-          {/* User Avatar */}
-          <div className="flex items-center justify-center w-10 h-10 text-sm font-bold text-white transition-shadow rounded-full cursor-pointer bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 hover:shadow-lg hover:shadow-purple-500/50">
-            J
-          </div>
+          {avatarSrc ? (
+                  <img
+                      src={avatarSrc}
+                      className="w-10 h-10 rounded-full object-cover"
+                      alt="avatar"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-10 h-10 text-2xl font-semibold text-white rounded-full select-none bg-gradient-to-br from-violet-400 to-pink-500">
+                      {userData?.name?.[0]?.toUpperCase() ?? "U"}
+                    </div>
+          )}
         </div>
       </div>
     </div>

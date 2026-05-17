@@ -33,7 +33,7 @@ export default function Home() {
         return;
       }
       const formJoin={
-        roomCode:roomCode ,userEmail:null, guestName:guestName
+        roomCode:roomCode ,userEmail:null, userName:guestName
       }
       console.log(formJoin);
       

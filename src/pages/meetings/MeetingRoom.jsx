@@ -45,7 +45,7 @@ export default function MeetingRoom() {
   const authHeader = { Authorization: `Bearer ${token?token:tokenGuest}`};
   const [generateJaasToken]=useGenerateJaasTokenMutation()
 
-  //check meeting status
+
   useEffect(() => {
     (async () => {
       try {

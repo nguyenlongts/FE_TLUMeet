@@ -99,13 +99,13 @@ const AddUserModal = ({ onClose, onAdd }) => {
         </Field>
 
         {/* Role */}
-        <Field label="Vai trò">
+        {/* <Field label="Vai trò">
           <select value={form.role} onChange={e => set('role', e.target.value)} className={fieldCls()}>
             <option value="User">User</option>
             <option value="Manager">Manager</option>
             <option value="Admin">Admin</option>
           </select>
-        </Field>
+        </Field> */}
 
         {/* Auto password */}
         <Field label="Mật khẩu (tự động)">

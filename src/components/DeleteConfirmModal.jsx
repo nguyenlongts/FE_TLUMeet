@@ -1,5 +1,7 @@
 import { Trash2, X, AlertTriangle } from "lucide-react";
 import { useDeleteMeetingApiMutation } from "../redux/features/meetings/meetingsApi";
+import { createPortal } from "react-dom";
+import toast from "react-hot-toast";
 
 const DeleteConfirmModal = ({
   isOpen,
@@ -16,15 +18,15 @@ const DeleteConfirmModal = ({
   };
   const onConfirm=async()=>{
     try {
-      const res=await deleteMeetingApi(meetingId)
-      console.log(res)
+      const res=await deleteMeetingApi(meetingId).unwrap()
+      toast.success("Xóa phòng thành công")
     } catch (error) {
       console.log(error)
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+  return createPortal(
+    <div className="fixed inset-0 z-99999 flex items-center justify-center p-4 bg-black/60">
       <div
         className="w-full max-w-md rounded-2xl overflow-hidden border border-white/8"
         style={{ background: "#1a1d2e" }}
@@ -88,7 +90,8 @@ const DeleteConfirmModal = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

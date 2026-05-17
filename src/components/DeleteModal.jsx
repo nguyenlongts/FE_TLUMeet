@@ -1,4 +1,9 @@
-const DeleteModal = ({ meeting, onClose, onConfirm }) => (
+import { Search, Video, Calendar, Clock, Pencil, Trash2, Plus, Users } from "lucide-react";
+import { createPortal } from "react-dom";
+
+
+const DeleteModal = ({ meeting, onClose, onConfirm }) => {
+  return createPortal(
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
     <div className="w-full max-w-sm rounded-2xl overflow-hidden border border-white/8" style={{ background: "#1a1d2e" }}>
       <div className="flex items-center justify-between px-6 py-5" style={{ background: "linear-gradient(135deg, #ef4444, #b91c1c)" }}>
@@ -30,6 +35,7 @@ const DeleteModal = ({ meeting, onClose, onConfirm }) => (
         </div>
       </div>
     </div>
-  </div>
-);
+  </div>,
+  document.body
+)};
 export default DeleteModal

@@ -43,7 +43,7 @@ const AVATAR_COLORS = [
   'linear-gradient(135deg,#f59e0b,#d97706)',
 ]
 const avatarColor = str => AVATAR_COLORS[(str?.charCodeAt(0) || 0) % AVATAR_COLORS.length]
-const getInitials = (title = '') => title.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?'
+const getInitials = (title = '') => title?.split(' ')?.slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?'
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
@@ -168,10 +168,10 @@ function AddMeetingModal({ onClose, onAdd }) {
     setLoading(true)
     await new Promise(r => setTimeout(r, 700))
     const newMeeting = {
-      _id: Math.random().toString(36).slice(2),
+      _id: Math.random().toString(36)?.slice(2),
       meetingId: 4000 + Math.floor(Math.random() * 1000),
       title: form.title,
-      roomCode: Math.random().toString(36).slice(2, 10),
+      roomCode: Math.random().toString(36)?.slice(2, 10),
       hostEmail: form.hostEmail,
       status: form.status,
       createdAt: new Date().toISOString(),
@@ -261,7 +261,7 @@ export default function MeetingsManagement() {
 
   const totalPages = Math.max(1, Math.ceil(filtered?.length / PAGE_SIZE))
   const currentPage = Math.min(page, totalPages)
-  const pageData = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  const pageData = filtered?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   const addMeeting = m => { setMeetings(p => [m, ...p]); setPage(1) }
   const changeStatus = (id, status) => setMeetings(p => p.map(m => m._id === id ? { ...m, status } : m))

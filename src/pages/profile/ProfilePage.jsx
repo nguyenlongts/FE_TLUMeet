@@ -52,7 +52,7 @@ const  ProfilePage=()=> {
         const fd = new FormData();
         fd.append("avatar", pendingAvatar.file);
         const result = await uploadAvatar(fd).unwrap();
-        avatarUrlUp = result.avatarUrl;
+        avatarUrlUp = result?.avatarUrl;
       }
       await updateProfile({
         userId: data.id,
@@ -75,7 +75,7 @@ const  ProfilePage=()=> {
   }
   }, [user])
 
-  const avatarSrc = previewUrl ?? user.avatarUrl ?? null  
+  const avatarSrc = previewUrl ?? user?.avatarUrl ?? null  
   return(
     <ConfigProvider
       theme={{
@@ -148,7 +148,7 @@ const  ProfilePage=()=> {
 
             <div>
               <p className="text-sm font-medium text-white">{user?.name}</p>
-              <p className="text-xs text-[#5a5478] mt-0.5">Product Designer</p>
+              {/* <p className="text-xs text-[#5a5478] mt-0.5">Product Designer</p> */}
               <span className="inline-block mt-2 text-[11px] bg-violet-900/50 text-violet-300 px-3 py-0.5 rounded-full border border-violet-700/40">
                 Pro Member
               </span>

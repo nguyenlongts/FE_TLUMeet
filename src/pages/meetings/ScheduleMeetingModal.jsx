@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Video, X, Calendar, Clock, User, Pencil } from "lucide-react";
-import { useScheduleMeetingMutation } from "../../redux/features/meetings/meetingsApi";
+import { useScheduleMeetingMutation, useUpdateMeetingApiMutation } from "../../redux/features/meetings/meetingsApi";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
@@ -10,7 +10,8 @@ const optionsRequireHostToStart = [
   { value: false, label: "Không cần host" },
 ];
 
-const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type }) => {
+const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) => {
+  console.log(editMeeting)
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
@@ -21,7 +22,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type }) => {
   });
 
   const [scheduleMeeting, { isLoading }] = useScheduleMeetingMutation();
-
+  const [updateMeeting, { isLoading: isUpdating }] = useUpdateMeetingApiMutation();
 
   useEffect(() => {
     if (type === "now") {
@@ -34,7 +35,6 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleSubmit = async () => {
     if (!formData.title || !formData.scheduledDateTime) return;
 
@@ -49,14 +49,20 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type }) => {
     };
 
     try {
-      const res = await scheduleMeeting(payload);
-      if (type === "now") navigate(`${res.data.data.meetingLink}`);
-      onClose();
+    if (type === "edit") {
+      // Gửi id của meeting cần update
+      await updateMeeting({ id: editMeeting.id,roomCode:editMeeting.roomCode, ...payload }).unwrap();
+      toast.success("Cập nhật thành công");
+    } else {
+      const res = await scheduleMeeting(payload).unwrap();
+      if (type === "now") navigate(`${res.data.meetingLink}`);
       toast.success("Lên lịch thành công");
-    } catch (err) {
-      console.error(err);
-      toast.error("Đã xảy ra lỗi");
     }
+    onClose();
+  } catch (err) {
+    console.error(err);
+    toast.error("Đã xảy ra lỗi");
+  }
   };
 
   const handleClose = () => {
@@ -64,9 +70,24 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type }) => {
     setFormData({ title: "", description: "", scheduledDateTime: "", duration: 60, requireHostToStart: false });
   };
 
+  useEffect(() => {
+  if (type === "edit" && editMeeting) {
+    setFormData({
+      title: editMeeting.title || "",
+      description: editMeeting.description || "",
+      scheduledDateTime: editMeeting.scheduledDateTime
+        ? new Date(editMeeting.scheduledDateTime).toISOString().slice(0, 16) // format cho input datetime-local
+        : "",
+      duration: editMeeting.duration || 60,
+      requireHostToStart: editMeeting.requireHostToStart ?? false,
+    });
+  }
+  }, [type, editMeeting]);
+
   if (!isOpen) return null;
 
   const isEdit = type === "edit";
+
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/60">
       <div
