@@ -191,7 +191,7 @@ export default function Home() {
                         />
                       )
                     }
-                    iconPosition="end"
+                    iconPlacement="end"
                   >
                     {isLoading ? "Đang kiểm tra..." : "Tham gia ngay"}
                   </Button>

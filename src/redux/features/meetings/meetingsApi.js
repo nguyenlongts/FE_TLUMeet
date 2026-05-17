@@ -24,6 +24,13 @@ const meetingsApi = createApi({
       }),
       providesTags: ["Meetings"],
     }),
+    getInvitedMeetings: builders.query({
+      query: () => ({
+        url: `/invited`,
+        method: "GET",
+      }),
+      providesTags: ["Meetings"],
+    }),
     scheduleMeeting: builders.mutation({
       query: (data) => ({
         method: "POST",
@@ -89,6 +96,7 @@ const meetingsApi = createApi({
 });
 
 export const { useScheduleMeetingMutation,useGetAllMeetingByEmailQuery,
+  useGetInvitedMeetingsQuery,
   useCheckRoomCodeQuery,useGetStatusMeetingQuery,useEndMeetingMutation,
   useJoinMeetingMutation,useStartMeetingMutation,
   useLazyCheckRoomCodeQuery,

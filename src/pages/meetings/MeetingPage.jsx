@@ -67,7 +67,7 @@ const MeetingPage = () => {
         <div>
           <h1 className="text-white text-2xl font-semibold">Meetings</h1>
           <p className="text-white/40 text-sm mt-1">
-            {meetings?.length} total · {meetings.filter((m) => m.status === "upcoming")?.length} upcoming
+            {meetings?.length} total · {meetings?.filter((m) => m.status === "upcoming")?.length} upcoming
           </p>
         </div>
 

@@ -63,11 +63,19 @@ function RegisterPage() {
     return "#22c55e";
   };
 
+  const getStrengthColor = () => {
+    if (passwordStrength < 40) return "#ef4444";
+    if (passwordStrength < 70) return "#eab308";
+    return "#22c55e";
+  };
+
   const getPasswordStrengthText = () => {
     if (passwordStrength < 40) return "Yếu";
     if (passwordStrength < 70) return "Trung bình";
     return "Mạnh";
   };
+
+  const getStrengthText = getPasswordStrengthText;
 
   const validateForm = () => {
     const newErrors = {};

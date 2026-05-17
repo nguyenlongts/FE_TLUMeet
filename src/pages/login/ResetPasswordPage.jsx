@@ -1,6 +1,7 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { Lock, Eye, EyeOff, ArrowLeft, AlertCircle } from "lucide-react";
+import { useResetPasswordMutation } from "../../redux/features/auth/authApi";
 
 function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -14,6 +15,7 @@ function ResetPasswordPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [resetPassword] = useResetPasswordMutation();
 
   const submit = async (e) => {
     e.preventDefault();
@@ -25,29 +27,10 @@ function ResetPasswordPage() {
 
     try {
       setLoading(true);
-
-      const res = await fetch(
-        "https://kiritsu2210-001-site1.rtempurl.com/api/auth/reset-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            token,
-            newPassword: password,
-          }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("Đặt lại mật khẩu thành công");
-        navigate("/login");
-      } else {
-        setError(data.message || "Đặt lại mật khẩu thất bại");
-      }
-    } catch {
-      setError("Không thể kết nối máy chủ");
+      await resetPassword({ token, newPassword: password }).unwrap();
+      navigate("/login", { state: { message: "Đặt lại mật khẩu thành công" } });
+    } catch (err) {
+      setError(err?.data?.message || "Đặt lại mật khẩu thất bại");
     } finally {
       setLoading(false);
     }

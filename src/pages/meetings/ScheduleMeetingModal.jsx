@@ -6,28 +6,34 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 
 const optionsRequireHostToStart = [
-  { value: true,  label: "Cần host để bắt đầu" },
+  { value: true, label: "Cần host để bắt đầu" },
   { value: false, label: "Không cần host" },
 ];
 
-const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) => {
-  console.log(editMeeting)
+const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     scheduledDateTime: "",
     duration: 60,
-    requireHostToStart: false,  
+    requireHostToStart: false,
   });
-
+  const getLocalMin = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    const local = new Date(now.getTime() - offset * 60000);
+    return local.toISOString().slice(0, 16);
+  };
   const [scheduleMeeting, { isLoading }] = useScheduleMeetingMutation();
-  const [updateMeeting, { isLoading: isUpdating }] = useUpdateMeetingApiMutation();
 
   useEffect(() => {
     if (type === "now") {
-      const date = new Date(Date.now()); 
-      setFormData((prev) => ({ ...prev, scheduledDateTime: date.toISOString() }));
+      const date = new Date(Date.now() + 30 * 1000);
+      setFormData((prev) => ({
+        ...prev,
+        scheduledDateTime: date.toISOString(),
+      }));
     }
   }, [type]);
 
@@ -37,13 +43,18 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
   };
   const handleSubmit = async () => {
     if (!formData.title || !formData.scheduledDateTime) return;
+    const selected = new Date(formData.scheduledDateTime);
+    const now = new Date();
 
-    const localDate = new Date(formData.scheduledDateTime);
+    if (selected < now) {
+      toast.error("Không thể tạo lịch trong quá khứ");
+      return;
+    }
     const payload = {
       hostEmail,
       title: formData.title,
       description: formData.description,
-      scheduledDateTime: localDate.toISOString(),
+      scheduledDateTime: selected.toISOString(),
       duration: Number(formData.duration),
       requireHostToStart: formData.requireHostToStart,
     };
@@ -67,7 +78,13 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
 
   const handleClose = () => {
     onClose();
-    setFormData({ title: "", description: "", scheduledDateTime: "", duration: 60, requireHostToStart: false });
+    setFormData({
+      title: "",
+      description: "",
+      scheduledDateTime: "",
+      duration: 60,
+      requireHostToStart: false,
+    });
   };
 
   useEffect(() => {
@@ -86,10 +103,9 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
 
   if (!isOpen) return null;
 
-  const isEdit = type === "edit";
-
-  return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/60">
+  const isEdit = false;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
       <div
         className="w-full max-w-lg rounded-2xl overflow-hidden border border-white/8"
         style={{ background: "#1a1d2e" }}
@@ -105,7 +121,9 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
             </div>
             <div>
               <p className="text-white text-sm font-medium">
-                {type === "schedule" ? "Schedule New Meeting" : "Start Meeting Now"}
+                {type === "schedule"
+                  ? "Schedule New Meeting"
+                  : "Start Meeting Now"}
               </p>
               <p className="text-white/70 text-xs">Start New Meeting</p>
             </div>
@@ -122,7 +140,9 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
         <div className="flex flex-col gap-4 p-6">
           {/* Title */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs uppercase tracking-wider text-white/50">Title</label>
+            <label className="text-xs uppercase tracking-wider text-white/50">
+              Title
+            </label>
             <input
               name="title"
               value={formData.title}
@@ -135,7 +155,9 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
 
           {/* Description */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs uppercase tracking-wider text-white/50">Description</label>
+            <label className="text-xs uppercase tracking-wider text-white/50">
+              Description
+            </label>
             <textarea
               name="description"
               value={formData.description}
@@ -159,9 +181,13 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
                   type="datetime-local"
                   name="scheduledDateTime"
                   value={formData.scheduledDateTime}
+                  min={getLocalMin()}
                   onChange={handleChange}
                   className="w-full rounded-lg px-3.5 py-2.5 text-xs text-white border border-white/10 outline-none focus:border-purple-500 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.06)", colorScheme: "dark" }}
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    colorScheme: "dark",
+                  }}
                 />
               </div>
             )}
@@ -197,11 +223,15 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
             >
               <div
                 className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium text-white shrink-0"
-                style={{ background: "linear-gradient(135deg, #f97316, #ef4444)" }}
+                style={{
+                  background: "linear-gradient(135deg, #f97316, #ef4444)",
+                }}
               >
                 {hostEmail?.charAt(0).toUpperCase()}
               </div>
-              <span className="text-white text-sm flex-1 truncate">{hostEmail}</span>
+              <span className="text-white text-sm flex-1 truncate">
+                {hostEmail}
+              </span>
               <span
                 className="text-white/40 text-xs px-2 py-0.5 rounded-full"
                 style={{ background: "rgba(255,255,255,0.08)" }}
@@ -230,14 +260,16 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
                     <input
                       type="radio"
                       name="requireHostToStart"
-
                       checked={formData.requireHostToStart === option.value}
                       onChange={() =>
-                        setFormData((prev) => ({ ...prev, requireHostToStart: option.value }))
+                        setFormData((prev) => ({
+                          ...prev,
+                          requireHostToStart: option.value,
+                        }))
                       }
                       className="sr-only"
                     />
-   
+
                     <div
                       className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
                         formData.requireHostToStart === option.value
@@ -270,10 +302,14 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               onClick={handleSubmit}
               disabled={isLoading}
               className="flex-[2] cursor-pointer py-3 rounded-lg text-sm font-medium text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
-              style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)" }}
+              style={{
+                background: "linear-gradient(135deg, #a855f7, #7c3aed)",
+              }}
             >
               {isEdit ? <Pencil size={16} /> : <Video size={16} />}
-              {isLoading ? "Loading..." : isEdit ? "Save Changes" : "Create Meeting"}
+              {/* {submitLabel} */}
+
+              {isLoading ? "Loading..." : "Create Meeting"}
             </button>
           </div>
         </div>

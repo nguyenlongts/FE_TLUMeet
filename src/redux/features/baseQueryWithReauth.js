@@ -13,7 +13,7 @@ const baseQuery=fetchBaseQuery({
 export const baseQueryWithReauth=async(args,api,extraOptions)=>{
     let result=await baseQuery(args,api,extraOptions)
     if(result?.error?.status==401){
-        const refreshToken=api.getState().refreshToken
+        const refreshToken=api.getState().auth.refreshToken
         if (!refreshToken){
             api.dispatch(logout())
             return result

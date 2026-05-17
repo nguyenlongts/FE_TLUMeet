@@ -12,11 +12,9 @@ import MeetingRoom from "../pages/meetings/MeetingRoom";
 import Dashboard from "../pages/dashboard/Dashboard";
 import ProfilePage from "../pages/profile/ProfilePage";
 import AppLayout from "../components/AppLayout";
-import AdminLayout from "../components/AdminLayout";
-import AdminHome from "../pages/admin/AdminHome";
-import UsersManagement from "../pages/admin/UsersManagement";
-import StatsPage from "../pages/admin/stats/StatsPage";
-import MeetingsManagement from "../pages/admin/meetings/MeetingsManagement";
+import ForgotPasswordPage from "../components/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/login/ResetPasswordPage";
+import ChangePasswordPage from "../pages/login/ChangePasswordPage";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +22,8 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/login", element: <LoginForm /> },
+      { path: "/forgot-password", element: <ForgotPasswordPage /> },
+      { path: "/reset-password", element: <ResetPasswordPage /> },
       { path: "/register", element: <Register /> },
       { path: "/waiting-room", element: <WaitingRoom /> },
       { path: "/meet/:roomName", element: <MeetingRoom /> },
@@ -38,6 +38,7 @@ const router = createBrowserRouter([
               { path: "/calendar", element: <CalendarPage /> },
               { path: "/profile", element: <ProfilePage /> },
               { path: "/meetings", element: <MeetingPage /> },
+              { path: "/change-password", element: <ChangePasswordPage /> },
             ],
           },
         ],

@@ -1,225 +1,105 @@
-import React, { useState } from "react";
-import { Lock, Eye, EyeOff, ArrowLeft, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import DashboardHeader from "../../components/DashboardHeader";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { useChangePasswordMutation } from "../../redux/features/auth/authApi";
+import { logout } from "../../redux/features/auth/authSlice";
 
 function ChangePasswordPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [changePassword, { isLoading }] = useChangePasswordMutation();
 
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-
   const [errors, setErrors] = useState({});
-  const [show, setShow] = useState({
-    current: false,
-    new: false,
-    confirm: false,
-  });
-  const [loading, setLoading] = useState(false);
+  const [show, setShow] = useState({ current: false, new: false, confirm: false });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
-  const validateForm = () => {
+  const validate = () => {
     const err = {};
-
-    if (!formData.currentPassword) {
-      err.currentPassword = "Vui lòng nhập mật khẩu hiện tại";
-    }
-
-    if (!formData.newPassword) {
-      err.newPassword = "Vui lòng nhập mật khẩu mới";
-    } else if (formData.newPassword.length < 6) {
-      err.newPassword = "Mật khẩu mới tối thiểu 6 ký tự";
-    }
-
-    if (formData.confirmPassword !== formData.newPassword) {
-      err.confirmPassword = "Xác nhận mật khẩu không khớp";
-    }
-
+    if (!formData.currentPassword) err.currentPassword = "Vui lòng nhập mật khẩu hiện tại";
+    if (!formData.newPassword) err.newPassword = "Vui lòng nhập mật khẩu mới";
+    else if (formData.newPassword.length < 6) err.newPassword = "Mật khẩu mới tối thiểu 6 ký tự";
+    if (formData.confirmPassword !== formData.newPassword) err.confirmPassword = "Xác nhận mật khẩu không khớp";
     setErrors(err);
     return Object.keys(err).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
-
+    if (!validate()) return;
     try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-      const payload = {
+      await changePassword({
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword,
-      };
-      const res = await fetch(
-        "https://kiritsu2210-001-site1.rtempurl.com/api/Auth/change-password",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.returnCode === 200) {
-        alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
-        localStorage.removeItem("token");
-        navigate("/login");
-      } else {
-        setErrors({
-          api: data.message || "Đổi mật khẩu thất bại",
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      setErrors({ api: "Không thể kết nối máy chủ" });
-    } finally {
-      setLoading(false);
+      }).unwrap();
+      toast.success("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
+      dispatch(logout());
+      navigate("/login");
+    } catch (err) {
+      toast.error(err?.data?.message || "Đổi mật khẩu thất bại");
     }
   };
 
+  const inputClass =
+    "w-full px-4 py-3 bg-[#1e1a35] border border-[#2a2245] rounded-xl text-white placeholder-[#3d3860] focus:outline-none focus:border-violet-500 transition";
+
+  const fields = [
+    { key: "currentPassword", label: "MẬT KHẨU HIỆN TẠI", showKey: "current" },
+    { key: "newPassword", label: "MẬT KHẨU MỚI", showKey: "new" },
+    { key: "confirmPassword", label: "XÁC NHẬN MẬT KHẨU MỚI", showKey: "confirm" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <DashboardHeader />
+    <div className="flex-1 flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-[#150f2a] border border-[#2a2245] rounded-2xl p-8">
+        <h1 className="text-xl font-semibold text-white mb-1">Đổi mật khẩu</h1>
+        <p className="text-sm text-[#5a5478] mb-6">Nhập mật khẩu hiện tại và mật khẩu mới của bạn</p>
 
-      {/* Content */}
-      <div className="flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {fields.map(({ key, label, showKey }) => (
+            <div key={key}>
+              <label className="text-[11px] tracking-widest font-medium text-white uppercase">
+                {label}
+              </label>
+              <div className="relative mt-1">
+                <input
+                  type={show[showKey] ? "text" : "password"}
+                  name={key}
+                  value={formData[key]}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShow((prev) => ({ ...prev, [showKey]: !prev[showKey] }))}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5a5478] hover:text-violet-400"
+                >
+                  {show[showKey] ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {errors[key] && <p className="text-red-400 text-xs mt-1">{errors[key]}</p>}
+            </div>
+          ))}
+
           <button
-            onClick={() => navigate("/dashboard")}
-            className="flex items-center text-gray-600 hover:text-indigo-600 mb-6"
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-3 mt-2 bg-gradient-to-r from-violet-600 to-purple-500 text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50"
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Quay lại
+            {isLoading ? "Đang xử lý..." : "Đổi mật khẩu"}
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Đổi mật khẩu
-          </h1>
-          <p className="text-gray-500 mb-6">
-            Vui lòng nhập mật khẩu hiện tại và mật khẩu mới
-          </p>
-          {errors.api && (
-            <div className="flex items-center space-x-2 bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg mb-4">
-              <AlertCircle className="w-5 h-5" />
-              <span className="text-sm">{errors.api}</span>
-            </div>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Current Password */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Mật khẩu hiện tại
-              </label>
-              <div className="relative mt-1">
-                <input
-                  type={show.current ? "text" : "password"}
-                  name="currentPassword"
-                  value={formData.currentPassword}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShow({ ...show, current: !show.current })}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                >
-                  {show.current ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.currentPassword && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.currentPassword}
-                </p>
-              )}
-            </div>
-
-            {/* New Password */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Mật khẩu mới
-              </label>
-              <div className="relative mt-1">
-                <input
-                  type={show.new ? "text" : "password"}
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShow({ ...show, new: !show.new })}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                >
-                  {show.new ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.newPassword && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.newPassword}
-                </p>
-              )}
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className="text-sm font-medium text-gray-700">
-                Xác nhận mật khẩu
-              </label>
-              <div className="relative mt-1">
-                <input
-                  type={show.confirm ? "text" : "password"}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShow({ ...show, confirm: !show.confirm })}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                >
-                  {show.confirm ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold disabled:opacity-50"
-            >
-              {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
-            </button>
-          </form>
-        </div>
+        </form>
       </div>
     </div>
   );

@@ -1,6 +1,8 @@
 import { Home, Calendar, Video, Settings, LogOut, CirclePlus, User } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { logout } from '../../redux/features/auth/authSlice'
 
 
 const  NavItem=({
@@ -32,10 +34,7 @@ const  NavItem=({
 const Sidebar=()=> {
   const [activeView,setActiveView]=useState("home")
   const navigate=useNavigate()
-  const handleLogout=()=>{
-    localStorage.removeItem("refreshToken")
-    navigate("/login")
-  }
+  const dispatch=useDispatch()
   return (
     <div className="flex flex-col items-center w-56 h-screen gap-12 py-8 border-r bg-linear-to-b from-slate-900 to-slate-950 border-slate-800">
       {/* Logo */}
@@ -81,7 +80,10 @@ const Sidebar=()=> {
           icon={Settings}
           label="Setting"
           active={activeView === 'settings'}
-          onClick={() => setActiveView('settings')}
+          onClick={() => {
+            navigate("/change-password")
+            setActiveView('settings')
+          }}
         />
         
       </nav>
@@ -89,9 +91,7 @@ const Sidebar=()=> {
       <div className="flex items-center justify-start gap-2 px-4 py-2 mt-auto transition transform border cursor-pointer rounded-xl hover:bg-slate-800 hover:scale-105">
         <LogOut className='text-white'/>
         <button
-          icon={LogOut}
-          active={false}
-          onClick={() => handleLogout()}
+          onClick={() => dispatch(logout())}
           className="cursor-pointer text-slate-300 hover:text-red-400 hover:bg-red-900/20">
             Log out
         </button>

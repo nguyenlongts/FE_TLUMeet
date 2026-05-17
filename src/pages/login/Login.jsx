@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -144,7 +144,6 @@ const LoginPage = () => {
     navigate("/", { replace: true });
   };
 
-  // Forgot Password Handlers
   const handleForgotPasswordClick = () => {
     setShowForgotPassword(true);
     setForgotEmail("");
@@ -317,6 +316,14 @@ const LoginPage = () => {
                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
               )}
             </div>
+
+            {/* Login Error */}
+            {loginError && (
+              <div className="flex items-start p-4 space-x-3 border border-red-200 rounded-lg bg-red-50">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700">{loginError}</p>
+              </div>
+            )}
 
             {/* Login Button */}
             <button
