@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Bell, X, ChevronRight, Check, XCircle, Video, Loader2 } from "lucide-react";
+import { Bell, X, ChevronRight, Check, XCircle, Video, Loader2, ChevronDown, Hash, Clock, User } from "lucide-react";
 import { useNotification } from "../context/NotificationContext";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -41,11 +41,10 @@ function NotiIcon({ type }) {
   );
 }
 
-function NotiActions({ noti, onClose }) {
+function NotiActions({ noti, onClose, status, setStatus }) {
   const navigate = useNavigate();
   const token = useSelector(selectAccessToken);
-  const { markOneRead, fetchNotifications } = useNotification();
-  const [status, setStatus] = useState("idle");
+  const { markOneRead } = useNotification();
 
   if (noti.type === "MeetingStarted") {
     let joinLink = "#";
@@ -141,10 +140,63 @@ function NotiActions({ noti, onClose }) {
   return null;
 }
 
-function NotiRow({ noti, onRead, onClose, expanded = false }) {
+function NotiDetail({ noti }) {
+  let payload = {};
+  try { payload = JSON.parse(noti.payload) ?? {}; } catch {}
+
+  const title = payload.title || payload.meetingTitle;
+  const host = payload.hostName || payload.hostEmail;
+  const roomCode = payload.roomCode;
+  const scheduledAt = payload.scheduledDateTime || payload.scheduledAt;
+  const duration = payload.duration;
+
+  if (!title && !host && !roomCode && !scheduledAt) return null;
+
+  return (
+    <div className="mt-2 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2.5 flex flex-col gap-1.5">
+      {title && (
+        <p className="text-xs font-medium text-slate-200 truncate">{title}</p>
+      )}
+      {host && (
+        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+          <User className="w-3 h-3 shrink-0" />
+          <span className="truncate">{host}</span>
+        </div>
+      )}
+      {roomCode && (
+        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+          <Hash className="w-3 h-3 shrink-0" />
+          <span className="font-mono tracking-wider">{roomCode}</span>
+        </div>
+      )}
+      {scheduledAt && (
+        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+          <Clock className="w-3 h-3 shrink-0" />
+          <span>
+            {new Date(scheduledAt).toLocaleString("vi-VN", {
+              day: "2-digit", month: "2-digit", year: "numeric",
+              hour: "2-digit", minute: "2-digit",
+            })}
+            {duration ? ` · ${duration} phút` : ""}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotiRow({ noti, onRead, onClose }) {
+  const [open, setOpen] = useState(false);
+  const [actionStatus, setActionStatus] = useState("idle");
+
+  const handleClick = () => {
+    if (!noti.isRead) onRead(noti.notificationId);
+    setOpen((p) => !p);
+  };
+
   return (
     <div
-      onClick={() => { if (!noti.isRead) onRead(noti.notificationId); }}
+      onClick={handleClick}
       className={`flex items-start gap-3 px-4 py-3 cursor-pointer transition ${
         !noti.isRead
           ? "bg-violet-500/[0.08] hover:bg-violet-500/[0.12]"
@@ -153,15 +205,25 @@ function NotiRow({ noti, onRead, onClose, expanded = false }) {
     >
       <NotiIcon type={noti.type} />
       <div className="flex-1 min-w-0">
-        <p
-          className={`text-sm leading-snug ${
-            !noti.isRead ? "text-slate-100 font-medium" : "text-slate-400"
-          }`}
-        >
-          {noti.title}
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p
+            className={`text-sm leading-snug flex-1 ${
+              !noti.isRead ? "text-slate-100 font-medium" : "text-slate-400"
+            }`}
+          >
+            {noti.title}
+          </p>
+          <ChevronDown
+            className={`w-3.5 h-3.5 text-slate-500 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+          />
+        </div>
         <p className="text-xs text-slate-500 mt-0.5">{timeAgo(noti.createdAt)}</p>
-        {expanded && <NotiActions noti={noti} onClose={onClose} />}
+        {open && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <NotiDetail noti={noti} />
+            <NotiActions noti={noti} onClose={onClose} status={actionStatus} setStatus={setActionStatus} />
+          </div>
+        )}
       </div>
       {!noti.isRead && (
         <span className="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0 mt-1.5" />
@@ -224,7 +286,6 @@ function NotificationPanel({ onClose }) {
                 noti={noti}
                 onRead={markOneRead}
                 onClose={onClose}
-                expanded
               />
             ))
           )}
@@ -313,7 +374,6 @@ export default function NotificationBell() {
                     noti={noti}
                     onRead={markOneRead}
                     onClose={() => setOpen(false)}
-                    expanded={false}
                   />
                 ))
               )}

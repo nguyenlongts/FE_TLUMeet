@@ -63,6 +63,7 @@ const meetingsApi = createApi({
         url: `/meeting/${roomCode}/end`,
         method: "POST",
       }),
+      invalidatesTags: ["Meetings"],
     }),
     joinMeeting: builders.mutation({
       query: (data) => ({

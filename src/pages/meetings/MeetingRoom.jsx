@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {useSelector} from 'react-redux'
 import { selectAccessToken, selectCurrentUser } from "../../redux/features/auth/authSlice";
 import { useGenerateJaasTokenMutation } from "../../redux/features/jass/jaasApi";
+import { useEndMeetingMutation } from "../../redux/features/meetings/meetingsApi";
 import { useTranslation } from "react-i18next";
 
 const JAAS_CONFIG = {
@@ -45,7 +46,8 @@ export default function MeetingRoom() {
 
   const tokenGuest=sessionStorage.getItem("joinToken")
   const authHeader = { Authorization: `Bearer ${token?token:tokenGuest}`};
-  const [generateJaasToken]=useGenerateJaasTokenMutation()
+  const [generateJaasToken] = useGenerateJaasTokenMutation()
+  const [endMeeting] = useEndMeetingMutation()
 
 
   useEffect(() => {
@@ -207,6 +209,7 @@ export default function MeetingRoom() {
             prejoinPageEnabled:  false,
             enableWelcomePage:   false,
             disableDeepLinking:  true,
+            inviteUrl:           `${window.location.origin}/meet/${roomName}`,
           },
           interfaceConfigOverwrite: {
             SHOW_JITSI_WATERMARK:      false,
@@ -221,15 +224,17 @@ export default function MeetingRoom() {
         apiRef.current.addEventListener("videoConferenceJoined", () => {
           setJitsiReady(true);
           setHasJoined(true);
+          try {
+            apiRef.current?.executeCommand("overwriteConfig", {
+              inviteUrl: `${window.location.origin}/meet/${roomName}`,
+            });
+          } catch (_) {}
         });
 
 
         apiRef.current.addEventListener("videoConferenceLeft", async () => {
-          // Host rời → end meeting
           if (isModerator) {
-            await fetch(`${JAAS_CONFIG.meetingUrl}/${roomName}/end`, {
-              method: "POST", headers: authHeader,
-            }).catch(() => {});
+            await endMeeting(roomName).catch(() => {});
           }
           goHome();
         });
