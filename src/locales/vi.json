@@ -1,0 +1,537 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "save": "Lưu thay đổi",
+    "cancel": "Hủy",
+    "notUpdated": "Chưa cập nhật"
+  },
+  "login": {
+    "welcome": "Chào Mừng Trở Lại",
+    "subtitle": "Đăng nhập vào tài khoản của bạn để tiếp tục",
+    "emailLabel": "Địa chỉ Email",
+    "emailPlaceholder": "Nhập email của bạn",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu của bạn",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "forgotPassword": "Quên mật khẩu?",
+    "signIn": "Đăng Nhập",
+    "signingIn": "Đang đăng nhập...",
+    "orContinueWith": "Hoặc tiếp tục với",
+    "noAccount": "Chưa có tài khoản?",
+    "signUp": "Đăng Ký",
+    "toast": {
+      "loginError": "Đã xảy ra lỗi khi đăng nhập, thử lại sau"
+    }
+  },
+  "register": {
+    "title": "Tạo Tài Khoản",
+    "subtitle": "Tham gia cộng đồng TLUHub ngay hôm nay",
+    "fullNameLabel": "Họ và Tên",
+    "fullNamePlaceholder": "Nguyễn Văn A",
+    "emailLabel": "Địa chỉ Email",
+    "emailPlaceholder": "Nhập email của bạn",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu của bạn",
+    "confirmPasswordLabel": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+    "passwordStrength": "Độ mạnh mật khẩu",
+    "strength": {
+      "weak": "Yếu",
+      "medium": "Trung bình",
+      "strong": "Mạnh"
+    },
+    "terms": "Tôi đồng ý với",
+    "termsLink": "Điều khoản dịch vụ",
+    "and": "và",
+    "privacyLink": "Chính sách bảo mật",
+    "signUp": "Đăng Ký",
+    "signingUp": "Đang đăng ký...",
+    "orContinueWith": "Hoặc tiếp tục với",
+    "hasAccount": "Đã có tài khoản?",
+    "signIn": "Đăng Nhập",
+    "validation": {
+      "fullNameRequired": "Họ tên không được để trống",
+      "fullNameMin": "Họ tên phải có ít nhất 2 ký tự",
+      "fullNameInvalid": "Họ tên không được chứa số hoặc ký tự đặc biệt",
+      "emailRequired": "Email không được để trống",
+      "emailInvalid": "Email không hợp lệ",
+      "passwordRequired": "Mật khẩu không được để trống",
+      "passwordMin": "Mật khẩu phải có ít nhất 6 ký tự",
+      "confirmPasswordRequired": "Vui lòng xác nhận mật khẩu",
+      "confirmPasswordMismatch": "Mật khẩu xác nhận không khớp"
+    },
+    "toast": {
+      "success": "Đăng ký thành công!",
+      "error": "Có lỗi xảy ra. Vui lòng thử lại sau."
+    }
+  },
+  "dashboard": {
+    "title": "Cuộc họp",
+    "loading": "Đang tải dashboard...",
+    "stats": {
+      "numberOfMeetings": "Số cuộc họp",
+      "rescheduled": "Cuộc họp chờ",
+      "cancelled": "Cuộc họp hết hạn",
+      "thisMonth": "Tháng này"
+    },
+    "actions": {
+      "newMeeting": "Cuộc họp mới",
+      "newMeetingSubtext": "Bắt đầu ngay",
+      "joinMeeting": "Tham gia họp",
+      "joinMeetingSubtext": "Qua đường link mời",
+      "scheduleMeeting": "Lên lịch họp",
+      "scheduleMeetingSubtext": "Đặt lịch trước"
+    },
+    "todayTitle": "Bạn có {{count}} cuộc họp hôm nay!",
+    "nextMeeting": "Còn {{hours}} giờ đến cuộc họp tiếp theo"
+  },
+  "joinModal": {
+    "title": "Tham gia phòng họp",
+    "roomCodeLabel": "MÃ PHÒNG HỌP",
+    "roomCodePlaceholder": "VD: MTG-ABC123",
+    "joinButton": "Tham gia ngay",
+    "joiningButton": "Đang kiểm tra...",
+    "validation": {
+      "required": "Vui lòng nhập mã phòng họp",
+      "minLength": "Mã phòng không hợp lệ"
+    },
+    "error": {
+      "notFound": "Phòng họp không tồn tại",
+      "serverError": "Không thể kết nối tới server"
+    }
+  },
+  "calendar": {
+    "loading": "Đang tải lịch...",
+    "days": ["T2", "T3", "T4", "T5", "T6", "T7", "CN"],
+    "months": ["THÁNG 1", "THÁNG 2", "THÁNG 3", "THÁNG 4", "THÁNG 5", "THÁNG 6", "THÁNG 7", "THÁNG 8", "THÁNG 9", "THÁNG 10", "THÁNG 11", "THÁNG 12"],
+    "legend": {
+      "mine": "Của tôi",
+      "invited": "Được mời"
+    },
+    "sidebar": {
+      "selectPrompt": "Chọn một ngày",
+      "loading": "Đang tải...",
+      "noMeetings": "Không có cuộc họp nào.",
+      "mine": "Của tôi",
+      "invited": "Được mời",
+      "duration": "{{duration}} phút"
+    }
+  },
+  "sidebar": {
+    "home": "Trang chủ",
+    "calendar": "Lịch",
+    "meeting": "Cuộc họp",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất"
+  },
+  "settingsSecurity": {
+    "sectionTitle": "Bảo mật",
+    "changePassword": "Đổi mật khẩu",
+    "changePasswordDesc": "Cập nhật mật khẩu đăng nhập của bạn"
+  },
+  "forgotPassword": {
+    "title": "Quên mật khẩu",
+    "subtitle": "Nhập email của bạn, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.",
+    "emailLabel": "Địa chỉ email",
+    "emailPlaceholder": "Nhập email của bạn",
+    "submit": "Gửi liên kết",
+    "submitting": "Đang gửi...",
+    "back": "Quay lại đăng nhập",
+    "emailInvalid": "Email không hợp lệ",
+    "successTitle": "Kiểm tra email của bạn!",
+    "successDesc": "Chúng tôi đã gửi liên kết đặt lại mật khẩu đến {{email}}. Liên kết có hiệu lực trong 15 phút.",
+    "backToLogin": "Quay lại đăng nhập",
+    "error": "Không thể gửi yêu cầu, thử lại sau"
+  },
+  "resetPassword": {
+    "title": "Đặt lại mật khẩu",
+    "subtitle": "Tạo mật khẩu mới cho tài khoản của bạn",
+    "newPasswordLabel": "Mật khẩu mới",
+    "newPasswordPlaceholder": "Nhập mật khẩu mới",
+    "confirmPasswordLabel": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+    "submit": "Đặt lại mật khẩu",
+    "submitting": "Đang xử lý...",
+    "tokenInvalid": "Token không hợp lệ hoặc đã hết hạn",
+    "passwordMin": "Mật khẩu phải có ít nhất 6 ký tự",
+    "passwordMismatch": "Mật khẩu xác nhận không khớp",
+    "successTitle": "Hoàn tất!",
+    "successDesc": "Mật khẩu của bạn đã được đặt lại thành công.",
+    "backToLogin": "Quay lại đăng nhập",
+    "error": "Đặt lại mật khẩu thất bại"
+  },
+  "changePassword": {
+    "title": "Đổi mật khẩu",
+    "subtitle": "Vui lòng nhập mật khẩu hiện tại và mật khẩu mới",
+    "back": "Quay lại",
+    "currentLabel": "Mật khẩu hiện tại",
+    "currentPlaceholder": "Nhập mật khẩu hiện tại",
+    "newLabel": "Mật khẩu mới",
+    "newPlaceholder": "Nhập mật khẩu mới",
+    "confirmLabel": "Xác nhận mật khẩu",
+    "confirmPlaceholder": "Nhập lại mật khẩu mới",
+    "submit": "Đổi mật khẩu",
+    "submitting": "Đang xử lý...",
+    "currentRequired": "Vui lòng nhập mật khẩu hiện tại",
+    "newRequired": "Vui lòng nhập mật khẩu mới",
+    "newMin": "Mật khẩu mới phải có ít nhất 6 ký tự",
+    "newSameAsOld": "Mật khẩu mới không được trùng mật khẩu cũ",
+    "confirmMismatch": "Xác nhận mật khẩu không khớp",
+    "successMessage": "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.",
+    "error": "Đổi mật khẩu thất bại"
+  },
+  "home": {
+    "header": { "signIn": "Đăng nhập", "signUp": "Đăng ký" },
+    "hero": {
+      "title1": "Họp trực tuyến",
+      "title2": "Đơn giản & Nhanh chóng",
+      "subtitle": "Tham gia cuộc họp ngay lập tức với mã phòng, không cần tạo tài khoản"
+    },
+    "joinCard": {
+      "title": "Tham gia cuộc họp",
+      "roomCodeLabel": "MÃ PHÒNG HỌP",
+      "roomCodePlaceholder": "VD: MTG-ABC123",
+      "nameLabel": "TÊN CỦA BẠN",
+      "namePlaceholder": "Nhập tên để người khác biết bạn là ai",
+      "joinButton": "Tham gia ngay",
+      "checking": "Đang kiểm tra...",
+      "roomCodeRequired": "Vui lòng nhập mã phòng họp",
+      "roomCodeInvalid": "Mã phòng không hợp lệ",
+      "nameRequired": "Vui lòng nhập tên của bạn",
+      "nameMin": "Tên phải có ít nhất 2 ký tự",
+      "roomNotFound": "Phòng họp không tồn tại",
+      "connectError": "Không thể kết nối tới server"
+    },
+    "footer": "© 2025 TLU Meeting. Nền tảng họp trực tuyến đơn giản và hiệu quả."
+  },
+  "waitingRoom": {
+    "title": "Đang chờ host...",
+    "subtitle": "Cuộc họp sẽ bắt đầu khi host tham gia",
+    "waitTime": "Thời gian chờ",
+    "roomCode": "Mã phòng",
+    "yourName": "Tên của bạn",
+    "notice": "Bạn sẽ tự động vào phòng khi host bắt đầu cuộc họp. Vui lòng không tắt trang này.",
+    "leave": "Rời khỏi phòng chờ"
+  },
+  "meetingRoom": {
+    "hostEnded": "Cuộc họp đã kết thúc. Đang chuyển trang...",
+    "waitingHost": "⏳ Đang chờ Host bắt đầu cuộc họp...",
+    "retry": "Thử lại",
+    "loadingRoom": "Đang tải phòng họp...",
+    "jitsiLoadError": "Không thể tải Jitsi. Kiểm tra kết nối."
+  },
+  "meetingsPage": {
+    "title": "Cuộc họp",
+    "totalSummary": "{{total}} tổng cộng · {{upcoming}} sắp tới",
+    "newMeeting": "Cuộc họp mới",
+    "searchPlaceholder": "Tìm phòng họp theo tên...",
+    "noMeetings": "Chưa có cuộc họp nào",
+    "noResults": "Không tìm thấy cuộc họp nào cho \"{{q}}\"",
+    "loading": "Đang tải...",
+    "deleteSuccess": "Đã xóa phòng thành công",
+    "deleteError": "Xảy ra lỗi khi xóa phòng"
+  },
+  "scheduleMeetingModal": {
+    "scheduleTitle": "Lên lịch cuộc họp",
+    "nowTitle": "Bắt đầu cuộc họp ngay",
+    "editTitle": "Chỉnh sửa cuộc họp",
+    "subtitle": "Bắt đầu cuộc họp mới",
+    "title": "Tiêu đề",
+    "titlePlaceholder": "Nhập tiêu đề cuộc họp...",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Nhập mô tả...",
+    "dateTime": "Ngày & giờ",
+    "duration": "Thời lượng",
+    "minutes": "{{count}} phút",
+    "host": "Chủ phòng",
+    "hostBadge": "Host",
+    "requireHostToStart": "Yêu cầu host bắt đầu",
+    "requireHostYes": "Cần host để bắt đầu",
+    "requireHostNo": "Không cần host",
+    "cancel": "Hủy",
+    "loading": "Đang xử lý...",
+    "createMeeting": "Tạo cuộc họp",
+    "saveChanges": "Lưu thay đổi",
+    "updateSuccess": "Cập nhật thành công",
+    "scheduleSuccess": "Lên lịch thành công",
+    "error": "Đã xảy ra lỗi"
+  },
+  "meetingCard": {
+    "joinNow": "Tham gia ngay",
+    "invitePeople": "Mời người khác",
+    "minutes": "{{count}} phút"
+  },
+  "dashboardHeader": {
+    "searchPlaceholder": "Tìm kiếm..."
+  },
+  "admin": {
+    "nav": {
+      "overview": "Tổng quan",
+      "dashboard": "Dashboard",
+      "management": "Quản lý",
+      "users": "Người dùng",
+      "meetings": "Cuộc họp",
+      "system": "Hệ thống",
+      "notifications": "Thông báo",
+      "settings": "Cài đặt",
+      "logout": "Đăng xuất",
+      "panelName": "Admin Panel",
+      "searchPlaceholder": "Tìm kiếm...",
+      "today": "Hôm nay",
+      "admin": "Admin"
+    },
+    "stats": {
+      "tag": "TLUMeet",
+      "title": "Tổng quan hệ thống",
+      "loading": "Đang tải...",
+      "refresh": "Làm mới",
+      "errorGeneric": "Đã xảy ra lỗi khi tải dữ liệu",
+      "cards": {
+        "totalUsers": "Tổng người dùng",
+        "totalMeetings": "Tổng phòng họp",
+        "totalMeetingsSub": "tất cả thời gian",
+        "liveMeetings": "Đang họp live",
+        "liveMeetingsSub": "● phòng đang hoạt động",
+        "activeRate": "Tỷ lệ hoạt động",
+        "activeRateSub": "phòng live / tổng phòng"
+      },
+      "tabs": {
+        "users": "Người dùng",
+        "meetings": "Phòng họp"
+      },
+      "usersTable": {
+        "user": "Người dùng",
+        "email": "Email",
+        "registered": "Đăng ký",
+        "errorLoad": "Không thể tải danh sách người dùng"
+      },
+      "meetingsTable": {
+        "meeting": "Phòng họp",
+        "roomCode": "Mã phòng",
+        "participants": "Số người",
+        "status": "Trạng thái",
+        "participantsCount": "{{count}} người",
+        "errorLoad": "Không thể tải danh sách phòng họp"
+      },
+      "meetingStatus": {
+        "started": "Live",
+        "created": "Chờ",
+        "ended": "Đã kết thúc",
+        "deleted": "Đã xóa"
+      },
+      "timeAgo": {
+        "seconds": "{{count}} giây trước",
+        "minutes": "{{count}} phút trước",
+        "hours": "{{count}} giờ trước",
+        "days": "{{count}} ngày trước"
+      }
+    },
+    "users": {
+      "loading": "Đang tải danh sách người dùng...",
+      "cards": {
+        "total": "Tổng người dùng",
+        "active": "Đang hoạt động",
+        "inactive": "Vô hiệu hóa"
+      },
+      "searchPlaceholder": "Tìm theo tên, email...",
+      "filters": {
+        "allRoles": "Tất cả vai trò",
+        "allStatuses": "Tất cả trạng thái",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "importExcel": "Import Excel",
+      "addUser": "Thêm người dùng",
+      "table": {
+        "user": "Người dùng",
+        "email": "Email",
+        "role": "Vai trò",
+        "status": "Trạng thái",
+        "createdAt": "Ngày tạo",
+        "empty": "Không tìm thấy người dùng nào",
+        "summary": "{{count}} người dùng · trang {{current}}/{{total}}"
+      },
+      "actions": {
+        "edit": "Chỉnh sửa",
+        "deactivate": "Vô hiệu hóa",
+        "activate": "Kích hoạt",
+        "delete": "Xóa người dùng"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "toast": {
+        "deleteSuccess": "Xóa người dùng thành công",
+        "deleteError": "Xảy ra lỗi khi xóa người dùng"
+      },
+      "import": {
+        "title": "Import từ Excel",
+        "dropTitle": "Kéo thả file vào đây",
+        "dropSubtitle": "hoặc click để chọn file .xlsx / .xls",
+        "defaultRole": "Vai trò mặc định",
+        "downloadTemplate": "Tải file mẫu (.xlsx)",
+        "invalidFile": "File không hợp lệ",
+        "invalidEmail": "Email không hợp lệ",
+        "summary": {
+          "total": "Tổng",
+          "valid": "Hợp lệ",
+          "invalid": "Lỗi"
+        },
+        "previewTable": {
+          "email": "Email",
+          "name": "Tên",
+          "role": "Vai trò",
+          "password": "Mật khẩu"
+        },
+        "reselect": "Chọn lại",
+        "importCount": "Import {{count}} người dùng",
+        "doneSuccess": "Import thành công!",
+        "donePartial": "Import hoàn tất với lỗi",
+        "doneSub": "Đã tạo {{success}}/{{total}} tài khoản. Mật khẩu đã được gán ngẫu nhiên.",
+        "credentialsHeader": "Thông tin đăng nhập ({{count}})",
+        "show": "Hiện",
+        "hide": "Ẩn",
+        "downloadXlsx": "Tải .xlsx",
+        "warning": "Mật khẩu chỉ hiển thị 1 lần — hãy tải hoặc copy ngay.",
+        "errorEmailCol": "Email lỗi",
+        "errorReasonCol": "Lý do",
+        "copyTitle": "Copy email,password",
+        "copyFailed": "Không copy được",
+        "done": "Hoàn tất",
+        "toastSuccess": "Đã tạo {{success}}/{{total}} người dùng",
+        "toastFailed": "{{count}} tài khoản không tạo được",
+        "toastImportError": "Import thất bại"
+      },
+      "addModal": {
+        "title": "Thêm người dùng",
+        "nameLabel": "Họ và tên",
+        "namePlaceholder": "Nguyễn Văn A",
+        "emailLabel": "Email",
+        "emailPlaceholder": "example@tluhub.vn",
+        "passwordLabel": "Mật khẩu (tự động)",
+        "passwordHint": "Gửi mật khẩu này cho người dùng sau khi tạo.",
+        "submit": "Tạo tài khoản",
+        "cancel": "Hủy",
+        "nameRequired": "Họ tên không được để trống",
+        "emailInvalid": "Email không hợp lệ",
+        "createSuccess": "Đã tạo tài khoản cho {{name}}",
+        "createError": "Có lỗi xảy ra"
+      }
+    },
+    "meetings": {
+      "loading": "Đang tải danh sách cuộc họp...",
+      "cards": {
+        "total": "Tổng phòng họp",
+        "live": "Đang diễn ra",
+        "scheduled": "Đã lên lịch",
+        "ended": "Đã kết thúc"
+      },
+      "searchPlaceholder": "Tìm theo tiêu đề, host, mã phòng...",
+      "filters": {
+        "all": "Tất cả trạng thái",
+        "scheduled": "Đã lên lịch",
+        "live": "Đang diễn ra",
+        "waitingForHost": "Chờ chủ phòng",
+        "ended": "Đã kết thúc"
+      },
+      "createButton": "Tạo phòng họp",
+      "table": {
+        "meeting": "Phòng họp",
+        "host": "Chủ phòng",
+        "roomCode": "Mã phòng",
+        "participants": "Số người",
+        "status": "Trạng thái",
+        "createdAt": "Ngày tạo",
+        "empty": "Không có phòng họp nào",
+        "summary": "{{count}} phòng họp · trang {{current}}/{{total}}"
+      },
+      "actions": {
+        "edit": "Chỉnh sửa",
+        "start": "Bắt đầu ngay",
+        "end": "Kết thúc phòng",
+        "delete": "Xóa phòng họp"
+      },
+      "status": {
+        "scheduled": "Đã lên lịch",
+        "live": "Đang diễn ra",
+        "waitingForHost": "Chờ chủ phòng",
+        "ended": "Đã kết thúc"
+      },
+      "toast": {
+        "deleteLoading": "Đang xóa...",
+        "deleteSuccess": "Xóa phòng họp thành công",
+        "deleteError": "Xóa phòng họp thất bại, thử lại sau",
+        "createSuccess": "Tạo phòng họp thành công",
+        "createError": "Tạo phòng họp thất bại",
+        "startSuccess": "Đã bắt đầu phòng họp",
+        "endSuccess": "Đã kết thúc phòng họp",
+        "actionFailed": "Thao tác thất bại (admin phải là chủ phòng mới đổi được trạng thái)"
+      },
+      "addModal": {
+        "title": "Tạo phòng họp mới",
+        "titleLabel": "Tiêu đề phòng họp",
+        "titlePlaceholder": "Vd: Họp chiến lược tháng 6",
+        "hostEmailLabel": "Email chủ phòng",
+        "hostEmailPlaceholder": "host@tluhub.vn",
+        "descriptionLabel": "Mô tả (tuỳ chọn)",
+        "descriptionPlaceholder": "Nội dung cuộc họp...",
+        "scheduledDateTimeLabel": "Thời gian bắt đầu",
+        "durationLabel": "Thời lượng (phút)",
+        "requireHostToStart": "Yêu cầu chủ phòng có mặt mới bắt đầu được",
+        "validation": {
+          "titleRequired": "Vui lòng nhập tiêu đề",
+          "hostEmailInvalid": "Email không hợp lệ",
+          "durationInvalid": "Thời lượng phải > 0"
+        },
+        "submit": "Tạo phòng họp",
+        "cancel": "Hủy"
+      }
+    },
+    "settings": {
+      "title": "Cài đặt",
+      "language": {
+        "sectionTitle": "Ngôn ngữ",
+        "label": "Ngôn ngữ hiển thị",
+        "desc": "Đổi ngôn ngữ giao diện admin"
+      },
+      "saveButton": "Lưu thay đổi",
+      "savedButton": "Đã lưu!",
+      "savedMessage": "Tuỳ chọn của bạn đã được cập nhật"
+    }
+  },
+  "profile": {
+    "loading": "Đang tải hồ sơ...",
+    "title": "Thông tin cá nhân",
+    "subtitle": "Quản lý ảnh đại diện và thông tin tài khoản của bạn",
+    "defaultUser": "Người dùng",
+    "proMember": "Pro Member",
+    "changeAvatar": "Đổi ảnh đại diện",
+    "pendingAvatarHint": "Ảnh mới sẽ được lưu khi bấm \"Lưu thay đổi\"",
+    "summary": "Tóm tắt",
+    "editTitle": "Chỉnh sửa thông tin",
+    "editSubtitle": "Cập nhật chi tiết hồ sơ của bạn bên dưới",
+    "fields": {
+      "name": "HỌ VÀ TÊN",
+      "email": "EMAIL",
+      "birthday": "NGÀY SINH",
+      "address": "ĐỊA CHỈ"
+    },
+    "placeholders": {
+      "name": "Họ và tên",
+      "email": "Email",
+      "birthday": "Chọn ngày sinh",
+      "address": "Địa chỉ"
+    },
+    "validation": {
+      "nameRequired": "Vui lòng nhập họ tên",
+      "emailRequired": "Vui lòng nhập email",
+      "emailInvalid": "Email không hợp lệ"
+    },
+    "toast": {
+      "success": "Cập nhật thành công!",
+      "error": "Cập nhật thất bại"
+    }
+  }
+}

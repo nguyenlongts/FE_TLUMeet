@@ -1,9 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { endMeeting } from "../../../api/meetingApi";
+import { baseQueryWithReauth } from "../baseQueryWithReauth";
 const baseQuery = fetchBaseQuery({
   baseUrl: `http://localhost:5555/api/meeting`,
   prepareHeaders: (headers, { getState }) => {
     const token = getState().auth.accessToken;
+    console.log(token)
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
@@ -13,12 +15,12 @@ const baseQuery = fetchBaseQuery({
 
 const meetingsApi = createApi({
   reducerPath: "meetingsApi",
-  baseQuery: baseQuery,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Meetings"],
   endpoints: (builders) => ({
     getAllMeetingByEmail: builders.query({
       query: (email) => ({
-        url: `/host/${email}`,
+        url: `/meeting/host/${email}`,
         method: "GET",
       }),
       providesTags: ["Meetings"],
@@ -32,6 +34,7 @@ const meetingsApi = createApi({
     }),
     scheduleMeeting: builders.mutation({
       query: (data) => ({
+        url: `/meeting`,
         method: "POST",
         body: data,
       }),
@@ -39,46 +42,59 @@ const meetingsApi = createApi({
     }),
     checkRoomCode: builders.query({
       query: (roomCode) => ({
-        url: `/check/${roomCode}`,
+        url: `/meeting/check/${roomCode}`,
         method: "GET",
       }),
     }),
     getStatusMeeting: builders.query({
       query: (roomCode) => ({
-        url: `/${roomCode}/status`,
+        url: `/meeting/${roomCode}/status`,
         method: "GET",
       }),
     }),
     startMeeting: builders.mutation({
       query: (roomCode) => ({
-        url: `/${roomCode}/start`,
+        url: `/meeting/${roomCode}/start`,
         method: "POST",
       }),
     }),
     endMeeting: builders.mutation({
       query: (roomCode) => ({
-        url: `/${roomCode}/end`,
+        url: `/meeting/${roomCode}/end`,
         method: "POST",
       }),
     }),
     joinMeeting: builders.mutation({
-      query: (data)=> ({
-        url: `/${data.roomCode}/join`,
-        method:"POST",
-        body:{
-          userEmail:data.userEmail||null,
-          guestName:data.guestName
-        }
-      })
+      query: (data) => ({
+        url: `/meeting/${data.roomCode}/join`,
+        method: "POST",
+        body: {
+          userEmail: data.userEmail || null,
+          guestName: data.guestName,
+        },
+      }),
     }),
     deleteMeetingApi: builders.mutation({
-      query: (id)=>({
-        url: `/${id}`,
-        method: "DELETE"
+      query: (id) => ({
+        url: `/meeting/${id}`,
+        method: "DELETE",
       }),
-      invalidatesTags:["Meetings"]
-    })
-
+      invalidatesTags: ["Meetings"],
+    }),
+    updateMeetingApi: builders.mutation({
+      query: (body) => ({
+        url: `/meeting`,
+        method: "PUT",
+        body: body,
+      }),
+      invalidatesTags: ["Meetings"],
+    }),
+    getMeetingInvited: builders.query({
+      query: () => ({
+        url: `/meeting/invited`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -88,6 +104,8 @@ export const { useScheduleMeetingMutation,useGetAllMeetingByEmailQuery,
   useJoinMeetingMutation,useStartMeetingMutation,
   useLazyCheckRoomCodeQuery,
   useLazyGetStatusMeetingQuery,
-  useDeleteMeetingApiMutation
+  useDeleteMeetingApiMutation,
+  useUpdateMeetingApiMutation,
+  useGetMeetingInvitedQuery
 } = meetingsApi;
 export default meetingsApi;

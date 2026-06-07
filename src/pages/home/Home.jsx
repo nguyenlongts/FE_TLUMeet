@@ -4,10 +4,12 @@ import { Form, Input, Button, ConfigProvider, theme } from "antd";
 import { Video, LogIn, UserPlus, ArrowRight } from "lucide-react";
 import { useCheckRoomCodeQuery, useJoinMeetingMutation, useLazyCheckRoomCodeQuery } from "../../redux/features/meetings/meetingsApi";
 import WaitingRoom from "../meetings/WaitingRoom";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 
 export default function Home() {
-
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [trigger,setTrigger]=useState(false);
@@ -22,31 +24,31 @@ export default function Home() {
     setShowWaitingRoom(false);
   };
   const handleJoinMeeting = async ({ roomCode, guestName }) => {
-    setShowWaitingRoom(true)
-    setRoomCode(roomCode);
-    setUserName(guestName)
     try {
       const resCheckRoomCode=await checkRoomCode(roomCode).unwrap()
-      console.log(resCheckRoomCode);
-      if(!resCheckRoomCode?.statusCode===200||!resCheckRoomCode){
-        form.setFields([{ name: "roomCode", errors: "Phòng họp không tồn tại" }]);
+      if (!resCheckRoomCode?.data) {
+        toast.error(t('home.joinCard.roomNotFound'));
+        form.setFields([{ name: "roomCode", errors: [t('home.joinCard.roomNotFound')] }]);
         return;
       }
+      setRoomCode(roomCode);
+      setUserName(guestName)
+      setShowWaitingRoom(true)
       const formJoin={
         roomCode:roomCode ,userEmail:null, guestName:guestName
       }
-      console.log(formJoin);
+      console.log(formJoin," fj");
       
       const res=await joinMeeting(formJoin).unwrap()
-      console.log(res)
+      console.log(res,"res join can thiet");
       if(error){console.log(error)}
       
       sessionStorage.setItem("guestName", guestName.trim());
       sessionStorage.setItem("joinToken", res?.data?.joinToken);
     } catch(err) {
       console.log(err);
-      
-      form.setFields([{ name: "roomCode", errors: [err?.data?.message||"Không thể kết nối tới server"] }]);
+      toast.error(err?.data?.message || t('home.joinCard.connectError'));
+      form.setFields([{ name: "roomCode", errors: [err?.data?.message || t('home.joinCard.connectError')] }]);
     } finally {
       setIsLoading(false);
     }
@@ -100,14 +102,14 @@ export default function Home() {
                 className="flex items-center gap-2 px-4 py-2 text-sm text-[#9b8fc0] border border-[#2a2245] rounded-xl hover:bg-[#1a1535] hover:text-white transition-colors"
               >
                 <LogIn size={15} />
-                <span className="hidden sm:inline">Đăng nhập</span>
+                <span className="hidden sm:inline">{t('home.header.signIn')}</span>
               </button>
               <button
                 onClick={() => navigate("/register")}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-opacity bg-gradient-to-r from-violet-600 to-purple-500 rounded-xl hover:opacity-90"
               >
                 <UserPlus size={15} />
-                <span className="hidden sm:inline">Đăng ký</span>
+                <span className="hidden sm:inline">{t('home.header.signUp')}</span>
               </button>
             </div>
           </div>
@@ -119,21 +121,21 @@ export default function Home() {
             {/* Hero */}
             <div className="mb-12 text-center">
               <h1 className="mb-4 text-5xl font-bold leading-tight text-white md:text-6xl">
-                Họp trực tuyến
+                {t('home.hero.title1')}
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-400">
-                  Đơn giản & Nhanh chóng
+                  {t('home.hero.title2')}
                 </span>
               </h1>
               <p className="text-lg text-[#5a5478] max-w-2xl mx-auto">
-                Tham gia cuộc họp ngay lập tức với mã phòng, không cần tạo tài khoản
+                {t('home.hero.subtitle')}
               </p>
             </div>
 
             {/* Card */}
             <div className="w-full max-w-xl bg-[#150f2a] border border-[#2a2245] rounded-2xl p-8">
               <h2 className="text-xl font-semibold text-center text-white mb-7">
-                Tham gia cuộc họp
+                {t('home.joinCard.title')}
               </h2>
 
               <Form
@@ -145,18 +147,18 @@ export default function Home() {
                 <Form.Item
                   label={
                     <span className="text-[11px] tracking-widest text-[#5a5478] font-medium">
-                      MÃ PHÒNG HỌP
+                      {t('home.joinCard.roomCodeLabel')}
                     </span>
                   }
                   name="roomCode"
                   rules={[
-                    { required: true, message: "Vui lòng nhập mã phòng họp" },
-                    { min: 6, message: "Mã phòng không hợp lệ" },
+                    { required: true, message: t('home.joinCard.roomCodeRequired') },
+                    { min: 6, message: t('home.joinCard.roomCodeInvalid') },
                   ]}
                   normalize={(val) => val.toUpperCase()}
                 >
                   <Input
-                    placeholder="VD: MTG-ABC123"
+                    placeholder={t('home.joinCard.roomCodePlaceholder')}
                     className="!font-mono"
                   />
                 </Form.Item>
@@ -164,16 +166,16 @@ export default function Home() {
                 <Form.Item
                   label={
                     <span className="text-[11px] tracking-widest text-[#5a5478] font-medium">
-                      TÊN CỦA BẠN
+                      {t('home.joinCard.nameLabel')}
                     </span>
                   }
                   name="guestName"
                   rules={[
-                    { required: true, message: "Vui lòng nhập tên của bạn" },
-                    { min: 2, message: "Tên phải có ít nhất 2 ký tự" },
+                    { required: true, message: t('home.joinCard.nameRequired') },
+                    { min: 2, message: t('home.joinCard.nameMin') },
                   ]}
                 >
-                  <Input placeholder="Nhập tên để người khác biết bạn là ai" />
+                  <Input placeholder={t('home.joinCard.namePlaceholder')} />
                 </Form.Item>
 
                 <Form.Item className="!mb-0 !mt-2">
@@ -193,7 +195,7 @@ export default function Home() {
                     }
                     iconPlacement="end"
                   >
-                    {isLoading ? "Đang kiểm tra..." : "Tham gia ngay"}
+                    {isLoading ? t('home.joinCard.checking') : t('home.joinCard.joinButton')}
                   </Button>
                 </Form.Item>
               </Form>
@@ -203,7 +205,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="py-5 text-center text-[#3d3860] text-xs border-t border-[#1a1535]">
-          &copy; 2025 TLU Meeting. Nền tảng họp trực tuyến đơn giản và hiệu quả.
+          {t('home.footer')}
         </footer>
         {showWaitingRoom&&(
           <WaitingRoom onCancel={handleCancel} onHostJoined={onHostJoined} roomCode={roomCode} userName={userName}/>

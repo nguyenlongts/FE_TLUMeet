@@ -12,14 +12,14 @@ const authApi = createApi({
   endpoints: (builders) => ({
     registerNewUser: builders.mutation({
       query: (newUser) => ({
-        url: `/register`,
+        url: `/Auth/register`,
         method: "POST",
         body: newUser,
       }),
     }),
     loginUser: builders.mutation({
       query: (data) => ({
-        url: `/login`,
+        url: `/Auth/login`,
         method: "POST",
         body: data,
       }),
@@ -27,7 +27,7 @@ const authApi = createApi({
 
     logoutUser: builders.mutation({
       query: () => ({
-        url: "/logout",
+        url: `/Auth/logout`,
         method: "POST",
       }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
@@ -41,37 +41,45 @@ const authApi = createApi({
 
     refreshToken: builders.mutation({
       query: (body) => ({
-        url: "/refresh",
+        url: "/Auth/refresh",
         method: "POST",
         body,
       }),
     }),
 
     forgotPassword: builders.mutation({
-      query: (body) => ({
-        url: "/forgot-password",
+      query: (email) => ({
+        url: "/Auth/forgot-password",
         method: "POST",
-        body,
+        body: { email },
       }),
     }),
 
     resetPassword: builders.mutation({
-      query: (body) => ({
-        url: "/reset-password",
+      query: ({ token, newPassword }) => ({
+        url: "/Auth/reset-password",
         method: "POST",
-        body,
+        body: { token, newPassword },
       }),
     }),
 
     changePassword: builders.mutation({
-      query: (body) => ({
-        url: "/change-password",
+      query: ({ currentPassword, newPassword }) => ({
+        url: "/Auth/change-password",
         method: "POST",
-        body,
+        body: { currentPassword, newPassword },
       }),
     }),
   }),
 });
 
-export const { useRegisterNewUserMutation, useLoginUserMutation, useLogoutUserMutation, useRefreshTokenMutation, useForgotPasswordMutation, useResetPasswordMutation, useChangePasswordMutation } = authApi;
+export const {
+  useRegisterNewUserMutation,
+  useLoginUserMutation,
+  useLogoutUserMutation,
+  useRefreshTokenMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  useChangePasswordMutation,
+} = authApi;
 export default authApi;

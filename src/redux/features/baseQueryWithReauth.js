@@ -1,7 +1,7 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
 import {setCredentials,logout} from "./auth/authSlice"
 const baseQuery=fetchBaseQuery({
-    baseUrl:"http://localhost:5555/api/Auth",
+    baseUrl:"http://localhost:5555/api",
     prepareHeaders:(headers,{getState})=>{
         const token=getState().auth.accessToken
         if(token){
@@ -20,7 +20,7 @@ export const baseQueryWithReauth=async(args,api,extraOptions)=>{
         }
         const refreshResult=await baseQuery(
             {
-                url:"/refresh",
+                url:"/Auth/refresh",
                 method:"POST",
                 body:{refreshToken}
             },
@@ -29,7 +29,6 @@ export const baseQueryWithReauth=async(args,api,extraOptions)=>{
         )
         if (refreshResult?.data) {
           api.dispatch(setCredentials(refreshResult.data));
-          // Retry lại request gốc với accessToken mới
           result = await baseQuery(args, api, extraOptions);
         } else {
           api.dispatch(logout());

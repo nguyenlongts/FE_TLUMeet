@@ -1,0 +1,537 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "notUpdated": "Not set"
+  },
+  "login": {
+    "welcome": "Welcome Back",
+    "subtitle": "Sign in to your account to continue",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot Password?",
+    "signIn": "Sign In",
+    "signingIn": "Signing In...",
+    "orContinueWith": "Or continue with",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign Up",
+    "toast": {
+      "loginError": "An error occurred while logging in, please try again"
+    }
+  },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Join the TLUHub community today",
+    "fullNameLabel": "Full Name",
+    "fullNamePlaceholder": "Nguyen Van A",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "passwordStrength": "Password strength",
+    "strength": {
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
+    "terms": "I agree to the",
+    "termsLink": "Terms of Service",
+    "and": "and",
+    "privacyLink": "Privacy Policy",
+    "signUp": "Sign Up",
+    "signingUp": "Signing up...",
+    "orContinueWith": "Or continue with",
+    "hasAccount": "Already have an account?",
+    "signIn": "Sign In",
+    "validation": {
+      "fullNameRequired": "Full name is required",
+      "fullNameMin": "Full name must be at least 2 characters",
+      "fullNameInvalid": "Full name must not contain numbers or special characters",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email address",
+      "passwordRequired": "Password is required",
+      "passwordMin": "Password must be at least 6 characters",
+      "confirmPasswordRequired": "Please confirm your password",
+      "confirmPasswordMismatch": "Passwords do not match"
+    },
+    "toast": {
+      "success": "Registration successful!",
+      "error": "Something went wrong. Please try again."
+    }
+  },
+  "dashboard": {
+    "title": "Meetings",
+    "loading": "Loading dashboard...",
+    "stats": {
+      "numberOfMeetings": "Number of meetings",
+      "rescheduled": "Rescheduled meetings",
+      "cancelled": "Cancel meetings",
+      "thisMonth": "This month"
+    },
+    "actions": {
+      "newMeeting": "New Meeting",
+      "newMeetingSubtext": "Start New Meeting",
+      "joinMeeting": "Join Meeting",
+      "joinMeetingSubtext": "Via Invitation Link",
+      "scheduleMeeting": "Schedule Meeting",
+      "scheduleMeetingSubtext": "Plan Your Meeting"
+    },
+    "todayTitle": "You have {{count}} meetings today!",
+    "nextMeeting": "{{hours}} hours left for the next meeting"
+  },
+  "joinModal": {
+    "title": "Join a Meeting",
+    "roomCodeLabel": "ROOM CODE",
+    "roomCodePlaceholder": "e.g. MTG-ABC123",
+    "joinButton": "Join Now",
+    "joiningButton": "Checking...",
+    "validation": {
+      "required": "Please enter a room code",
+      "minLength": "Invalid room code"
+    },
+    "error": {
+      "notFound": "Meeting room does not exist",
+      "serverError": "Cannot connect to server"
+    }
+  },
+  "calendar": {
+    "loading": "Loading calendar...",
+    "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "months": ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"],
+    "legend": {
+      "mine": "My meetings",
+      "invited": "Invited"
+    },
+    "sidebar": {
+      "selectPrompt": "Select a date",
+      "loading": "Loading...",
+      "noMeetings": "No meetings.",
+      "mine": "Mine",
+      "invited": "Invited",
+      "duration": "{{duration}} mins"
+    }
+  },
+  "sidebar": {
+    "home": "Home",
+    "calendar": "Calendar",
+    "meeting": "Meeting",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "settingsSecurity": {
+    "sectionTitle": "Security",
+    "changePassword": "Change password",
+    "changePasswordDesc": "Update your login password"
+  },
+  "forgotPassword": {
+    "title": "Forgot Password",
+    "subtitle": "Enter your email and we'll send you a link to reset your password.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Enter your email",
+    "submit": "Send reset link",
+    "submitting": "Sending...",
+    "back": "Back to login",
+    "emailInvalid": "Invalid email",
+    "successTitle": "Check your email!",
+    "successDesc": "We've sent a password reset link to {{email}}. The link is valid for 15 minutes.",
+    "backToLogin": "Back to login",
+    "error": "Could not send request, try again later"
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "subtitle": "Create a new password for your account",
+    "newPasswordLabel": "New password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmPasswordLabel": "Confirm password",
+    "confirmPasswordPlaceholder": "Re-enter password",
+    "submit": "Reset password",
+    "submitting": "Processing...",
+    "tokenInvalid": "Invalid or expired token",
+    "passwordMin": "Password must be at least 6 characters",
+    "passwordMismatch": "Passwords do not match",
+    "successTitle": "All done!",
+    "successDesc": "Your password has been reset successfully.",
+    "backToLogin": "Back to login",
+    "error": "Reset password failed"
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "subtitle": "Enter your current and new password",
+    "back": "Back",
+    "currentLabel": "Current password",
+    "currentPlaceholder": "Enter current password",
+    "newLabel": "New password",
+    "newPlaceholder": "Enter new password",
+    "confirmLabel": "Confirm password",
+    "confirmPlaceholder": "Re-enter new password",
+    "submit": "Change password",
+    "submitting": "Processing...",
+    "currentRequired": "Please enter your current password",
+    "newRequired": "Please enter a new password",
+    "newMin": "New password must be at least 6 characters",
+    "newSameAsOld": "New password cannot be the same as the old one",
+    "confirmMismatch": "Passwords do not match",
+    "successMessage": "Password changed successfully! Please log in again.",
+    "error": "Change password failed"
+  },
+  "home": {
+    "header": { "signIn": "Sign in", "signUp": "Sign up" },
+    "hero": {
+      "title1": "Online meetings",
+      "title2": "Simple & Fast",
+      "subtitle": "Join a meeting instantly with a room code, no account needed"
+    },
+    "joinCard": {
+      "title": "Join a meeting",
+      "roomCodeLabel": "ROOM CODE",
+      "roomCodePlaceholder": "e.g. MTG-ABC123",
+      "nameLabel": "YOUR NAME",
+      "namePlaceholder": "Enter your name so others know who you are",
+      "joinButton": "Join now",
+      "checking": "Checking...",
+      "roomCodeRequired": "Please enter a room code",
+      "roomCodeInvalid": "Invalid room code",
+      "nameRequired": "Please enter your name",
+      "nameMin": "Name must be at least 2 characters",
+      "roomNotFound": "Meeting room does not exist",
+      "connectError": "Cannot connect to server"
+    },
+    "footer": "© 2025 TLU Meeting. A simple and effective online meeting platform."
+  },
+  "waitingRoom": {
+    "title": "Waiting for host...",
+    "subtitle": "The meeting will start when the host joins",
+    "waitTime": "Wait time",
+    "roomCode": "Room code",
+    "yourName": "Your name",
+    "notice": "You'll be admitted automatically when the host starts the meeting. Please keep this tab open.",
+    "leave": "Leave waiting room"
+  },
+  "meetingRoom": {
+    "hostEnded": "The meeting has ended. Redirecting...",
+    "waitingHost": "⏳ Waiting for host to start the meeting...",
+    "retry": "Retry",
+    "loadingRoom": "Loading meeting room...",
+    "jitsiLoadError": "Cannot load Jitsi. Check your connection."
+  },
+  "meetingsPage": {
+    "title": "Meetings",
+    "totalSummary": "{{total}} total · {{upcoming}} upcoming",
+    "newMeeting": "New Meeting",
+    "searchPlaceholder": "Search meetings by name...",
+    "noMeetings": "No meetings yet",
+    "noResults": "No meetings found for \"{{q}}\"",
+    "loading": "Loading...",
+    "deleteSuccess": "Meeting deleted",
+    "deleteError": "Failed to delete meeting"
+  },
+  "scheduleMeetingModal": {
+    "scheduleTitle": "Schedule New Meeting",
+    "nowTitle": "Start Meeting Now",
+    "editTitle": "Edit Meeting",
+    "subtitle": "Start New Meeting",
+    "title": "Title",
+    "titlePlaceholder": "Enter meeting title...",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter description...",
+    "dateTime": "Date & Time",
+    "duration": "Duration",
+    "minutes": "{{count}} minutes",
+    "host": "Host",
+    "hostBadge": "Host",
+    "requireHostToStart": "Require Host To Start",
+    "requireHostYes": "Host required to start",
+    "requireHostNo": "No host required",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "createMeeting": "Create Meeting",
+    "saveChanges": "Save Changes",
+    "updateSuccess": "Updated successfully",
+    "scheduleSuccess": "Scheduled successfully",
+    "error": "Something went wrong"
+  },
+  "meetingCard": {
+    "joinNow": "Join Now",
+    "invitePeople": "Invite people",
+    "minutes": "{{count}} minutes"
+  },
+  "dashboardHeader": {
+    "searchPlaceholder": "Search..."
+  },
+  "admin": {
+    "nav": {
+      "overview": "Overview",
+      "dashboard": "Dashboard",
+      "management": "Management",
+      "users": "Users",
+      "meetings": "Meetings",
+      "system": "System",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "logout": "Log out",
+      "panelName": "Admin Panel",
+      "searchPlaceholder": "Search...",
+      "today": "Today",
+      "admin": "Admin"
+    },
+    "stats": {
+      "tag": "TLUMeet",
+      "title": "System Overview",
+      "loading": "Loading...",
+      "refresh": "Refresh",
+      "errorGeneric": "Failed to load data",
+      "cards": {
+        "totalUsers": "Total users",
+        "totalMeetings": "Total meetings",
+        "totalMeetingsSub": "all time",
+        "liveMeetings": "Live meetings",
+        "liveMeetingsSub": "● rooms active",
+        "activeRate": "Active rate",
+        "activeRateSub": "live / total rooms"
+      },
+      "tabs": {
+        "users": "Users",
+        "meetings": "Meetings"
+      },
+      "usersTable": {
+        "user": "User",
+        "email": "Email",
+        "registered": "Registered",
+        "errorLoad": "Failed to load users"
+      },
+      "meetingsTable": {
+        "meeting": "Meeting",
+        "roomCode": "Room code",
+        "participants": "Participants",
+        "status": "Status",
+        "participantsCount": "{{count}} people",
+        "errorLoad": "Failed to load meetings"
+      },
+      "meetingStatus": {
+        "started": "Live",
+        "created": "Pending",
+        "ended": "Ended",
+        "deleted": "Deleted"
+      },
+      "timeAgo": {
+        "seconds": "{{count}}s ago",
+        "minutes": "{{count}}m ago",
+        "hours": "{{count}}h ago",
+        "days": "{{count}}d ago"
+      }
+    },
+    "users": {
+      "loading": "Loading users...",
+      "cards": {
+        "total": "Total users",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "searchPlaceholder": "Search by name, email...",
+      "filters": {
+        "allRoles": "All roles",
+        "allStatuses": "All statuses",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "importExcel": "Import Excel",
+      "addUser": "Add user",
+      "table": {
+        "user": "User",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "createdAt": "Created at",
+        "empty": "No users found",
+        "summary": "{{count}} users · page {{current}}/{{total}}"
+      },
+      "actions": {
+        "edit": "Edit",
+        "deactivate": "Deactivate",
+        "activate": "Activate",
+        "delete": "Delete user"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "toast": {
+        "deleteSuccess": "User deleted",
+        "deleteError": "Failed to delete user"
+      },
+      "import": {
+        "title": "Import from Excel",
+        "dropTitle": "Drop file here",
+        "dropSubtitle": "or click to choose a .xlsx / .xls file",
+        "defaultRole": "Default role",
+        "downloadTemplate": "Download template (.xlsx)",
+        "invalidFile": "Invalid file",
+        "invalidEmail": "Invalid email",
+        "summary": {
+          "total": "Total",
+          "valid": "Valid",
+          "invalid": "Errors"
+        },
+        "previewTable": {
+          "email": "Email",
+          "name": "Name",
+          "role": "Role",
+          "password": "Password"
+        },
+        "reselect": "Reselect",
+        "importCount": "Import {{count}} users",
+        "doneSuccess": "Import successful!",
+        "donePartial": "Import completed with errors",
+        "doneSub": "Created {{success}}/{{total}} accounts. Passwords were generated randomly.",
+        "credentialsHeader": "Credentials ({{count}})",
+        "show": "Show",
+        "hide": "Hide",
+        "downloadXlsx": "Download .xlsx",
+        "warning": "Passwords are shown only once — download or copy now.",
+        "errorEmailCol": "Failed email",
+        "errorReasonCol": "Reason",
+        "copyTitle": "Copy email,password",
+        "copyFailed": "Copy failed",
+        "done": "Done",
+        "toastSuccess": "Created {{success}}/{{total}} users",
+        "toastFailed": "{{count}} accounts failed",
+        "toastImportError": "Import failed"
+      },
+      "addModal": {
+        "title": "Add user",
+        "nameLabel": "Full name",
+        "namePlaceholder": "John Doe",
+        "emailLabel": "Email",
+        "emailPlaceholder": "example@tluhub.vn",
+        "passwordLabel": "Password (auto-generated)",
+        "passwordHint": "Send this password to the user after creation.",
+        "submit": "Create account",
+        "cancel": "Cancel",
+        "nameRequired": "Full name is required",
+        "emailInvalid": "Invalid email",
+        "createSuccess": "Account created for {{name}}",
+        "createError": "Something went wrong"
+      }
+    },
+    "meetings": {
+      "loading": "Loading meetings...",
+      "cards": {
+        "total": "Total meetings",
+        "live": "Live",
+        "scheduled": "Scheduled",
+        "ended": "Ended"
+      },
+      "searchPlaceholder": "Search by title, host, room code...",
+      "filters": {
+        "all": "All statuses",
+        "scheduled": "Scheduled",
+        "live": "Live",
+        "waitingForHost": "Waiting for host",
+        "ended": "Ended"
+      },
+      "createButton": "Create meeting",
+      "table": {
+        "meeting": "Meeting",
+        "host": "Host",
+        "roomCode": "Room code",
+        "participants": "Participants",
+        "status": "Status",
+        "createdAt": "Created at",
+        "empty": "No meetings",
+        "summary": "{{count}} meetings · page {{current}}/{{total}}"
+      },
+      "actions": {
+        "edit": "Edit",
+        "start": "Start now",
+        "end": "End meeting",
+        "delete": "Delete meeting"
+      },
+      "status": {
+        "scheduled": "Scheduled",
+        "live": "Live",
+        "waitingForHost": "Waiting for host",
+        "ended": "Ended"
+      },
+      "toast": {
+        "deleteLoading": "Deleting...",
+        "deleteSuccess": "Meeting deleted",
+        "deleteError": "Failed to delete meeting, try again later",
+        "createSuccess": "Meeting created",
+        "createError": "Failed to create meeting",
+        "startSuccess": "Meeting started",
+        "endSuccess": "Meeting ended",
+        "actionFailed": "Action failed (admin must be the host to change status)"
+      },
+      "addModal": {
+        "title": "Create new meeting",
+        "titleLabel": "Meeting title",
+        "titlePlaceholder": "e.g. June strategy meeting",
+        "hostEmailLabel": "Host email",
+        "hostEmailPlaceholder": "host@tluhub.vn",
+        "descriptionLabel": "Description (optional)",
+        "descriptionPlaceholder": "Meeting content...",
+        "scheduledDateTimeLabel": "Start time",
+        "durationLabel": "Duration (minutes)",
+        "requireHostToStart": "Require host to be present to start",
+        "validation": {
+          "titleRequired": "Please enter a title",
+          "hostEmailInvalid": "Invalid email",
+          "durationInvalid": "Duration must be > 0"
+        },
+        "submit": "Create meeting",
+        "cancel": "Cancel"
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "language": {
+        "sectionTitle": "Language",
+        "label": "Display language",
+        "desc": "Change the admin interface language"
+      },
+      "saveButton": "Save Changes",
+      "savedButton": "Saved!",
+      "savedMessage": "Your preferences have been updated"
+    }
+  },
+  "profile": {
+    "loading": "Loading profile...",
+    "title": "Personal Information",
+    "subtitle": "Manage your avatar and account information",
+    "defaultUser": "User",
+    "proMember": "Pro Member",
+    "changeAvatar": "Change avatar",
+    "pendingAvatarHint": "The new picture will be saved when you click \"Save Changes\"",
+    "summary": "Summary",
+    "editTitle": "Edit Information",
+    "editSubtitle": "Update your profile details below",
+    "fields": {
+      "name": "FULL NAME",
+      "email": "EMAIL",
+      "birthday": "BIRTHDAY",
+      "address": "ADDRESS"
+    },
+    "placeholders": {
+      "name": "Full name",
+      "email": "Email",
+      "birthday": "Pick a date",
+      "address": "Address"
+    },
+    "validation": {
+      "nameRequired": "Please enter your full name",
+      "emailRequired": "Please enter your email",
+      "emailInvalid": "Invalid email address"
+    },
+    "toast": {
+      "success": "Profile updated successfully!",
+      "error": "Failed to update profile"
+    }
+  }
+}

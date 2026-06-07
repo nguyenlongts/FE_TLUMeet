@@ -1,7 +1,7 @@
 const Loading = ({ text = "Loading..." }) => {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5"
-      style={{ background: "#12141f" }}>
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 "
+      style={{ background: "rgba(18, 20, 31, 0.8)" }}>
 
       {/* Spinner */}
       <div className="relative w-14 h-14">

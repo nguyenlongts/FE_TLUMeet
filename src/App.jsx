@@ -9,8 +9,8 @@ import InvitePopup from "./components/InvitePopup";
 function App() {
   return (
     <>
-      <InvitePopup />
-      <Toaster position="top-right" reverseOrder={false} />
+      {/* <InvitePopup /> */}
+      {/* <Toaster position="top-right" reverseOrder={false} /> */}
       <div className="flex w-full h-screen">
         <Sidebar />
         <div className="flex flex-col w-full bg-[#292937]">

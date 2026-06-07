@@ -15,17 +15,22 @@ const AuthProvider = ({ children }) => {
     refresh({ refreshToken })
       .unwrap()
       .then((data) => {
+        const payload = JSON.parse(atob(data.data.token.split('.')[1]))
+        const roles = (payload.roles ?? [payload.role ?? payload.Role])
+          .filter(Boolean)
+          .map((r) => r.toString().trim().toLowerCase())
         dispatch(
-                    setCredentials({
-                      user: {
-                        id:data.data.id,
-                        email:data.data.email,
-                        name:data.data.name,
-                      },
-                      accessToken: data.data.token,
-                      refreshToken: data.data.refreshToken,
-                    }),
-                  );
+          setCredentials({
+            user: {
+              id: data.data.id,
+              email: data.data.email,
+              name: data.data.name,
+              roles,
+            },
+            accessToken: data.data.token,
+            refreshToken: data.data.refreshToken,
+          }),
+        );
       })
       .catch(() => {
         dispatch(logout());

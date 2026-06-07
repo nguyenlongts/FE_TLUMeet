@@ -6,46 +6,69 @@ import WaitingRoom from "../pages/meetings/WaitingRoom";
 import Home from "../pages/home/Home";
 import Register from "../pages/login/Register";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
 import MeetingPage from "../pages/meetings/MeetingPage";
 import MeetingRoom from "../pages/meetings/MeetingRoom";
 import Dashboard from "../pages/dashboard/Dashboard";
-import ProfilePage from "../pages/profile/ProfileModal";
+import ProfilePage from "../pages/profile/ProfilePage";
 import AppLayout from "../components/AppLayout";
+import AdminLayout from "../components/AdminLayout";
+import AdminHome from "../pages/admin/AdminHome";
+import UsersManagement from "../pages/admin/UsersManagement";
+import StatsPage from "../pages/admin/stats/StatsPage";
+import MeetingsManagement from "../pages/admin/meetings/MeetingsManagement";
+import AdminSettingsPage from "../pages/admin/AdminSettingsPage";
+import SettingsPage from "../pages/settings/SettingsPage";
 import ForgotPasswordPage from "../components/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/login/ResetPasswordPage";
 import ChangePasswordPage from "../pages/login/ChangePasswordPage";
+import PublicRoute from "./PublicRote";
 
 const router = createBrowserRouter([
   {
-    element: <AppLayout />, 
+    element: <AppLayout />,
     children: [
-     
-      { path: "/", element: <Home /> },
-      { path: "/login", element: <LoginForm /> },
-      { path: "/forgot-password", element: <ForgotPasswordPage /> },
-      { path: "/reset-password", element: <ResetPasswordPage /> },
-      { path: "/register", element: <Register /> },
+      { path: "/", element: <PublicRoute><Home /></PublicRoute> },
+      { path: "/login", element: <PublicRoute><LoginForm /> </PublicRoute>},
+      { path: "/register", element: <PublicRoute><Register /></PublicRoute> },
+      { path: "/forgot-password", element: <PublicRoute><ForgotPasswordPage /></PublicRoute> },
+      { path: "/reset-password", element: <PublicRoute><ResetPasswordPage /></PublicRoute> },
       { path: "/waiting-room", element: <WaitingRoom /> },
       { path: "/meet/:roomName", element: <MeetingRoom /> },
 
-     
       {
         element: <ProtectedRoute />,
         children: [
+          { path: "/change-password", element: <ChangePasswordPage /> },
           {
-            element: <App />, 
+            element: <App />,
             children: [
               { path: "/dashboard", element: <Dashboard /> },
               { path: "/calendar", element: <CalendarPage /> },
               { path: "/profile", element: <ProfilePage /> },
               { path: "/meetings", element: <MeetingPage /> },
-              { path: "/change-password", element: <ChangePasswordPage /> },
+              {path: "/settings", element: <SettingsPage/>}
             ],
           },
         ],
       },
 
       { path: "*", element: <Navigate to="/" replace /> },
+    ],
+  },
+
+  {
+    element: <AdminRoute />,
+    children: [
+      {
+        element: <AdminLayout />,
+        children: [
+          { path: "/admin", element: <StatsPage /> },
+          { path: "/admin/users", element: <UsersManagement /> },
+          { path: "/admin/meetings", element: <MeetingsManagement/>},
+          { path: "/admin/settings", element: <AdminSettingsPage /> }
+        ],
+      },
     ],
   },
 ]);

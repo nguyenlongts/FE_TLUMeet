@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {useSelector} from 'react-redux'
 import { selectAccessToken, selectCurrentUser } from "../../redux/features/auth/authSlice";
 import { useGenerateJaasTokenMutation } from "../../redux/features/jass/jaasApi";
+import { useTranslation } from "react-i18next";
 
 const JAAS_CONFIG = {
   appId:          "vpaas-magic-cookie-xxxxxxx",
@@ -13,6 +14,7 @@ const JAAS_CONFIG = {
 
 
 export default function MeetingRoom() {
+  const { t } = useTranslation();
   const { roomName } = useParams();
   const navigate     = useNavigate();
   const token=useSelector(selectAccessToken);
@@ -45,7 +47,7 @@ export default function MeetingRoom() {
   const authHeader = { Authorization: `Bearer ${token?token:tokenGuest}`};
   const [generateJaasToken]=useGenerateJaasTokenMutation()
 
-  //check meeting status
+
   useEffect(() => {
     (async () => {
       try {
@@ -153,7 +155,7 @@ export default function MeetingRoom() {
       script.async   = true;
       script.onload  = initJitsi;
       script.onerror = () =>
-        setStatus(s => ({ ...s, error: "Không thể tải Jitsi. Kiểm tra kết nối." }));
+        setStatus(s => ({ ...s, error: t('meetingRoom.jitsiLoadError') }));
       document.body.appendChild(script);
     };
 
@@ -264,14 +266,14 @@ export default function MeetingRoom() {
   // Host đã end meeting
   if (hostEnded) return (
     <div className="h-screen flex items-center justify-center">
-      <p className="text-xl text-gray-600">Cuộc họp đã kết thúc. Đang chuyển trang...</p>
+      <p className="text-xl text-gray-600">{t('meetingRoom.hostEnded')}</p>
     </div>
   );
 
 
   if (status.needsHost) return (
     <div className="h-screen flex items-center justify-center">
-      <p className="text-gray-500">⏳ Đang chờ Host bắt đầu cuộc họp...</p>
+      <p className="text-gray-500">{t('meetingRoom.waitingHost')}</p>
     </div>
   );
 
@@ -281,7 +283,7 @@ export default function MeetingRoom() {
       <p className="text-red-500">{status.error}</p>
       <button onClick={() => window.location.reload()}
         className="px-4 py-2 bg-indigo-600 text-white rounded-lg">
-        Thử lại
+        {t('meetingRoom.retry')}
       </button>
     </div>
   );
@@ -298,7 +300,7 @@ export default function MeetingRoom() {
         <div className="absolute inset-0 flex items-center justify-center bg-gray-800/90">
           <div className="text-center text-white">
             <div className="animate-spin h-12 w-12 border-b-2 border-indigo-400 rounded-full mx-auto mb-4" />
-            <p>Đang tải phòng họp...</p>
+            <p>{t('meetingRoom.loadingRoom')}</p>
             <p>{status.error}</p>
             <p className="text-sm text-gray-400 mt-1">{roomName}</p>
           </div>

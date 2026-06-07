@@ -1,33 +1,36 @@
-import { useEffect, useState } from "react";
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
-import { useLoginUserMutation } from "../redux/features/auth/authApi";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  selectAccessToken,
-  setCredentials,
-} from "../redux/features/auth/authSlice";
-import toast from "react-hot-toast";
+import { useEffect, useState } from 'react'
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { useLoginUserMutation } from '../redux/features/auth/authApi'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectAccessToken, setCredentials } from '../redux/features/auth/authSlice'
+import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
+
 const LoginForm = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname ?? "/dashboard";
-  const dispatch = useDispatch();
-  const [shouldNavigate, setShouldNavigate] = useState(false);
-  const accessToken = useSelector(selectAccessToken);
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginUser, { isLoading, isSuccess }] = useLoginUserMutation();
-  const [loginError, setLoginError] = useState("");
+  const navigate = useNavigate()
+  const location = useLocation()
+  const dispatch = useDispatch()
+  const from = location.state?.from?.pathname ?? '/dashboard'
+
+  const { t, i18n } = useTranslation()
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loginUser, { isLoading }] = useLoginUserMutation()
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoginError("");
+    e.preventDefault()
     try {
-      const res = await loginUser({
-        email: email,
-        password: password,
-      }).unwrap();
+      const res = await loginUser({ email, password }).unwrap()
+
+      // Decode JWT để lấy roles (backend trả về mảng `roles`, vd ["super_admin"])
+      const payload = JSON.parse(atob(res.data.token.split('.')[1]))
+      const roles = (payload.roles ?? [payload.role ?? payload.Role])
+        .filter(Boolean)
+        .map((r) => r.toString().trim().toLowerCase())
+      const isAdmin = roles.some((r) => r.includes('admin'))
 
       dispatch(
         setCredentials({
@@ -35,37 +38,63 @@ const LoginForm = () => {
             id: res.data.id,
             email: res.data.email,
             name: res.data.name,
+            roles,
           },
           accessToken: res.data.token,
           refreshToken: res.data.refreshToken,
-        }),
-      );
-      setShouldNavigate(true);
-      toast.success("Đăng nhập thành công");
-    } catch (error) {
-      const msg = error?.data?.message || "Email hoặc mật khẩu không chính xác";
-      setLoginError(msg);
-    }
-  };
+        })
+      )
 
-  useEffect(() => {
-    if (shouldNavigate && accessToken) {
-      navigate(from, { replace: true });
+      toast.success(res.message)
+      navigate(isAdmin ? '/admin' : from, { replace: true })
+    } catch (error) {
+      const message =
+        error?.data?.message ||
+        error?.message ||
+        t('login.toast.loginError')
+      toast.error(message, { position: 'top-center' })
     }
-  }, [accessToken, shouldNavigate]);
+  }
+
   return (
-    <div className="flex items-center justify-center h-screen  bg-[#0b0919]">
+    <div className="flex items-center justify-center h-screen bg-[#0b0919]">
       <div className="p-8 bg-[#150f2a] border border-[#2a2245] rounded-lg w-lg">
+
+        {/* Language switcher */}
+        <div className="flex justify-end gap-2 mb-4">
+          <button
+            onClick={() => i18n.changeLanguage('vi')}
+            className={`text-xs px-2 py-1 rounded transition-colors ${
+              i18n.language === 'vi'
+                ? 'bg-purple-600 text-white'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            VI
+          </button>
+          <button
+            onClick={() => i18n.changeLanguage('en')}
+            className={`text-xs px-2 py-1 rounded transition-colors ${
+              i18n.language === 'en'
+                ? 'bg-purple-600 text-white'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            EN
+          </button>
+        </div>
+
         <div className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold text-white">Welcome Back</h1>
-          <p className="text-slate-400">Sign in to your account to continue</p>
+          <h1 className="mb-2 text-4xl font-bold text-white">{t('login.welcome')}</h1>
+          <p className="text-slate-400">{t('login.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email Input */}
+
+          {/* Email */}
           <div className="relative">
             <label className="block mb-2 text-sm font-medium text-white">
-              Email Address
+              {t('login.emailLabel')}
             </label>
             <div className="relative">
               <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
@@ -73,72 +102,64 @@ const LoginForm = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full py-3 pl-12 pr-4  border  rounded-xl tracking-widest text-[#5a5478] placeholder-slate-500 focus:border-black"
+                placeholder={t('login.emailPlaceholder')}
+                className="w-full py-3 pl-12 pr-4 outline-none focus:border-purple-500 border rounded-xl tracking-widest text-[#5a5478] placeholder-slate-500"
               />
             </div>
           </div>
 
-          {/* Password Input */}
+          {/* Password */}
           <div className="relative">
             <label className="block mb-2 text-sm font-medium text-white">
-              Password
+              {t('login.passwordLabel')}
             </label>
             <div className="relative">
               <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
               <input
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="w-full py-3 pl-12 pr-4 border tracking-widest text-[#5a5478]  rounded-xl placeholder-slate-500 focus:border-black "
+                placeholder={t('login.passwordPlaceholder')}
+                className="w-full py-3 pl-12 pr-4 focus:border-purple-500 outline-none border tracking-widest text-[#5a5478] rounded-xl placeholder-slate-500"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-3.5 text-slate-500 hover:text-slate-300 transition-colors"
               >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
           </div>
 
-          {/* Remember Me & Forgot Password */}
+          {/* Remember me + Forgot password */}
           <div className="flex items-center justify-between text-sm">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 className="w-4 h-4 border rounded cursor-pointer bg-slate-700 border-slate-600 accent-blue-500"
               />
-              <span className="text-slate-400">Remember me</span>
+              <span className="text-slate-400">{t('login.rememberMe')}</span>
             </label>
             <button
               type="button"
-              onClick={() => navigate("/forgot-password")}
-              className="text-blue-400 transition-colors hover:text-blue-300"
+              onClick={() => navigate('/forgot-password')}
+              className="text-blue-400 transition-colors hover:text-blue-300 cursor-pointer"
             >
-              Forgot Password?
+              {t('login.forgotPassword')}
             </button>
           </div>
 
-          {/* Login Error */}
-          {loginError && (
-            <div className="flex items-start gap-2 p-3 border border-red-500/40 rounded-lg bg-red-500/10">
-              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-400">{loginError}</p>
-            </div>
-          )}
-
-          {/* Submit Button */}
+          {/* Submit button */}
           <button
             type="submit"
-            className="w-full py-3 font-semibold text-white transition-all duration-300 shadow-lg !bg-gradient-to-r !from-violet-600 !to-purple-500 rounded-xl hover:shadow-blue-500/50 hover:shadow-2xl cursor-pointer  transform hover:scale-105"
+            disabled={isLoading}
+            className={`w-full py-3 font-semibold text-white transition-all duration-300 shadow-lg !bg-gradient-to-r !from-violet-600 !to-purple-500 
+              rounded-xl hover:shadow-blue-500/50 hover:shadow-2xl cursor-pointer 
+              transform hover:scale-105
+              ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Sign In
+            {isLoading ? t('login.signingIn') : t('login.signIn')}
           </button>
 
           {/* Divider */}
@@ -148,12 +169,12 @@ const LoginForm = () => {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 text-white bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-                Or continue with
+                {t('login.orContinueWith')}
               </span>
             </div>
           </div>
 
-          {/* Social Buttons */}
+          {/* Social buttons */}
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -170,18 +191,18 @@ const LoginForm = () => {
           </div>
         </form>
 
-        {/* Toggle to Register */}
         <p className="mt-6 text-center text-slate-400">
-          Don&apos;t have an account?{" "}
+          {t('login.noAccount')}{' '}
           <button
-            onClick={() => navigate("/register")}
+            onClick={() => navigate('/register')}
             className="font-semibold text-blue-400 transition-colors hover:text-blue-300"
           >
-            Sign Up
+            {t('login.signUp')}
           </button>
         </p>
       </div>
     </div>
-  );
-};
-export default LoginForm;
+  )
+}
+
+export default LoginForm

@@ -1,14 +1,16 @@
 // src/components/ProtectedRoute.jsx
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { selectAccessToken, selectIsRestoring, selectRefreshToken } from "../redux/features/auth/authSlice";
 
 const ProtectedRoute = () => {
+  const { t } = useTranslation();
   const accessToken = useSelector(selectAccessToken);
   const refreshToken=useSelector(selectRefreshToken)
-    const isStoring=useSelector(selectIsRestoring)
-    
-  if(isStoring) return <>Đang tải</>
+  const isStoring=useSelector(selectIsRestoring)
+
+  if(isStoring) return <>{t('common.loading')}</>
   if (!refreshToken) {
     return <Navigate to="/login"  />;
   }

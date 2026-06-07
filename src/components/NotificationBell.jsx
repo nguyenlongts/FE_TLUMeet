@@ -1,10 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Bell } from "lucide-react";
+import { Bell, X, ChevronRight, Check, XCircle, Video, Loader2 } from "lucide-react";
 import { useNotification } from "../context/NotificationContext";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectAccessToken } from "../redux/features/auth/authSlice";
+import { acceptInvite, rejectInvite } from "../api/notificationApi";
 
 function timeAgo(dateStr) {
-  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  const normalized = dateStr.endsWith("Z") ? dateStr : dateStr + "Z";
+  const diff = Math.floor((Date.now() - new Date(normalized).getTime()) / 1000);
   if (diff < 60) return "Vừa xong";
   if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
   if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
@@ -13,24 +17,235 @@ function timeAgo(dateStr) {
 
 function NotiIcon({ type }) {
   const base =
-    "w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0";
-  if (type === "invitation")
-    return <div className={`${base} bg-indigo-100 text-indigo-600`}>📩</div>;
-  if (type === "meeting_started")
-    return <div className={`${base} bg-green-100 text-green-600`}>▶️</div>;
-  if (type === "invitation_accepted")
-    return <div className={`${base} bg-blue-100 text-blue-600`}>✅</div>;
-  if (type === "invitation_rejected")
-    return <div className={`${base} bg-red-100 text-red-600`}>❌</div>;
-  return <div className={`${base} bg-gray-100 text-gray-500`}>🔔</div>;
+    "w-9 h-9 rounded-full flex items-center justify-center text-sm flex-shrink-0";
+  if (type === "MeetingInvite")
+    return (
+      <div className={`${base} bg-purple-500/20 border border-purple-500/30`}>
+        📩
+      </div>
+    );
+  if (type === "MeetingStarted")
+    return (
+      <div className={`${base} bg-green-500/15 border border-green-500/25`}>
+        ▶️
+      </div>
+    );
+  if (type === "MeetingInviteResponse")
+    return (
+      <div className={`${base} bg-blue-500/15 border border-blue-500/25`}>
+        🔔
+      </div>
+    );
+  return (
+    <div className={`${base} bg-white/5 border border-white/10`}>🔔</div>
+  );
+}
+
+function NotiActions({ noti, onClose }) {
+  const navigate = useNavigate();
+  const token = useSelector(selectAccessToken);
+  const { markOneRead, fetchNotifications } = useNotification();
+  const [status, setStatus] = useState("idle");
+
+  if (noti.type === "MeetingStarted") {
+    let joinLink = "#";
+    try {
+      joinLink = JSON.parse(noti.payload)?.joinLink ?? "#";
+    } catch {}
+    return (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(joinLink);
+          onClose();
+        }}
+        className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition"
+      >
+        <Video className="w-3.5 h-3.5" />
+        Tham gia ngay
+      </button>
+    );
+  }
+
+  if (noti.type === "MeetingInvite") {
+    let payload = {};
+    try {
+      payload = JSON.parse(noti.payload) ?? {};
+    } catch {}
+    // const inviteId = payload.InviteId??payload.inviteId;
+    const inviteId= payload.inviteId
+    console.log(payload, "invite payload") // xem payload trông như thế nào
+    if (status === "accepted")
+      return (
+        <span className="mt-2 inline-flex items-center gap-1 text-xs text-green-400 font-medium">
+          <Check className="w-3.5 h-3.5" /> Đã chấp nhận
+        </span>
+      );
+    if (status === "rejected")
+      return (
+        <span className="mt-2 inline-flex items-center gap-1 text-xs text-red-400 font-medium">
+          <XCircle className="w-3.5 h-3.5" /> Đã từ chối
+        </span>
+      );
+
+    const handleAccept = async (e) => {
+      e.stopPropagation();
+      if (!inviteId) return;
+      setStatus("loading-accept");
+      try {
+        const res = await acceptInvite(inviteId, token);
+        if (res.ok) { setStatus("accepted"); markOneRead(noti.notificationId);}
+        else setStatus("idle");
+      } catch { setStatus("idle"); }
+    };
+
+    const handleReject = async (e) => {
+      e.stopPropagation();
+      if (!inviteId) return;
+      setStatus("loading-reject");
+      try {
+        const res = await rejectInvite(inviteId, token);
+        if (res.ok) { setStatus("rejected"); markOneRead(noti.notificationId); }
+        else setStatus("idle");
+      } catch { setStatus("idle"); }
+    };
+
+    const isLoading = status === "loading-accept" || status === "loading-reject";
+
+    return (
+      <div className="mt-2 flex gap-2">
+        <button
+          onClick={handleAccept}
+          disabled={isLoading}
+          className="flex items-center gap-1 px-3 py-1.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition"
+        >
+          {status === "loading-accept"
+            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            : <Check className="w-3.5 h-3.5" />}
+          Đồng ý
+        </button>
+        <button
+          onClick={handleReject}
+          disabled={isLoading}
+          className="flex items-center gap-1 px-3 py-1.5 bg-transparent hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed text-red-400 border border-red-500/30 hover:border-red-500/50 text-xs font-semibold rounded-lg transition"
+        >
+          {status === "loading-reject"
+            ? <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
+            : <XCircle className="w-3.5 h-3.5" />}
+          Từ chối
+        </button>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function NotiRow({ noti, onRead, onClose, expanded = false }) {
+  return (
+    <div
+      onClick={() => { if (!noti.isRead) onRead(noti.notificationId); }}
+      className={`flex items-start gap-3 px-4 py-3 cursor-pointer transition ${
+        !noti.isRead
+          ? "bg-violet-500/[0.08] hover:bg-violet-500/[0.12]"
+          : "hover:bg-white/[0.04]"
+      }`}
+    >
+      <NotiIcon type={noti.type} />
+      <div className="flex-1 min-w-0">
+        <p
+          className={`text-sm leading-snug ${
+            !noti.isRead ? "text-slate-100 font-medium" : "text-slate-400"
+          }`}
+        >
+          {noti.title}
+        </p>
+        <p className="text-xs text-slate-500 mt-0.5">{timeAgo(noti.createdAt)}</p>
+        {expanded && <NotiActions noti={noti} onClose={onClose} />}
+      </div>
+      {!noti.isRead && (
+        <span className="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0 mt-1.5" />
+      )}
+    </div>
+  );
+}
+
+function NotificationPanel({ onClose }) {
+  const { notifications, unreadCount, markAllRead, markOneRead, refetch:fetchNotifications } = useNotification();
+
+  return (
+    <div className="fixed inset-0 z-[100] flex justify-end" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
+      <div
+        className="relative z-10 w-full max-w-md h-full bg-[#1e2235] border-l border-white/[0.08] shadow-2xl flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+        style={{ animation: "slideInRight 0.22s cubic-bezier(.4,0,.2,1)" }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08] flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <Bell className="w-5 h-5 text-violet-400" />
+            <span className="font-semibold text-slate-100">Thông báo</span>
+            {unreadCount > 0 && (
+              <span className="px-2 py-0.5 bg-violet-500/25 text-violet-400 text-xs font-bold rounded-full border border-violet-500/30">
+                {unreadCount} mới
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {unreadCount > 0 && (
+              <button
+                onClick={markAllRead}
+                className="text-xs text-violet-400 hover:text-violet-300 transition"
+              >
+                Đánh dấu tất cả đã đọc
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-slate-200 transition"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* List */}
+        <div className="flex-1 overflow-y-auto divide-y divide-white/[0.06]">
+          {notifications.length === 0 ? (
+            <div className="py-16 flex flex-col items-center gap-3 text-slate-500">
+              <Bell className="w-10 h-10 opacity-20" />
+              <span className="text-sm">Không có thông báo nào</span>
+            </div>
+          ) : (
+            notifications.map((noti) => (
+              <NotiRow
+                key={noti.notificationId}
+                noti={noti}
+                onRead={markOneRead}
+                onClose={onClose}
+                expanded
+              />
+            ))
+          )}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to   { transform: translateX(0);    opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
 }
 
 export default function NotificationBell() {
-  const { notifications, unreadCount, markAllRead, markOneRead } =
-    useNotification();
+  const { notifications, unreadCount, markAllRead, markOneRead, refetch:fetchNotifications } = useNotification();
   const [open, setOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = (e) => {
@@ -41,86 +256,80 @@ export default function NotificationBell() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const handleOpen = () => {
-    setOpen((prev) => !prev);
-    if (!open && unreadCount > 0) markAllRead();
-  };
-
-  const handleClickNoti = (noti) => {
-    if (!noti.isRead) markOneRead(noti.notificationId); // ← field BE trả về
-    setOpen(false);
-  };
+  const PREVIEW_COUNT = 5;
+  const previewNotis = notifications.slice(0, PREVIEW_COUNT);
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={handleOpen}
-        className="relative flex items-center justify-center w-11 h-11 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
-        aria-label="Thông báo"
-      >
-        <Bell className="w-5 h-5" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
-            {unreadCount > 99 ? "99+" : unreadCount}
-          </span>
-        )}
-      </button>
-
-      {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <span className="font-semibold text-gray-800 text-sm">
-              Thông báo
+    <>
+      <div className="relative" ref={dropdownRef}>
+        {/* Bell button */}
+        <button
+          onClick={() => setOpen((p) => !p)}
+          className="relative flex items-center justify-center w-10 h-10 rounded-lg border border-white/[0.08] bg-[#1e2235] text-slate-400 hover:text-violet-400 hover:border-violet-500/40 hover:bg-violet-500/10 transition"
+          aria-label="Thông báo"
+        >
+          <Bell className="w-[18px] h-[18px]" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border-2 border-[#0f1117]">
+              {unreadCount > 99 ? "99+" : unreadCount}
             </span>
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllRead}
-                className="text-xs text-indigo-600 hover:text-indigo-800 transition"
-              >
-                Đánh dấu tất cả đã đọc
-              </button>
-            )}
-          </div>
+          )}
+        </button>
 
-          <div className="max-h-96 overflow-y-auto divide-y divide-gray-50">
-            {notifications.length === 0 ? (
-              <div className="py-10 flex flex-col items-center gap-2 text-gray-400">
-                <Bell className="w-8 h-8 opacity-30" />
-                <span className="text-sm">Không có thông báo nào</span>
+        {/* Dropdown */}
+        {open && (
+          <div className="absolute right-0 mt-2 w-80 bg-[#1e2235] rounded-xl border border-white/[0.08] z-50 overflow-hidden shadow-[0_20px_48px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.04)]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08]">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-slate-100 text-sm">Thông báo</span>
+                {unreadCount > 0 && (
+                  <span className="px-2 py-0.5 bg-violet-500/25 text-violet-400 text-[10px] font-bold rounded-full border border-violet-500/30">
+                    {unreadCount} mới
+                  </span>
+                )}
               </div>
-            ) : (
-              notifications.map((noti) => (
+              {unreadCount > 0 && (
                 <button
-                  key={noti.notificationId}
-                  onClick={() => handleClickNoti(noti)}
-                  className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-gray-50 transition ${
-                    !noti.isRead ? "bg-indigo-50" : "bg-white"
-                  }`}
+                  onClick={markAllRead}
+                  className="text-xs text-violet-400 hover:text-violet-300 transition"
                 >
-                  <NotiIcon type={noti.type} />
-                  <div className="flex-1 min-w-0">
-                    <p
-                      className={`text-sm leading-snug ${
-                        !noti.isRead
-                          ? "text-gray-900 font-medium"
-                          : "text-gray-600"
-                      }`}
-                    >
-                      {noti.title}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {timeAgo(noti.createdAt)}
-                    </p>
-                  </div>
-                  {!noti.isRead && (
-                    <span className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0 mt-1.5" />
-                  )}
+                  Đánh dấu tất cả đã đọc
                 </button>
-              ))
-            )}
+              )}
+            </div>
+
+            {/* List */}
+            <div className="max-h-80 overflow-y-auto divide-y divide-white/[0.06]">
+              {previewNotis.length === 0 ? (
+                <div className="py-10 flex flex-col items-center gap-2 text-slate-500">
+                  <Bell className="w-8 h-8 opacity-20" />
+                  <span className="text-sm">Không có thông báo nào</span>
+                </div>
+              ) : (
+                previewNotis.map((noti) => (
+                  <NotiRow
+                    key={noti.notificationId}
+                    noti={noti}
+                    onRead={markOneRead}
+                    onClose={() => setOpen(false)}
+                    expanded={false}
+                  />
+                ))
+              )}
+            </div>
+            <button
+              onClick={() => { setOpen(false); setPanelOpen(true); }}
+              className="w-full flex items-center justify-center gap-1.5 px-4 py-3 border-t border-white/[0.08] text-sm text-violet-400 font-medium hover:bg-violet-500/10 transition"
+            >
+              Xem tất cả thông báo
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      {panelOpen && <NotificationPanel onClose={() => setPanelOpen(false)} />}
+    </>
   );
 }
