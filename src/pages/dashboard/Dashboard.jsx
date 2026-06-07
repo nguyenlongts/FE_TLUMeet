@@ -140,7 +140,9 @@ const Dashboard = () => {
   const user = useSelector(selectCurrentUser)
   const [type, setType] = useState('')
   const { data: meetingsRaw, isLoading: isMeetingsLoading } = useGetAllMeetingByEmailQuery(user?.email, { skip: !user?.email })
-  const meetings = meetingsRaw?.data || []
+  const meetings = [...(meetingsRaw?.data || [])].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  )
   console.log(meetings, 'meetings')
 
   const numberOfMeetings = meetings?.length || 0
@@ -275,10 +277,21 @@ const Dashboard = () => {
 
         {/* Meetings Grid */}
         <div className="grid grid-cols-3 gap-6">
-          {meetings.map((meeting) => (
+          {meetings.slice(0, 6).map((meeting) => (
             <MeetingCard key={meeting.id} meeting={meeting} />
           ))}
         </div>
+
+        {meetings.length > 6 && (
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => navigate('/meetings')}
+              className="px-6 py-2.5 rounded-xl text-sm font-medium text-white border border-purple-500/50 hover:border-purple-400 hover:bg-purple-500/10 transition-colors"
+            >
+              {t('dashboard.viewMore', { count: meetings.length - 6 })}
+            </button>
+          </div>
+        )}
       </div>
 
       {isScheduleMeetingModalOpen && (

@@ -83,7 +83,8 @@
       "scheduleMeetingSubtext": "Đặt lịch trước"
     },
     "todayTitle": "Bạn có {{count}} cuộc họp hôm nay!",
-    "nextMeeting": "Còn {{hours}} giờ đến cuộc họp tiếp theo"
+    "nextMeeting": "Còn {{hours}} giờ đến cuộc họp tiếp theo",
+    "viewMore": "Xem thêm {{count}} cuộc họp"
   },
   "joinModal": {
     "title": "Tham gia phòng họp",
@@ -256,7 +257,15 @@
     "updateSuccess": "Cập nhật thành công",
     "scheduleSuccess": "Lên lịch thành công",
     "error": "Đã xảy ra lỗi",
-    "pastDateError": "Không thể tạo cuộc họp trong quá khứ"
+    "pastDateError": "Không thể tạo cuộc họp trong quá khứ",
+    "validation": {
+      "titleRequired": "Tiêu đề không được để trống",
+      "titleMin": "Tiêu đề phải có ít nhất 3 ký tự",
+      "titleMax": "Tiêu đề không được vượt quá 100 ký tự",
+      "descriptionMax": "Mô tả không được vượt quá 500 ký tự",
+      "dateRequired": "Vui lòng chọn thời gian",
+      "pastDate": "Không thể tạo cuộc họp trong quá khứ"
+    }
   },
   "meetingCard": {
     "joinNow": "Tham gia ngay",

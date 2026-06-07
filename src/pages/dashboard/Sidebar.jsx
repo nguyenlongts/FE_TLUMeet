@@ -1,4 +1,5 @@
 import { Home, Calendar, Video, Settings, LogOut, CirclePlus, User } from 'lucide-react'
+import tluLogo from '../../assets/tlumeet-logo.png'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -43,9 +44,12 @@ const Sidebar = () => {
 
   return (
     <div className="flex flex-col items-center w-56 h-screen gap-12 py-8 border-r bg-linear-to-b from-slate-900 to-slate-950 border-slate-800">
-      <div className="flex items-center justify-center w-20 h-20 transition-shadow rounded-full cursor-pointer bg-gradient-to-br from-orange-400 to-red-500 hover:shadow-lg hover:shadow-orange-500/50">
-        <CirclePlus />
-      </div>
+      <img
+        src={tluLogo}
+        alt="TLUMeeting"
+        className="h-24 w-auto cursor-pointer -mb-6"
+        onClick={() => { navigate('/dashboard'); setActiveView('home') }}
+      />
 
       <nav className="flex flex-col items-start w-full gap-8 px-4">
         <NavItem

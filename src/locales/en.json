@@ -83,7 +83,8 @@
       "scheduleMeetingSubtext": "Plan Your Meeting"
     },
     "todayTitle": "You have {{count}} meetings today!",
-    "nextMeeting": "{{hours}} hours left for the next meeting"
+    "nextMeeting": "{{hours}} hours left for the next meeting",
+    "viewMore": "View {{count}} more meetings"
   },
   "joinModal": {
     "title": "Join a Meeting",
@@ -256,7 +257,15 @@
     "updateSuccess": "Updated successfully",
     "scheduleSuccess": "Scheduled successfully",
     "error": "Something went wrong",
-    "pastDateError": "Cannot create a meeting in the past"
+    "pastDateError": "Cannot create a meeting in the past",
+    "validation": {
+      "titleRequired": "Title is required",
+      "titleMin": "Title must be at least 3 characters",
+      "titleMax": "Title must not exceed 100 characters",
+      "descriptionMax": "Description must not exceed 500 characters",
+      "dateRequired": "Please select a date and time",
+      "pastDate": "Cannot schedule a meeting in the past"
+    }
   },
   "meetingCard": {
     "joinNow": "Join Now",

@@ -21,8 +21,31 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
     requireHostToStart: false,  
   });
 
+  const [errors, setErrors] = useState({});
   const [scheduleMeeting, { isLoading }] = useScheduleMeetingMutation();
   const [updateMeeting, { isLoading: isUpdating }] = useUpdateMeetingApiMutation();
+
+  const validate = () => {
+    const errs = {};
+    if (!formData.title.trim())
+      errs.title = t('scheduleMeetingModal.validation.titleRequired');
+    else if (formData.title.trim().length < 3)
+      errs.title = t('scheduleMeetingModal.validation.titleMin');
+    else if (formData.title.trim().length > 100)
+      errs.title = t('scheduleMeetingModal.validation.titleMax');
+
+    if (formData.description.length > 500)
+      errs.description = t('scheduleMeetingModal.validation.descriptionMax');
+
+    if (type !== "now") {
+      if (!formData.scheduledDateTime)
+        errs.scheduledDateTime = t('scheduleMeetingModal.validation.dateRequired');
+      else if (new Date(formData.scheduledDateTime) < new Date())
+        errs.scheduledDateTime = t('scheduleMeetingModal.validation.pastDate');
+    }
+
+    return errs;
+  };
 
   useEffect(() => {
     if (type === "now") {
@@ -34,16 +57,14 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
-  const handleSubmit = async () => {
-    if (!formData.title || !formData.scheduledDateTime) return;
 
-    if (type !== "now") {
-      const selectedDate = new Date(formData.scheduledDateTime);
-      if (selectedDate < new Date()) {
-        toast.error(t('scheduleMeetingModal.pastDateError'));
-        return;
-      }
+  const handleSubmit = async () => {
+    const errs = validate();
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
     }
 
     const localDate = new Date(formData.scheduledDateTime);
@@ -76,6 +97,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
   const handleClose = () => {
     onClose();
     setFormData({ title: "", description: "", scheduledDateTime: "", duration: 60, requireHostToStart: false });
+    setErrors({});
   };
 
   useEffect(() => {
@@ -140,9 +162,10 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               value={formData.title}
               onChange={handleChange}
               placeholder={t('scheduleMeetingModal.titlePlaceholder')}
-              className="w-full rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-white/30 border border-white/10 outline-none focus:border-purple-500 transition-colors"
+              className={`w-full rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-white/30 border outline-none transition-colors ${errors.title ? 'border-red-500' : 'border-white/10 focus:border-purple-500'}`}
               style={{ background: "rgba(255,255,255,0.06)" }}
             />
+            {errors.title && <p className="text-xs text-red-400">{errors.title}</p>}
           </div>
 
           {/* Description */}
@@ -154,9 +177,10 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               onChange={handleChange}
               placeholder={t('scheduleMeetingModal.descriptionPlaceholder')}
               rows={3}
-              className="w-full rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-white/30 border border-white/10 outline-none focus:border-purple-500 transition-colors resize-none"
+              className={`w-full rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-white/30 border outline-none transition-colors resize-none ${errors.description ? 'border-red-500' : 'border-white/10 focus:border-purple-500'}`}
               style={{ background: "rgba(255,255,255,0.06)" }}
             />
+            {errors.description && <p className="text-xs text-red-400">{errors.description}</p>}
           </div>
 
           {/* Date & Duration */}
@@ -173,9 +197,10 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
                   value={formData.scheduledDateTime}
                   onChange={handleChange}
                   min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
-                  className="w-full rounded-lg px-3.5 py-2.5 text-xs text-white border border-white/10 outline-none focus:border-purple-500 transition-colors"
+                  className={`w-full rounded-lg px-3.5 py-2.5 text-xs text-white border outline-none transition-colors ${errors.scheduledDateTime ? 'border-red-500' : 'border-white/10 focus:border-purple-500'}`}
                   style={{ background: "rgba(255,255,255,0.06)", colorScheme: "dark" }}
                 />
+                {errors.scheduledDateTime && <p className="text-xs text-red-400">{errors.scheduledDateTime}</p>}
               </div>
             )}
             <div className="flex-1 flex flex-col gap-1.5">

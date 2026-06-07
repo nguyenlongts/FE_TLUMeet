@@ -44,9 +44,15 @@ export default function InviteModal({ open, onClose, roomCode }) {
     try {
       setLoading(true);
       const res = await sendInvites(roomCode, emails, token);
+      const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body?.message || `Lỗi ${res.status}`);
+        const msg = body?.Message || body?.message || `Lỗi ${res.status}`;
+        if (res.status === 409) {
+          toast.error(msg, { duration: 5000 });
+        } else {
+          toast.error("Gửi lời mời thất bại: " + msg);
+        }
+        return;
       }
       toast.success(`Đã gửi lời mời tới ${emails.length} người`);
       setEmails([]);
