@@ -33,7 +33,7 @@ export const NotificationProvider = ({ children }) => {
       if (!res.ok) return;
       const data = await res.json();
       console.log(data, "noti"); // xem payload trông như thế nào
-      setNotifications(Array.isArray(data) ? data : []);
+      setNotifications(Array.isArray(data) ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : []);
     } catch {}
   }, [token]);
 
