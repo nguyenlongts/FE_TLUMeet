@@ -188,7 +188,7 @@ export default function Home() {
                         />
                       )
                     }
-                    iconPosition="end"
+                    iconPlacement="end"
                   >
                     {isLoading ? t('home.joinCard.checking') : t('home.joinCard.joinButton')}
                   </Button>

@@ -46,6 +46,7 @@ export default function InviteModal({ open, onClose, roomCode }) {
     try {
       setLoading(true);
       const res = await sendInvites(roomCode, emails, token);
+      const body = await res.json().catch(() => ({}));
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.message || t("inviteModal.errorStatus", { status: res.status }));

@@ -140,12 +140,31 @@ const Dashboard = () => {
   const user = useSelector(selectCurrentUser)
   const [type, setType] = useState('')
   const { data: meetingsRaw, isLoading: isMeetingsLoading } = useGetAllMeetingByEmailQuery(user?.email, { skip: !user?.email })
-  const meetings = meetingsRaw?.data || []
+  const meetings = [...(meetingsRaw?.data || [])].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  )
   console.log(meetings, 'meetings')
 
   const numberOfMeetings = meetings?.length || 0
   const waitingCount = meetings?.filter((m) => m.status === 'WaitingForHost')?.length || 0
   const expiredMeetings = meetings.filter((m) => getMeetingState(m) === 'expired').length
+
+  const today = new Date()
+  const todayCount = meetings.filter((m) => {
+    if (!m.scheduledDateTime) return false
+    const d = parseUtc(m.scheduledDateTime)
+    return d.getFullYear() === today.getFullYear() &&
+      d.getMonth() === today.getMonth() &&
+      d.getDate() === today.getDate()
+  }).length
+
+  const nextUpcoming = meetings
+    .filter((m) => m.scheduledDateTime && getMeetingState(m) === 'upcoming')
+    .sort((a, b) => parseUtc(a.scheduledDateTime) - parseUtc(b.scheduledDateTime))[0]
+
+  const hoursUntilNext = nextUpcoming
+    ? Math.ceil((parseUtc(nextUpcoming.scheduledDateTime) - new Date()) / 3_600_000)
+    : null
 
   const [jitsiReady, setJitsiReady] = useState(false)
   const [hostEnded, setHostEnded] = useState(false)
@@ -176,7 +195,7 @@ const Dashboard = () => {
         <h1 className="mb-8 text-3xl font-bold text-[var(--content)]">{t('dashboard.title')}</h1>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-10">
+        <div className="flex flex-wrap gap-6 mb-10">
           <StatCard
             icon="🔴"
             label={t('dashboard.stats.numberOfMeetings')}

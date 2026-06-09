@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Bell, X, ChevronRight, Check, XCircle, Video, Loader2 } from "lucide-react";
+import { Bell, X, ChevronRight, Check, XCircle, Video, Loader2, ChevronDown, Hash, Clock, User } from "lucide-react";
 import { useNotification } from "../context/NotificationContext";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -53,46 +53,10 @@ function NotiIcon({ type }) {
   );
 }
 
-function NotiActions({ noti, onClose }) {
-  const { t } = useTranslation();
+function NotiActions({ noti, onClose, status, setStatus }) {
   const navigate = useNavigate();
   const token = useSelector(selectAccessToken);
-  const { markOneRead, fetchNotifications } = useNotification();
-  const [status, setStatus] = useState(() => {
-    try {
-      const p = JSON.parse(noti.payload) ?? {};
-      const s = p.status ?? p.Status;
-      if (s === "Accepted") return "accepted";
-      if (s === "Rejected" || s === "Declined") return "rejected";
-    } catch {}
-    return "idle";
-  });
-
-  // Với thông báo "phòng đã bắt đầu", kiểm tra phòng còn hoạt động không
-  // để ẩn nút "Tham gia ngay" khi phòng đã kết thúc.
-  const [meetingEnded, setMeetingEnded] = useState(false);
-  useEffect(() => {
-    if (noti.type !== "MeetingStarted") return;
-    let roomCode;
-    try {
-      const p = JSON.parse(noti.payload) ?? {};
-      roomCode = p.roomCode ?? p.RoomCode;
-    } catch {}
-    if (!roomCode) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await getMeetingStatus(roomCode, token);
-        if (!res.ok) return;
-        const json = await res.json();
-        const data = json?.data ?? json;
-        if (!cancelled && (data?.isEnded === true || data?.status === "Ended")) {
-          setMeetingEnded(true);
-        }
-      } catch { /* bỏ qua lỗi mạng, giữ nút như mặc định */ }
-    })();
-    return () => { cancelled = true; };
-  }, [noti, token]);
+  const { markOneRead } = useNotification();
 
   if (noti.type === "MeetingStarted") {
     if (meetingEnded) return null;
@@ -189,11 +153,63 @@ function NotiActions({ noti, onClose }) {
   return null;
 }
 
-function NotiRow({ noti, onRead, onClose, expanded = false }) {
-  const { t } = useTranslation();
+function NotiDetail({ noti }) {
+  let payload = {};
+  try { payload = JSON.parse(noti.payload) ?? {}; } catch {}
+
+  const title = payload.title || payload.meetingTitle;
+  const host = payload.hostName || payload.hostEmail;
+  const roomCode = payload.roomCode;
+  const scheduledAt = payload.scheduledDateTime || payload.scheduledAt;
+  const duration = payload.duration;
+
+  if (!title && !host && !roomCode && !scheduledAt) return null;
+
+  return (
+    <div className="mt-2 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2.5 flex flex-col gap-1.5">
+      {title && (
+        <p className="text-xs font-medium text-slate-200 truncate">{title}</p>
+      )}
+      {host && (
+        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+          <User className="w-3 h-3 shrink-0" />
+          <span className="truncate">{host}</span>
+        </div>
+      )}
+      {roomCode && (
+        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+          <Hash className="w-3 h-3 shrink-0" />
+          <span className="font-mono tracking-wider">{roomCode}</span>
+        </div>
+      )}
+      {scheduledAt && (
+        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+          <Clock className="w-3 h-3 shrink-0" />
+          <span>
+            {new Date(scheduledAt).toLocaleString("vi-VN", {
+              day: "2-digit", month: "2-digit", year: "numeric",
+              hour: "2-digit", minute: "2-digit",
+            })}
+            {duration ? ` · ${duration} phút` : ""}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotiRow({ noti, onRead, onClose }) {
+  const [open, setOpen] = useState(false);
+  const [actionStatus, setActionStatus] = useState("idle");
+
+  const handleClick = () => {
+    if (!noti.isRead) onRead(noti.notificationId);
+    setOpen((p) => !p);
+  };
+
   return (
     <div
-      onClick={() => { if (!noti.isRead) onRead(noti.notificationId); }}
+      onClick={handleClick}
       className={`flex items-start gap-3 px-4 py-3 cursor-pointer transition ${
         !noti.isRead
           ? "bg-[var(--accent)]/[0.08] hover:bg-[var(--accent)]/[0.12]"
@@ -275,7 +291,6 @@ function NotificationPanel({ onClose }) {
                 noti={noti}
                 onRead={markOneRead}
                 onClose={onClose}
-                expanded
               />
             ))
           )}
@@ -365,7 +380,6 @@ export default function NotificationBell() {
                     noti={noti}
                     onRead={markOneRead}
                     onClose={() => setOpen(false)}
-                    expanded={false}
                   />
                 ))
               )}

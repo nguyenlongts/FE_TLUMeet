@@ -22,9 +22,32 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
   });
   const [errors, setErrors] = useState({});
 
+  const [errors, setErrors] = useState({});
   const [scheduleMeeting, { isLoading }] = useScheduleMeetingMutation();
   const [updateMeeting, { isLoading: isUpdating }] = useUpdateMeetingApiMutation();
   const isSubmitting = isLoading || isUpdating;
+
+  const validate = () => {
+    const errs = {};
+    if (!formData.title.trim())
+      errs.title = t('scheduleMeetingModal.validation.titleRequired');
+    else if (formData.title.trim().length < 3)
+      errs.title = t('scheduleMeetingModal.validation.titleMin');
+    else if (formData.title.trim().length > 100)
+      errs.title = t('scheduleMeetingModal.validation.titleMax');
+
+    if (formData.description.length > 500)
+      errs.description = t('scheduleMeetingModal.validation.descriptionMax');
+
+    if (type !== "now") {
+      if (!formData.scheduledDateTime)
+        errs.scheduledDateTime = t('scheduleMeetingModal.validation.dateRequired');
+      else if (new Date(formData.scheduledDateTime) < new Date())
+        errs.scheduledDateTime = t('scheduleMeetingModal.validation.pastDate');
+    }
+
+    return errs;
+  };
 
   useEffect(() => {
     if (type === "now") {
@@ -191,6 +214,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               className="w-full rounded-lg px-3.5 py-2.5 text-sm text-[var(--content)] placeholder-white/30 border border-[var(--line)] outline-none focus:border-[var(--accent)] transition-colors resize-none"
               style={{ background: "rgba(255,255,255,0.06)" }}
             />
+            {errors.description && <p className="text-xs text-red-400">{errors.description}</p>}
           </div>
 
           {/* Date & Duration */}

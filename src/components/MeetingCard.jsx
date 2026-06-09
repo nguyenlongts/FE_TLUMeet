@@ -195,21 +195,16 @@
 // export default MeetingCard;
 import { useState } from "react";
 import {
-  Search,
   Video,
   Calendar,
   Clock,
   Pencil,
   Trash2,
-  Plus,
-  Users,
-  Edit,
+  UserPlus,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import WaitingRoom from "../pages/meetings/WaitingRoom";
 import InviteModal from "./InviteModal";
-import { UserPlus } from "lucide-react";
 import ScheduleMeetingModal from "../pages/meetings/ScheduleMeetingModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { useTranslation } from "react-i18next";
@@ -222,7 +217,7 @@ const AVATAR_COLORS = [
 ];
 
 const formatDate = (dt) => {
-  const d = new Date(dt);
+  const d = new Date(dt + "Z");
   return d.toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -231,7 +226,7 @@ const formatDate = (dt) => {
 };
 
 const formatTime = (dt) => {
-  const d = new Date(dt);
+  const d = new Date(dt + "Z");
   return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 };
 

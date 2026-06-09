@@ -167,37 +167,54 @@ export default function MeetingRoom() {
       initialized.current = true;
 
       try {
-        // 1) Fetch JWT từ BE
-        const dataRqJaas={
+        let roomFullName, jaasToken;
+
+        if (isModerator) {
+          // Host: lấy JAAS JWT từ backend
+          const res = await generateJaasToken({
             roomName,
             userName,
-            email:userEmail || "",
-            isModerator,
-            avatarUrl:"",
+            email: userEmail || "",
+            isModerator: true,
+            avatarUrl: "",
             expiresInMinutes: 120,
-          }
-        const res= await generateJaasToken(dataRqJaas).unwrap()
-        console.log(res,"resday");
+          }).unwrap();
+          roomFullName = `${res.appId}/${res.roomName}`;
+          jaasToken = res.token;
+        } else {
+          // Guest: lấy JWT từ backend với isModerator: false để có đúng appId
+          const res = await generateJaasToken({
+            roomName,
+            userName: userName || "Guest",
+            email: userEmail,
+            isModerator: false,
+            avatarUrl: "",
+            expiresInMinutes: 120,
+          }).unwrap();
+          roomFullName = `${res.appId}/${res.roomName}`;
+          jaasToken = res.token;
+        }
 
-        // 2) Khởi tạo Jitsi
+        // Khởi tạo Jitsi
         apiRef.current = new window.JitsiMeetExternalAPI(JAAS_CONFIG.domain, {
-          roomName:  `${res.appId}/${res.roomName}`,
-          width:     "100%",
-          height:    "100%",
+          roomName:   roomFullName,
+          width:      "100%",
+          height:     "100%",
           parentNode: containerRef.current,
-          jwt:       res.token,
-          userInfo:  { displayName: userName },
+          ...(jaasToken && { jwt: jaasToken }),
+          userInfo:   { displayName: userName },
           configOverwrite: {
             startWithAudioMuted: true,
             startWithVideoMuted: true,
             prejoinPageEnabled:  false,
             enableWelcomePage:   false,
             disableDeepLinking:  true,
+            inviteUrl:           `${window.location.origin}/meet/${roomName}`,
           },
           interfaceConfigOverwrite: {
-            SHOW_JITSI_WATERMARK:     false,
+            SHOW_JITSI_WATERMARK:      false,
             SHOW_WATERMARK_FOR_GUESTS: false,
-            MOBILE_APP_PROMO:         false,
+            MOBILE_APP_PROMO:          false,
           },
         });
 
@@ -207,6 +224,11 @@ export default function MeetingRoom() {
         apiRef.current.addEventListener("videoConferenceJoined", () => {
           setJitsiReady(true);
           setHasJoined(true);
+          try {
+            apiRef.current?.executeCommand("overwriteConfig", {
+              inviteUrl: `${window.location.origin}/meet/${roomName}`,
+            });
+          } catch (_) {}
         });
 
 
@@ -221,7 +243,8 @@ export default function MeetingRoom() {
         apiRef.current.addEventListener("readyToClose", goHome);
 
       } catch (err) {
-        setStatus(s => ({ ...s, error: err.message }));
+        const msg = err?.data?.error || err?.data?.message || err?.message || "Không thể khởi tạo phòng họp";
+        setStatus(s => ({ ...s, error: msg }));
         console.log(err);
       }
     };

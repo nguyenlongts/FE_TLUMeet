@@ -59,11 +59,19 @@ function RegisterPage() {
     return "#22c55e";
   };
 
+  const getStrengthColor = () => {
+    if (passwordStrength < 40) return "#ef4444";
+    if (passwordStrength < 70) return "#eab308";
+    return "#22c55e";
+  };
+
   const getPasswordStrengthText = () => {
     if (passwordStrength < 40) return t("register.strength.weak");
     if (passwordStrength < 70) return t("register.strength.medium");
     return t("register.strength.strong");
   };
+
+  const getStrengthText = getPasswordStrengthText;
 
   const validateForm = () => {
     const newErrors = {};
