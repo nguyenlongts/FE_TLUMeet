@@ -8,21 +8,21 @@ const genPassword = () => {
   return Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
 }
 const fieldCls = (err) =>
-  `w-full px-3.5 py-2.5 rounded-xl text-sm text-white outline-none border transition-colors
-   bg-[#0f0a1e] placeholder-[#5a4d7a]
-   ${err ? 'border-red-500/50 focus:border-red-400' : 'border-[#2a2245] focus:border-violet-500/60'}`
+  `w-full px-3.5 py-2.5 rounded-xl text-sm text-[var(--content)] outline-none border transition-colors
+   bg-[var(--bg)] placeholder-[var(--faint)]
+   ${err ? 'border-red-500/50 focus:border-red-400' : 'border-[var(--line)] focus:border-[var(--accent)]/60'}`
 
 function ModalActions({ onClose, onSubmit, loading, submitLabel }) {
   const { t } = useTranslation()
   return (
     <div className="flex gap-3 mt-6">
       <button onClick={onClose}
-        className="flex-1 py-2.5 rounded-xl text-sm border border-[#2a2245] hover:bg-white/5 transition-colors"
-        style={{ color: '#8b7bb5' }}>
+        className="flex-1 py-2.5 rounded-xl text-sm border border-[var(--line)] hover:bg-[var(--overlay)] transition-colors"
+        style={{ color: 'var(--muted)' }}>
         {t('admin.users.addModal.cancel')}
       </button>
       <button onClick={onSubmit} disabled={loading}
-        className="flex-[2] py-2.5 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-60"
+        className="flex-[2] py-2.5 rounded-xl text-sm font-semibold text-[var(--content)] flex items-center justify-center gap-2 disabled:opacity-60"
         style={{ background: 'linear-gradient(135deg,#a855f7,#7c3aed)' }}>
         {loading ? <RefreshCw size={14} className="animate-spin" /> : null}
         {submitLabel}
@@ -34,7 +34,7 @@ function ModalActions({ onClose, onSubmit, loading, submitLabel }) {
 function Field({ label, error, children }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: '#8b7bb5' }}>{label}</label>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--muted)' }}>{label}</label>
       {children}
       {error && <p className="text-[11px] mt-1 text-red-400">{error}</p>}
     </div>
@@ -110,18 +110,18 @@ const AddUserModal = ({ onClose, onAdd }) => {
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
               <button onClick={() => setShowPw(p => !p)}
-                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
-                style={{ color: '#8b7bb5' }}>
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--overlay)] transition-colors"
+                style={{ color: 'var(--muted)' }}>
                 {showPw ? <EyeOff size={13} /> : <Eye size={13} />}
               </button>
               <button onClick={copyPw}
-                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
-                style={{ color: copied ? '#34d399' : '#8b7bb5' }}>
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--overlay)] transition-colors"
+                style={{ color: copied ? '#34d399' : 'var(--muted)' }}>
                 {copied ? <Check size={13} /> : <Copy size={13} />}
               </button>
             </div>
           </div>
-          <p className="text-[11px] mt-1" style={{ color: '#5a4d7a' }}>
+          <p className="text-[11px] mt-1" style={{ color: 'var(--faint)' }}>
             {t('admin.users.addModal.passwordHint')}
           </p>
         </Field>

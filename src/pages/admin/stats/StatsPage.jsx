@@ -1,8 +1,12 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Users, Video, BarChart2, Activity, RefreshCw, ChevronRight, User } from "lucide-react"
 import { useGetMeetingsQuery, useGetStatsQuery, useGetUsersQuery } from "../../../redux/features/admin/adminApi"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
+import {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
+  PieChart, Pie, Cell, Legend,
+} from "recharts"
 
 /* ─── helpers ─────────────────────────────────────────────── */
 const useTimeAgo = () => {
@@ -68,6 +72,84 @@ const ErrorState = ({ message }) => {
   )
 }
 
+/* ─── charts ───────────────────────────────────────────────── */
+const STATUS_META = [
+  { key: "live",      label: "Live",      color: "#34d399" },
+  { key: "scheduled", label: "Scheduled", color: "#22d3ee" },
+  { key: "waiting",   label: "Waiting",   color: "#f59e0b" },
+  { key: "ended",     label: "Ended",     color: "#64748b" },
+]
+const normStatus = (s) =>
+  typeof s === "number"
+    ? ({ 0: "scheduled", 1: "waiting", 2: "live", 3: "ended" }[s] ?? "other")
+    : (s || "").toString().toLowerCase()
+
+const DashboardCharts = ({ meetings, t }) => {
+  const { daily, statusData } = useMemo(() => {
+    const days = []
+    const today = new Date(); today.setHours(0, 0, 0, 0)
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today); d.setDate(d.getDate() - i)
+      days.push({ key: d.toDateString(), name: d.toLocaleDateString(undefined, { day: "2-digit", month: "2-digit" }), value: 0 })
+    }
+    const map = Object.fromEntries(days.map((d) => [d.key, d]))
+    const counts = {}
+    meetings.forEach((m) => {
+      counts[normStatus(m.status)] = (counts[normStatus(m.status)] || 0) + 1
+      if (m.createdAt) {
+        const d = new Date(m.createdAt); d.setHours(0, 0, 0, 0)
+        const hit = map[d.toDateString()]; if (hit) hit.value++
+      }
+    })
+    const statusData = STATUS_META
+      .map((m) => ({ name: m.label, value: counts[m.key] || 0, color: m.color }))
+      .filter((x) => x.value > 0)
+    return { daily: days.map(({ name, value }) => ({ name, value })), statusData }
+  }, [meetings])
+
+  const tooltipStyle = { background: "#150f2a", border: "1px solid #2a2245", borderRadius: 12, color: "#fff", fontSize: 12 }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-7">
+      {/* Bar: meetings per day */}
+      <div className="lg:col-span-2 bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5">
+        <h3 className="text-sm font-semibold text-white mb-0.5">{t('admin.stats.charts.perDayTitle', 'Phòng họp 7 ngày qua')}</h3>
+        <p className="text-xs text-slate-500 mb-4">{t('admin.stats.charts.perDaySub', 'Số phòng được tạo theo ngày')}</p>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={daily} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+            <XAxis dataKey="name" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis allowDecimals={false} tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+            <Tooltip cursor={{ fill: "rgba(124,58,237,0.08)" }} contentStyle={tooltipStyle} />
+            <Bar dataKey="value" radius={[6, 6, 0, 0]} fill="#7c3aed" maxBarSize={44} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Pie: status breakdown */}
+      <div className="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5 flex flex-col">
+        <h3 className="text-sm font-semibold text-white mb-0.5">{t('admin.stats.charts.statusTitle', 'Trạng thái phòng họp')}</h3>
+        <p className="text-xs text-slate-500 mb-2">{t('admin.stats.charts.statusSub', 'Phân bổ theo trạng thái')}</p>
+        {statusData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={48} outerRadius={72} paddingAngle={3} stroke="none">
+                {statusData.map((e, i) => <Cell key={i} fill={e.color} />)}
+              </Pie>
+              <Tooltip contentStyle={tooltipStyle} />
+              <Legend verticalAlign="bottom" height={24} iconType="circle" wrapperStyle={{ fontSize: 12, color: "#94a3b8" }} />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center flex-1 py-10 text-sm text-slate-500">
+            {t('admin.stats.charts.noData', 'Chưa có dữ liệu')}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function StatsPage() {
   const { t } = useTranslation()
   const timeAgo = useTimeAgo()
@@ -106,6 +188,7 @@ export default function StatsPage() {
     refetchUsers()
     refetchMeetings()
   }
+
 
   const activeRate = stats && stats.totalMeetings > 0
     ? ((stats.activeMeetings / stats.totalMeetings) * 100).toFixed(1) + "%"
@@ -163,6 +246,8 @@ export default function StatsPage() {
           />
         </div>
 
+        {/* Charts */}
+        <DashboardCharts meetings={meetings} t={t} />
 
         <div className="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
 

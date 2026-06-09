@@ -30,6 +30,12 @@ export const markOneAsRead = (id, token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
+/** GET /api/meeting/{roomCode}/status — lấy trạng thái phòng (isEnded, status, ...) */
+export const getMeetingStatus = (roomCode, token) =>
+  fetch(`${MEETING_BASE}/${roomCode}/status`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
 // ── Meeting Invite API ────────────────────────────────────────────────────────
 
 
@@ -61,7 +67,7 @@ export const acceptInvite = (inviteId, token) =>
 /**
  * Invitee từ chối lời mời.
  * POST /api/meeting/invite/{inviteId}/respond
- * body: { status: "Rejected" }
+ * body: { status: "Declined" }  // backend chỉ chấp nhận "Accepted" | "Declined"
  */
 export const rejectInvite = (inviteId, token) =>
   fetch(`${MEETING_BASE}/invite/${inviteId}/respond`, {
@@ -70,5 +76,5 @@ export const rejectInvite = (inviteId, token) =>
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ status: "Rejected" }),
+    body: JSON.stringify({ status: "Declined" }),
   });

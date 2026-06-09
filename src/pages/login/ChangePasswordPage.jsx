@@ -61,23 +61,23 @@ export default function ChangePasswordPage() {
   }
 
   const inputBase =
-    'w-full py-3 pl-12 pr-12 border rounded-xl tracking-wide text-[#c4b5fd] placeholder-slate-500 bg-[#0f0a1e] focus:outline-none focus:border-violet-500 transition-colors'
+    'w-full py-3 pl-12 pr-12 border rounded-xl tracking-wide text-[var(--accent-fg)] placeholder-slate-500 bg-[var(--bg)] focus:outline-none focus:border-[var(--accent)] transition-colors'
 
   const Field = ({ label, name, showKey, placeholder, error }) => (
     <div>
-      <label className="block mb-2 text-sm font-medium text-white">{label}</label>
+      <label className="block mb-2 text-sm font-medium text-[var(--content)]">{label}</label>
       <div className="relative">
-        <KeyRound className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+        <KeyRound className="absolute left-4 top-3.5 w-5 h-5 text-[var(--faint)]" />
         <input
           type={show[showKey] ? 'text' : 'password'}
           name={name}
           value={form[name]}
           onChange={onChange}
           placeholder={placeholder}
-          className={`${inputBase} ${error ? 'border-red-500/60' : 'border-[#2a2245]'}`}
+          className={`${inputBase} ${error ? 'border-red-500/60' : 'border-[var(--line)]'}`}
         />
         <button type="button" onClick={() => setShow((s) => ({ ...s, [showKey]: !s[showKey] }))}
-          className="absolute right-4 top-3.5 text-slate-500 hover:text-slate-300 transition-colors">
+          className="absolute right-4 top-3.5 text-[var(--faint)] hover:text-[var(--muted)] transition-colors">
           {show[showKey] ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
         </button>
       </div>
@@ -86,22 +86,22 @@ export default function ChangePasswordPage() {
   )
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#0b0919] py-8">
-      <div className="p-8 bg-[#150f2a] border border-[#2a2245] rounded-lg w-full max-w-md mx-4">
+    <div className="flex items-center justify-center min-h-screen bg-[var(--bg)] py-8">
+      <div className="p-8 bg-[var(--surface)] border border-[var(--line)] rounded-lg w-full max-w-md mx-4">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors text-sm mb-6"
+          className="flex items-center gap-2 text-[var(--muted)] hover:text-[var(--content)] transition-colors text-sm mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           {t('changePassword.back')}
         </button>
 
         <div className="mb-8">
-          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-500 mb-5">
-            <KeyRound className="w-7 h-7 text-white" />
+          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent)] mb-5">
+            <KeyRound className="w-7 h-7 text-[var(--content)]" />
           </div>
-          <h1 className="mb-2 text-4xl font-bold text-white">{t('changePassword.title')}</h1>
-          <p className="text-slate-400">{t('changePassword.subtitle')}</p>
+          <h1 className="mb-2 text-4xl font-bold text-[var(--content)]">{t('changePassword.title')}</h1>
+          <p className="text-[var(--muted)]">{t('changePassword.subtitle')}</p>
         </div>
 
         {errors.api && (
@@ -137,7 +137,7 @@ export default function ChangePasswordPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 font-semibold text-white shadow-lg bg-gradient-to-r from-violet-600 to-purple-500 rounded-xl hover:shadow-blue-500/50 hover:shadow-2xl cursor-pointer transform hover:scale-105 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full py-3 font-semibold text-[var(--content)] shadow-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent)] rounded-xl hover:shadow-blue-500/50 hover:shadow-2xl cursor-pointer transform hover:scale-105 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isLoading ? t('changePassword.submitting') : t('changePassword.submit')}
           </button>

@@ -83,7 +83,8 @@
       "scheduleMeetingSubtext": "Plan Your Meeting"
     },
     "todayTitle": "You have {{count}} meetings today!",
-    "nextMeeting": "{{hours}} hours left for the next meeting"
+    "nextMeeting": "{{hours}} hours left for the next meeting",
+    "viewMore": "View more"
   },
   "joinModal": {
     "title": "Join a Meeting",
@@ -230,7 +231,10 @@
     "noResults": "No meetings found for \"{{q}}\"",
     "loading": "Loading...",
     "deleteSuccess": "Meeting deleted",
-    "deleteError": "Failed to delete meeting"
+    "deleteError": "Failed to delete meeting",
+    "tabAll": "All",
+    "tabOwned": "Organized by me",
+    "tabInvited": "Invited"
   },
   "scheduleMeetingModal": {
     "scheduleTitle": "Schedule New Meeting",
@@ -255,12 +259,76 @@
     "saveChanges": "Save Changes",
     "updateSuccess": "Updated successfully",
     "scheduleSuccess": "Scheduled successfully",
-    "error": "Something went wrong"
+    "error": "Something went wrong",
+    "errorTitleRequired": "Please enter a meeting title",
+    "errorDateTimeRequired": "Please select date & time",
+    "errorDateTimePast": "Time must be in the future"
   },
   "meetingCard": {
     "joinNow": "Join Now",
     "invitePeople": "Invite people",
-    "minutes": "{{count}} minutes"
+    "minutes": "{{count}} minutes",
+    "status": {
+      "Scheduled": "Scheduled",
+      "WaitingForHost": "Waiting for host",
+      "Live": "Live",
+      "Ended": "Ended"
+    }
+  },
+  "notificationBell": {
+    "title": "Notifications",
+    "unreadBadge": "{{count}} new",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications",
+    "viewAll": "View all notifications",
+    "joinNow": "Join now",
+    "accepted": "Accepted",
+    "rejected": "Declined",
+    "accept": "Accept",
+    "reject": "Decline",
+    "timeAgo": {
+      "justNow": "Just now",
+      "minutes": "{{count}}m ago",
+      "hours": "{{count}}h ago",
+      "days": "{{count}}d ago"
+    }
+  },
+  "invitePopup": {
+    "title": "Meeting invitation",
+    "subtitle": "You're invited to a meeting",
+    "defaultMeeting": "Meeting",
+    "host": "Host",
+    "accept": "Accept",
+    "reject": "Decline",
+    "toast": {
+      "accepted": "Accepted! You'll be notified when the room starts.",
+      "acceptError": "Could not accept invite: {{error}}",
+      "rejected": "Invite declined."
+    }
+  },
+  "inviteModal": {
+    "title": "Invite people",
+    "emailPlaceholder": "Enter email...",
+    "add": "Add",
+    "cancel": "Cancel",
+    "sending": "Sending...",
+    "sendInvite": "Send Invite ({{count}})",
+    "emailInvalid": "Invalid email",
+    "emailDuplicate": "Email already in the list",
+    "noRoomCode": "Meeting room code not found",
+    "sendSuccess": "Invites sent to {{count}} people",
+    "sendError": "Failed to send invites: {{error}}",
+    "errorStatus": "Error {{status}}"
+  },
+  "deleteConfirmModal": {
+    "confirmDelete": "Confirm Delete",
+    "permanent": "This action is permanent",
+    "defaultTitle": "Delete Item",
+    "defaultDescription": "Are you sure you want to delete this item? This action cannot be undone.",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "delete": "Delete",
+    "deleteSuccess": "Room deleted successfully"
   },
   "dashboardHeader": {
     "searchPlaceholder": "Search..."

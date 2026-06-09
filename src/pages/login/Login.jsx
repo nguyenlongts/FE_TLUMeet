@@ -217,7 +217,7 @@ const LoginPage = () => {
         <div className="mb-8 text-center">
           <div className="flex justify-center mb-4">
             <div className="bg-[#2D8CFF] p-3 rounded-2xl shadow-lg">
-              <Video className="w-12 h-12 text-white" />
+              <Video className="w-12 h-12 text-[var(--content)]" />
             </div>
           </div>
           <h1 className="mb-2 text-3xl font-bold text-gray-900">
@@ -326,7 +326,7 @@ const LoginPage = () => {
                 isLoading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[#2D8CFF] hover:bg-[#0B5CFF] hover:shadow-xl"
-              } text-white`}
+              } text-[var(--content)]`}
             >
               {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
@@ -366,7 +366,7 @@ const LoginPage = () => {
                 </p>
                 <button
                   onClick={handleCloseForgotPassword}
-                  className="w-full py-3 bg-[#2D8CFF] text-white rounded-lg hover:bg-[#0B5CFF] transition font-medium"
+                  className="w-full py-3 bg-[#2D8CFF] text-[var(--content)] rounded-lg hover:bg-[#0B5CFF] transition font-medium"
                 >
                   Đóng
                 </button>
@@ -431,7 +431,7 @@ const LoginPage = () => {
                         isSendingReset
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-[#2D8CFF] hover:bg-[#0B5CFF]"
-                      } text-white`}
+                      } text-[var(--content)]`}
                     >
                       {isSendingReset ? "Đang gửi..." : "Gửi email"}
                     </button>

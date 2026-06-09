@@ -6,10 +6,12 @@ import { useCheckRoomCodeQuery, useJoinMeetingMutation, useLazyCheckRoomCodeQuer
 import WaitingRoom from "../meetings/WaitingRoom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../../context/ThemeContext";
 
 
 export default function Home() {
   const { t } = useTranslation();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [trigger,setTrigger]=useState(false);
@@ -60,53 +62,46 @@ export default function Home() {
   return (
     <ConfigProvider
       theme={{
-        algorithm: theme.darkAlgorithm,
+        algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
         token: {
-          colorPrimary: "#7c3aed",
-          colorBgContainer: "#0e0c1e",
-          colorBorder: "#2a2245",
-          colorText: "#ccc9e8",
-          colorTextPlaceholder: "#3d3860",
+          colorPrimary: isDark ? "#7c3aed" : "#0284c7",
           borderRadius: 12,
           fontSize: 14,
           controlHeight: 44,
-          colorBgElevated: "#1a1535",
         },
         components: {
           Input: {
-            activeBorderColor: "#7c3aed",
-            hoverBorderColor: "#4a3a8a",
+            activeBorderColor: isDark ? "#7c3aed" : "#0284c7",
             paddingInline: 16,
           },
           Form: {
-            labelColor: "#5a5478",
             labelFontSize: 11,
           },
         },
       }}
     >
-      <div className="min-h-screen bg-[#0b0919] flex flex-col font-sans">
+      <div className="min-h-screen bg-[var(--bg)] flex flex-col font-sans">
         {/* Header */}
         <header className="w-full">
           <div className="flex items-center justify-between px-6 py-5 mx-auto max-w-7xl">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl">
-                <Video className="w-6 h-6 text-white" />
+              <div className="p-2 bg-gradient-to-br from-[var(--accent)] to-[var(--accent)] rounded-xl">
+                <Video className="w-6 h-6 text-[var(--content)]" />
               </div>
-              <span className="text-xl font-semibold text-white">TLU Meeting</span>
+              <span className="text-xl font-semibold text-[var(--content)]">TLU Meeting</span>
             </div>
 
             <div className="flex items-center gap-3">
               <button
                 onClick={() => navigate("/login")}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-[#9b8fc0] border border-[#2a2245] rounded-xl hover:bg-[#1a1535] hover:text-white transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted)] border border-[var(--line)] rounded-xl hover:bg-[var(--surface)] hover:text-[var(--content)] transition-colors"
               >
                 <LogIn size={15} />
                 <span className="hidden sm:inline">{t('home.header.signIn')}</span>
               </button>
               <button
                 onClick={() => navigate("/register")}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition-opacity bg-gradient-to-r from-violet-600 to-purple-500 rounded-xl hover:opacity-90"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[var(--content)] transition-opacity bg-gradient-to-r from-[var(--accent)] to-[var(--accent)] rounded-xl hover:opacity-90"
               >
                 <UserPlus size={15} />
                 <span className="hidden sm:inline">{t('home.header.signUp')}</span>
@@ -120,21 +115,21 @@ export default function Home() {
           <div className="flex flex-col items-center w-full max-w-4xl">
             {/* Hero */}
             <div className="mb-12 text-center">
-              <h1 className="mb-4 text-5xl font-bold leading-tight text-white md:text-6xl">
+              <h1 className="mb-4 text-5xl font-bold leading-tight text-[var(--content)] md:text-6xl">
                 {t('home.hero.title1')}
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-400">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-fg)] to-pink-400">
                   {t('home.hero.title2')}
                 </span>
               </h1>
-              <p className="text-lg text-[#5a5478] max-w-2xl mx-auto">
+              <p className="text-lg text-[var(--faint)] max-w-2xl mx-auto">
                 {t('home.hero.subtitle')}
               </p>
             </div>
 
             {/* Card */}
-            <div className="w-full max-w-xl bg-[#150f2a] border border-[#2a2245] rounded-2xl p-8">
-              <h2 className="text-xl font-semibold text-center text-white mb-7">
+            <div className="w-full max-w-xl bg-[var(--surface)] border border-[var(--line)] rounded-2xl p-8">
+              <h2 className="text-xl font-semibold text-center text-[var(--content)] mb-7">
                 {t('home.joinCard.title')}
               </h2>
 
@@ -146,7 +141,7 @@ export default function Home() {
               >
                 <Form.Item
                   label={
-                    <span className="text-[11px] tracking-widest text-[#5a5478] font-medium">
+                    <span className="text-[11px] tracking-widest text-[var(--faint)] font-medium">
                       {t('home.joinCard.roomCodeLabel')}
                     </span>
                   }
@@ -165,7 +160,7 @@ export default function Home() {
 
                 <Form.Item
                   label={
-                    <span className="text-[11px] tracking-widest text-[#5a5478] font-medium">
+                    <span className="text-[11px] tracking-widest text-[var(--faint)] font-medium">
                       {t('home.joinCard.nameLabel')}
                     </span>
                   }
@@ -184,7 +179,7 @@ export default function Home() {
                     htmlType="submit"
                     loading={isLoading}
                     block
-                    className="!h-11 !rounded-xl !font-medium !text-sm !bg-gradient-to-r !from-violet-600 !to-purple-500 !border-0 group"
+                    className="!h-11 !rounded-xl !font-medium !text-sm !bg-gradient-to-r !from-[var(--accent)] !to-[var(--accent)] !border-0 group"
                     icon={
                       !isLoading && (
                         <ArrowRight
@@ -204,7 +199,7 @@ export default function Home() {
         </main>
 
         {/* Footer */}
-        <footer className="py-5 text-center text-[#3d3860] text-xs border-t border-[#1a1535]">
+        <footer className="py-5 text-center text-[var(--line)] text-xs border-t border-[var(--surface)]">
           {t('home.footer')}
         </footer>
         {showWaitingRoom&&(

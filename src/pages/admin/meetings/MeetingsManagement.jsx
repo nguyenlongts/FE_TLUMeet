@@ -5,8 +5,9 @@ import {
   Calendar, Hash, Mail, Clock,
   Shield, ShieldOff, Trash2, Edit2,
   RefreshCw, Copy, Check, CheckCircle2,
-  XCircle, AlertCircle, Play, Square,
+  XCircle, AlertCircle, Play, Square, FileSpreadsheet,
 } from 'lucide-react'
+import * as XLSX from 'xlsx'
 import { useGetMeetingsQuery } from '../../../redux/features/admin/adminApi'
 import {
   useDeleteMeetingApiMutation,
@@ -40,16 +41,6 @@ const STATUS_MAP = {
   waitingForHost: { bg: 'rgba(168,85,247,.12)', color: '#c084fc', border: 'rgba(168,85,247,.28)', i18nKey: 'admin.meetings.status.waitingForHost', Icon: AlertCircle },
   ended:          { bg: 'rgba(139,123,181,.1)', color: '#8b7bb5', border: 'rgba(139,123,181,.2)', i18nKey: 'admin.meetings.status.ended',          Icon: Square },
 }
-
-const AVATAR_COLORS = [
-  'linear-gradient(135deg,#06b6d4,#3b82f6)',
-  'linear-gradient(135deg,#a855f7,#7c3aed)',
-  'linear-gradient(135deg,#f97316,#ef4444)',
-  'linear-gradient(135deg,#10b981,#059669)',
-  'linear-gradient(135deg,#f59e0b,#d97706)',
-]
-const avatarColor = str => AVATAR_COLORS[(str?.charCodeAt(0) || 0) % AVATAR_COLORS.length]
-const getInitials = (title = '') => title?.split(' ')?.slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?'
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }) {
@@ -335,6 +326,22 @@ export default function MeetingsManagement() {
     return d.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' })
   }
 
+  const exportExcel = () => {
+    const rows = (filtered ?? []).map(m => ({
+      ID: m.meetingId,
+      [t('admin.meetings.table.title', 'Tiêu đề')]: m.title,
+      [t('admin.meetings.table.roomCode', 'Mã phòng')]: m.roomCode,
+      [t('admin.meetings.table.host', 'Host')]: m.hostEmail,
+      [t('admin.meetings.table.status', 'Trạng thái')]: m.status,
+      [t('admin.meetings.table.participants', 'Số người')]: m.totalParticipants ?? 0,
+      [t('admin.meetings.table.createdAt', 'Ngày tạo')]: m.createdAt ? new Date(m.createdAt).toLocaleString() : '',
+    }))
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length ? rows : [{}]), 'Meetings')
+    const ts = new Date().toISOString().slice(0, 10)
+    XLSX.writeFile(wb, `tlu-meetings-${ts}.xlsx`)
+  }
+
   return (
     <div className="space-y-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
 
@@ -385,6 +392,13 @@ export default function MeetingsManagement() {
           {t('admin.meetings.createButton')}
         </button>
         <button
+          onClick={exportExcel}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-colors"
+        >
+          <FileSpreadsheet size={15} />
+          {t('admin.meetings.exportButton', 'Xuất Excel')}
+        </button>
+        <button
           onClick={refetch}
           className="w-10 h-10 flex items-center justify-center rounded-xl border border-[#2a2245] hover:bg-white/5 transition-colors"
           style={{ color: '#8b7bb5' }}
@@ -428,17 +442,11 @@ export default function MeetingsManagement() {
                   className="transition-colors hover:bg-white/[0.02]"
                   style={{ borderBottom: i < pageData?.length - 1 ? '1px solid #1a1430' : 'none' }}>
 
-                  {/* Title + avatar */}
+                  {/* Title */}
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shrink-0"
-                        style={{ background: avatarColor(meeting.title) }}>
-                        {getInitials(meeting.title)}
-                      </div>
-                      <div>
-                        <span className="font-medium text-white whitespace-nowrap">{meeting.title}</span>
-                        <p className="text-[11px] mt-0.5" style={{ color: '#5a4d7a' }}>#{meeting.meetingId}</p>
-                      </div>
+                    <div>
+                      <span className="font-medium text-white whitespace-nowrap">{meeting.title}</span>
+                      <p className="text-[11px] mt-0.5" style={{ color: '#5a4d7a' }}>#{meeting.meetingId}</p>
                     </div>
                   </td>
 

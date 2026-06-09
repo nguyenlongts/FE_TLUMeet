@@ -1,1 +1,61 @@
 @import "tailwindcss";
+
+/* Cho phép dùng biến variant `dark:` theo class nếu cần sau này */
+@custom-variant dark (&:where(:root:not(.light), :root:not(.light) *));
+
+/*
+  Token màu ngữ nghĩa.
+  Mặc định (:root) = DARK để giữ nguyên giao diện hiện tại (không FOUC).
+  Thêm class `.light` lên <html> để chuyển sang sáng (trắng + xanh nước biển).
+*/
+:root {
+  --bg: #0b0919;          /* nền trang */
+  --surface: #150f2a;     /* thẻ/panel */
+  --surface-2: #0e0c1e;   /* input/inset/elevated */
+  --line: #2a2245;        /* viền/đường kẻ */
+  --content: #f1eefb;     /* chữ chính */
+  --muted: #8b7bb5;       /* chữ phụ */
+  --faint: #5a5478;       /* chữ mờ/placeholder */
+  --overlay: rgba(255, 255, 255, 0.06); /* lớp phủ nhẹ */
+
+  /* Màu nhấn: DARK = tím */
+  --accent: #7c3aed;
+  --accent-hover: #6d28d9;
+  --accent-fg: #a78bfa;   /* chữ/icon nhấn trên nền */
+}
+
+:root.light {
+  --bg: #eef3fa;          /* trắng ngả xanh nhạt */
+  --surface: #ffffff;
+  --surface-2: #e7eef8;
+  --line: #d3e0ee;
+  --content: #0f2747;     /* navy đậm */
+  --muted: #4f688c;       /* xám-xanh */
+  --faint: #93a7c0;
+  --overlay: rgba(2, 132, 199, 0.07); /* phủ xanh nhạt */
+
+  /* Màu nhấn: LIGHT = xanh nước biển */
+  --accent: #0284c7;
+  --accent-hover: #0369a1;
+  --accent-fg: #0369a1;
+}
+
+/* Đăng ký token thành utility Tailwind: bg-surface, text-content, border-line... */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-content: var(--content);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+}
+
+html,
+body {
+  background-color: var(--bg);
+  color: var(--content);
+}

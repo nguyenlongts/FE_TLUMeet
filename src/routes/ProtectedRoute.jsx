@@ -27,10 +27,10 @@ const ProtectedRoute = () => {
 
 //   if (isRestoring)
 //     return (
-//       <div className="flex items-center justify-center w-full h-screen bg-[#292937]">
+//       <div className="flex items-center justify-center w-full h-screen bg-[var(--surface)]">
 //         <div className="flex flex-col items-center gap-3">
-//           <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
-//           <p className="text-slate-400 text-sm">Đang tải...</p>
+//           <div className="w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+//           <p className="text-[var(--muted)] text-sm">Đang tải...</p>
 //         </div>
 //       </div>
 //     );

@@ -71,11 +71,12 @@ export const NotificationProvider = ({ children }) => {
 
     conn.on("MeetingStarted", (data) => {
       console.log("[SignalR] Phòng đã bắt đầu:", data);
+      const meetingTitle = data.title || "Cuộc họp";
       setNotifications((prev) => [
         {
           notificationId: Date.now(),
           type: "MeetingStarted",
-          title: `Phòng "${data.title}" đã bắt đầu`,
+          title: `Phòng "${meetingTitle}" đã bắt đầu`,
           payload: JSON.stringify(data),
           isRead: false,
           createdAt: new Date().toISOString(),
@@ -87,14 +88,14 @@ export const NotificationProvider = ({ children }) => {
         (t) => (
           <div className="flex items-center gap-3">
             <span>
-              🔴 Phòng <b>{data.title}</b> đã bắt đầu
+              🔴 Phòng <b>{meetingTitle}</b> đã bắt đầu
             </span>
             <button
               onClick={() => {
                 navigate(data.joinLink);
                 toast.dismiss(t.id);
               }}
-              className="px-2 py-1 bg-purple-500 text-white text-xs rounded shrink-0"
+              className="px-2 py-1 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--content)] text-xs rounded shrink-0"
             >
               Tham gia ngay
             </button>

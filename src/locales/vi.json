@@ -83,7 +83,8 @@
       "scheduleMeetingSubtext": "Đặt lịch trước"
     },
     "todayTitle": "Bạn có {{count}} cuộc họp hôm nay!",
-    "nextMeeting": "Còn {{hours}} giờ đến cuộc họp tiếp theo"
+    "nextMeeting": "Còn {{hours}} giờ đến cuộc họp tiếp theo",
+    "viewMore": "Xem thêm"
   },
   "joinModal": {
     "title": "Tham gia phòng họp",
@@ -230,7 +231,10 @@
     "noResults": "Không tìm thấy cuộc họp nào cho \"{{q}}\"",
     "loading": "Đang tải...",
     "deleteSuccess": "Đã xóa phòng thành công",
-    "deleteError": "Xảy ra lỗi khi xóa phòng"
+    "deleteError": "Xảy ra lỗi khi xóa phòng",
+    "tabAll": "Tất cả",
+    "tabOwned": "Mình tổ chức",
+    "tabInvited": "Được mời"
   },
   "scheduleMeetingModal": {
     "scheduleTitle": "Lên lịch cuộc họp",
@@ -255,12 +259,76 @@
     "saveChanges": "Lưu thay đổi",
     "updateSuccess": "Cập nhật thành công",
     "scheduleSuccess": "Lên lịch thành công",
-    "error": "Đã xảy ra lỗi"
+    "error": "Đã xảy ra lỗi",
+    "errorTitleRequired": "Vui lòng nhập tiêu đề cuộc họp",
+    "errorDateTimeRequired": "Vui lòng chọn ngày & giờ",
+    "errorDateTimePast": "Thời gian phải ở tương lai"
   },
   "meetingCard": {
     "joinNow": "Tham gia ngay",
     "invitePeople": "Mời người khác",
-    "minutes": "{{count}} phút"
+    "minutes": "{{count}} phút",
+    "status": {
+      "Scheduled": "Đã lên lịch",
+      "WaitingForHost": "Chờ chủ phòng",
+      "Live": "Đang diễn ra",
+      "Ended": "Đã kết thúc"
+    }
+  },
+  "notificationBell": {
+    "title": "Thông báo",
+    "unreadBadge": "{{count}} mới",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "empty": "Không có thông báo nào",
+    "viewAll": "Xem tất cả thông báo",
+    "joinNow": "Tham gia ngay",
+    "accepted": "Đã chấp nhận",
+    "rejected": "Đã từ chối",
+    "accept": "Đồng ý",
+    "reject": "Từ chối",
+    "timeAgo": {
+      "justNow": "Vừa xong",
+      "minutes": "{{count}} phút trước",
+      "hours": "{{count}} giờ trước",
+      "days": "{{count}} ngày trước"
+    }
+  },
+  "invitePopup": {
+    "title": "Lời mời họp",
+    "subtitle": "Lời mời tham gia cuộc họp",
+    "defaultMeeting": "Cuộc họp",
+    "host": "Host",
+    "accept": "Chấp nhận",
+    "reject": "Từ chối",
+    "toast": {
+      "accepted": "Đã chấp nhận! Bạn sẽ được thông báo khi phòng bắt đầu.",
+      "acceptError": "Không thể chấp nhận lời mời: {{error}}",
+      "rejected": "Đã từ chối lời mời."
+    }
+  },
+  "inviteModal": {
+    "title": "Mời mọi người",
+    "emailPlaceholder": "Nhập email...",
+    "add": "Thêm",
+    "cancel": "Hủy",
+    "sending": "Đang gửi...",
+    "sendInvite": "Gửi lời mời ({{count}})",
+    "emailInvalid": "Email không hợp lệ",
+    "emailDuplicate": "Email đã có trong danh sách",
+    "noRoomCode": "Không tìm thấy mã phòng họp",
+    "sendSuccess": "Đã gửi lời mời tới {{count}} người",
+    "sendError": "Gửi lời mời thất bại: {{error}}",
+    "errorStatus": "Lỗi {{status}}"
+  },
+  "deleteConfirmModal": {
+    "confirmDelete": "Xác nhận xóa",
+    "permanent": "Hành động này không thể hoàn tác",
+    "defaultTitle": "Xóa mục",
+    "defaultDescription": "Bạn có chắc muốn xóa mục này? Hành động này không thể hoàn tác.",
+    "cancel": "Hủy",
+    "deleting": "Đang xóa...",
+    "delete": "Xóa",
+    "deleteSuccess": "Xóa phòng thành công"
   },
   "dashboardHeader": {
     "searchPlaceholder": "Tìm kiếm..."

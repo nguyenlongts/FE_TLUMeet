@@ -2,14 +2,16 @@ import { Trash2, X, AlertTriangle } from "lucide-react";
 import { useDeleteMeetingApiMutation } from "../redux/features/meetings/meetingsApi";
 import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const DeleteConfirmModal = ({
   isOpen,
   onClose,
-  title = "Delete Item",
-  description = "Are you sure you want to delete this item? This action cannot be undone.",
+  title,
+  description,
   meetingId
 }) => {
+  const { t } = useTranslation();
   const [deleteMeetingApi, {isLoading:deleteLoading}]=useDeleteMeetingApiMutation()
   if (!isOpen) return null;
   const handleClose = () => {
@@ -19,7 +21,7 @@ const DeleteConfirmModal = ({
   const onConfirm=async()=>{
     try {
       const res=await deleteMeetingApi(meetingId).unwrap()
-      toast.success("Xóa phòng thành công")
+      toast.success(t("deleteConfirmModal.deleteSuccess"))
     } catch (error) {
       console.log(error)
     }
@@ -28,8 +30,8 @@ const DeleteConfirmModal = ({
   return createPortal(
     <div className="fixed inset-0 z-99999 flex items-center justify-center p-4 bg-black/60">
       <div
-        className="w-full max-w-md rounded-2xl overflow-hidden border border-white/8"
-        style={{ background: "#1a1d2e" }}
+        className="w-full max-w-md rounded-2xl overflow-hidden border border-[var(--line)]"
+        style={{ background: "var(--surface)" }}
       >
         {/* Header */}
         <div
@@ -41,13 +43,13 @@ const DeleteConfirmModal = ({
               <Trash2 size={18} color="white" />
             </div>
             <div>
-              <p className="text-white text-sm font-medium">Confirm Delete</p>
-              <p className="text-white/70 text-xs">This action is permanent</p>
+              <p className="text-[var(--content)] text-sm font-medium">{t("deleteConfirmModal.confirmDelete")}</p>
+              <p className="text-[var(--content)]/70 text-xs">{t("deleteConfirmModal.permanent")}</p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors"
+            className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-[var(--content)] hover:bg-white/25 transition-colors"
           >
             <X size={14} />
           </button>
@@ -64,8 +66,8 @@ const DeleteConfirmModal = ({
               <AlertTriangle size={20} className="text-red-400" />
             </div>
             <div>
-              <p className="text-white text-sm font-medium">{title}</p>
-              <p className="text-white/60 text-xs">{description}</p>
+              <p className="text-[var(--content)] text-sm font-medium">{title || t("deleteConfirmModal.defaultTitle")}</p>
+              <p className="text-[var(--content)]/60 text-xs">{description || t("deleteConfirmModal.defaultDescription")}</p>
             </div>
           </div>
 
@@ -74,18 +76,18 @@ const DeleteConfirmModal = ({
             <button
               onClick={handleClose}
               disabled={deleteLoading}
-              className="flex-1 cursor-pointer py-3 rounded-lg text-sm text-white/70 border border-white/15 hover:border-white/30 transition-colors disabled:opacity-70"
+              className="flex-1 cursor-pointer py-3 rounded-lg text-sm text-[var(--content)]/70 border border-[var(--line)] hover:border-[var(--line)] transition-colors disabled:opacity-70"
             >
-              Cancel
+              {t("deleteConfirmModal.cancel")}
             </button>
             <button
               onClick={onConfirm}
               disabled={deleteLoading}
-              className="flex-[2] cursor-pointer py-3 rounded-lg text-sm font-medium text-white flex items-center justify-center gap-2 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
+              className="flex-[2] cursor-pointer py-3 rounded-lg text-sm font-medium text-[var(--content)] flex items-center justify-center gap-2 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
               style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)" }}
             >
               <Trash2 size={16} />
-              {deleteLoading ? "Deleting..." : "Delete"}
+              {deleteLoading ? t("deleteConfirmModal.deleting") : t("deleteConfirmModal.delete")}
             </button>
           </div>
         </div>

@@ -22,7 +22,7 @@ function DashboardHeader() {
         <div className="flex items-center space-x-3 relative">
           <button
             onClick={() => navigate("/create-meeting")}
-            className="flex items-center space-x-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium shadow-md"
+            className="flex items-center space-x-2 px-6 py-3 bg-indigo-600 text-[var(--content)] rounded-lg hover:bg-indigo-700 transition font-medium shadow-md"
           >
             <Plus className="w-5 h-5" />
             <span>Tạo phòng mới</span>

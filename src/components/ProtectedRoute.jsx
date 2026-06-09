@@ -58,7 +58,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
                     userRole === "Admin" ? "/admin" : "/dashboard";
                   window.location.href = correctPath;
                 }}
-                className="w-full px-6 py-3 bg-[#2D8CFF] text-white rounded-lg hover:bg-[#0B5CFF] transition font-medium"
+                className="w-full px-6 py-3 bg-[#2D8CFF] text-[var(--content)] rounded-lg hover:bg-[#0B5CFF] transition font-medium"
               >
                 Quay về Dashboard
               </button>

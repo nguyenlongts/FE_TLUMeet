@@ -51,8 +51,8 @@ function WaitingRoom({ roomCode, userName, onHostJoined, onCancel }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
       <div
-        className="w-full max-w-md rounded-2xl overflow-hidden border border-white/10"
-        style={{ background: "#1a1d2e" }}
+        className="w-full max-w-md rounded-2xl overflow-hidden border border-[var(--line)]"
+        style={{ background: "var(--surface)" }}
       >
         {/* Header */}
         <div
@@ -62,7 +62,7 @@ function WaitingRoom({ roomCode, userName, onHostJoined, onCancel }) {
           {/* Close button */}
           <button
             onClick={onCancel}
-            className="absolute top-4 right-4 w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-white hover:bg-white/25 transition-colors"
+            className="absolute top-4 right-4 w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-[var(--content)] hover:bg-white/25 transition-colors"
           >
             <X size={14} />
           </button>
@@ -76,8 +76,8 @@ function WaitingRoom({ roomCode, userName, onHostJoined, onCancel }) {
           </div>
 
           <div className="text-center">
-            <p className="text-white font-semibold text-lg">{t('waitingRoom.title')}</p>
-            <p className="text-white/70 text-sm mt-1">
+            <p className="text-[var(--content)] font-semibold text-lg">{t('waitingRoom.title')}</p>
+            <p className="text-[var(--content)]/70 text-sm mt-1">
               {t('waitingRoom.subtitle')}
             </p>
           </div>
@@ -87,10 +87,10 @@ function WaitingRoom({ roomCode, userName, onHostJoined, onCancel }) {
         <div className="flex flex-col gap-4 p-6">
           {/* Timer */}
           <div
-            className="flex flex-col items-center gap-1 rounded-xl py-5 border border-white/10"
+            className="flex flex-col items-center gap-1 rounded-xl py-5 border border-[var(--line)]"
             style={{ background: "rgba(168,85,247,0.08)" }}
           >
-            <p className="text-xs uppercase tracking-wider text-purple-400">
+            <p className="text-xs uppercase tracking-wider text-[var(--accent-fg)]">
               {t('waitingRoom.waitTime')}
             </p>
             <p
@@ -104,30 +104,30 @@ function WaitingRoom({ roomCode, userName, onHostJoined, onCancel }) {
           {/* Info rows */}
           <div className="flex flex-col gap-2">
             <div
-              className="flex items-center justify-between rounded-lg px-4 py-3 border border-white/10"
+              className="flex items-center justify-between rounded-lg px-4 py-3 border border-[var(--line)]"
               style={{ background: "rgba(255,255,255,0.05)" }}
             >
-              <span className="text-sm text-white/50">{t('waitingRoom.roomCode')}</span>
-              <code className="text-sm font-mono font-bold text-purple-400">
+              <span className="text-sm text-[var(--content)]/50">{t('waitingRoom.roomCode')}</span>
+              <code className="text-sm font-mono font-bold text-[var(--accent-fg)]">
                 {roomCode}
               </code>
             </div>
             <div
-              className="flex items-center justify-between rounded-lg px-4 py-3 border border-white/10"
+              className="flex items-center justify-between rounded-lg px-4 py-3 border border-[var(--line)]"
               style={{ background: "rgba(255,255,255,0.05)" }}
             >
-              <span className="text-sm text-white/50">{t('waitingRoom.yourName')}</span>
-              <span className="text-sm font-medium text-white">{userName}</span>
+              <span className="text-sm text-[var(--content)]/50">{t('waitingRoom.yourName')}</span>
+              <span className="text-sm font-medium text-[var(--content)]">{userName}</span>
             </div>
           </div>
 
           {/* Notice */}
           <div
-            className="flex items-start gap-3 rounded-lg px-4 py-3 border border-purple-500/30"
+            className="flex items-start gap-3 rounded-lg px-4 py-3 border border-[var(--accent)]/30"
             style={{ background: "rgba(168,85,247,0.08)" }}
           >
-            <AlertCircle size={16} className="text-purple-400 mt-0.5 shrink-0" />
-            <p className="text-sm text-white/60 leading-relaxed">
+            <AlertCircle size={16} className="text-[var(--accent-fg)] mt-0.5 shrink-0" />
+            <p className="text-sm text-[var(--content)]/60 leading-relaxed">
               {t('waitingRoom.notice')}
             </p>
           </div>
@@ -135,7 +135,7 @@ function WaitingRoom({ roomCode, userName, onHostJoined, onCancel }) {
           {/* Cancel button */}
           <button
             onClick={onCancel}
-            className="w-full py-3 rounded-lg text-sm text-white/70 border border-white/15 hover:border-white/30 hover:text-white transition-colors"
+            className="w-full py-3 rounded-lg text-sm text-[var(--content)]/70 border border-[var(--line)] hover:border-[var(--line)] hover:text-[var(--content)] transition-colors"
           >
             {t('waitingRoom.leave')}
           </button>

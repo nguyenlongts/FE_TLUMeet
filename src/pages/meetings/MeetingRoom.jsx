@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {useSelector} from 'react-redux'
 import { selectAccessToken, selectCurrentUser } from "../../redux/features/auth/authSlice";
 import { useGenerateJaasTokenMutation } from "../../redux/features/jass/jaasApi";
+import { useEndMeetingMutation } from "../../redux/features/meetings/meetingsApi";
 import { useTranslation } from "react-i18next";
 
 const JAAS_CONFIG = {
@@ -46,6 +47,7 @@ export default function MeetingRoom() {
   const tokenGuest=sessionStorage.getItem("joinToken")
   const authHeader = { Authorization: `Bearer ${token?token:tokenGuest}`};
   const [generateJaasToken]=useGenerateJaasTokenMutation()
+  const [endMeeting]=useEndMeetingMutation()
 
 
   useEffect(() => {
@@ -209,11 +211,9 @@ export default function MeetingRoom() {
 
 
         apiRef.current.addEventListener("videoConferenceLeft", async () => {
-          // Host rời → end meeting
+          // Host rời → end meeting (qua RTK để invalidate cache "Meetings")
           if (isModerator) {
-            await fetch(`${JAAS_CONFIG.meetingUrl}/${roomName}/end`, {
-              method: "POST", headers: authHeader,
-            }).catch(() => {});
+            await endMeeting(roomName).unwrap().catch(() => {});
           }
           goHome();
         });
@@ -265,7 +265,7 @@ export default function MeetingRoom() {
     <div className="h-screen flex items-center justify-center flex-col gap-4">
       <p className="text-red-500">{status.error}</p>
       <button onClick={() => window.location.reload()}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-lg">
+        className="px-4 py-2 bg-indigo-600 text-[var(--content)] rounded-lg">
         {t('meetingRoom.retry')}
       </button>
     </div>
@@ -281,7 +281,7 @@ export default function MeetingRoom() {
 
       {!jitsiReady && !status.error && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-800/90">
-          <div className="text-center text-white">
+          <div className="text-center text-[var(--content)]">
             <div className="animate-spin h-12 w-12 border-b-2 border-indigo-400 rounded-full mx-auto mb-4" />
             <p>{t('meetingRoom.loadingRoom')}</p>
             <p>{status.error}</p>

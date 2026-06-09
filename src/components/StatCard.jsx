@@ -13,9 +13,9 @@ const StatCard=({
         {icon}
       </div>
       <div>
-        <p className="text-sm text-slate-400">{label}</p>
-        <p className="text-3xl font-bold text-white">{value}</p>
-        <p className="mt-1 text-xs text-slate-400">{subtext}</p>
+        <p className="text-sm text-[var(--muted)]">{label}</p>
+        <p className="text-3xl font-bold text-[var(--content)]">{value}</p>
+        <p className="mt-1 text-xs text-[var(--muted)]">{subtext}</p>
       </div>
     </div>
   )

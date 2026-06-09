@@ -6,8 +6,10 @@ import { useSelector } from "react-redux";
 import { selectAccessToken } from "../redux/features/auth/authSlice";
 import toast from "react-hot-toast";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 
 export default function InviteModal({ open, onClose, roomCode }) {
+  const { t } = useTranslation();
   const token = useSelector(selectAccessToken);
   const [input, setInput] = useState("");
   const [emails, setEmails] = useState([]);
@@ -21,11 +23,11 @@ export default function InviteModal({ open, onClose, roomCode }) {
     const value = input.trim().toLowerCase();
     if (!value) return;
     if (!isValidEmail(value)) {
-      toast.error("Email không hợp lệ");
+      toast.error(t("inviteModal.emailInvalid"));
       return;
     }
     if (emails.includes(value)) {
-      toast.error("Email đã có trong danh sách");
+      toast.error(t("inviteModal.emailDuplicate"));
       return;
     }
     setEmails((prev) => [...prev, value]);
@@ -38,7 +40,7 @@ export default function InviteModal({ open, onClose, roomCode }) {
   const handleSubmit = async () => {
     if (emails.length === 0) return;
     if (!roomCode) {
-      toast.error("Không tìm thấy mã phòng họp");
+      toast.error(t("inviteModal.noRoomCode"));
       return;
     }
     try {
@@ -46,13 +48,13 @@ export default function InviteModal({ open, onClose, roomCode }) {
       const res = await sendInvites(roomCode, emails, token);
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body?.message || `Lỗi ${res.status}`);
+        throw new Error(body?.message || t("inviteModal.errorStatus", { status: res.status }));
       }
-      toast.success(`Đã gửi lời mời tới ${emails.length} người`);
+      toast.success(t("inviteModal.sendSuccess", { count: emails.length }));
       setEmails([]);
       onClose();
     } catch (err) {
-      toast.error("Gửi lời mời thất bại: " + err.message);
+      toast.error(t("inviteModal.sendError", { error: err.message }));
     } finally {
       setLoading(false);
     }
@@ -77,43 +79,43 @@ export default function InviteModal({ open, onClose, roomCode }) {
           initial={{ scale: 0.9, y: 40 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 40 }}
-          className="w-full max-w-md bg-[#1e2235] rounded-2xl shadow-xl p-5 text-white"
+          className="w-full max-w-md bg-[var(--surface)] rounded-2xl shadow-xl p-5 text-[var(--content)]"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              <UserPlus size={18} /> Invite people
+              <UserPlus size={18} /> {t("inviteModal.title")}
             </h2>
             <div className="flex items-center gap-2">
               {roomCode && (
-                <span className="text-xs text-white/40 font-mono bg-white/5 px-2 py-1 rounded">
+                <span className="text-xs text-[var(--content)]/40 font-mono bg-[var(--overlay)] px-2 py-1 rounded">
                   {roomCode}
                 </span>
               )}
               <button onClick={handleClose}>
-                <X className="text-white/50 hover:text-white" />
+                <X className="text-[var(--content)]/50 hover:text-[var(--content)]" />
               </button>
             </div>
           </div>
 
           {/* Input */}
           <div className="flex gap-2">
-            <div className="flex items-center flex-1 bg-white/5 px-3 rounded-lg border border-white/10">
-              <Mail size={14} className="text-white/40" />
+            <div className="flex items-center flex-1 bg-[var(--overlay)] px-3 rounded-lg border border-[var(--line)]">
+              <Mail size={14} className="text-[var(--content)]/40" />
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAddEmail()}
-                placeholder="Nhập email..."
+                placeholder={t("inviteModal.emailPlaceholder")}
                 className="bg-transparent outline-none px-2 py-2 text-sm flex-1"
               />
             </div>
             <button
               onClick={handleAddEmail}
-              className="px-3 py-2 bg-purple-500 rounded-lg text-sm cursor-pointer hover:bg-purple-600 transition"
+              className="px-3 py-2 bg-[var(--accent)] rounded-lg text-sm cursor-pointer hover:bg-[var(--accent)] transition"
             >
-              Add
+              {t("inviteModal.add")}
             </button>
           </div>
 
@@ -128,7 +130,7 @@ export default function InviteModal({ open, onClose, roomCode }) {
                   <span>{email}</span>
                   <button
                     onClick={() => handleRemove(email)}
-                    className="text-white/50 hover:text-white"
+                    className="text-[var(--content)]/50 hover:text-[var(--content)]"
                   >
                     <X size={11} />
                   </button>
@@ -141,16 +143,16 @@ export default function InviteModal({ open, onClose, roomCode }) {
           <div className="flex justify-end mt-5 gap-2">
             <button
               onClick={handleClose}
-              className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition"
+              className="px-3 py-1.5 text-sm text-[var(--content)]/60 hover:text-[var(--content)] transition"
             >
-              Cancel
+              {t("inviteModal.cancel")}
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading || emails.length === 0}
-              className="px-4 py-1.5 bg-purple-500 text-sm cursor-pointer rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="px-4 py-1.5 bg-[var(--accent)] text-sm cursor-pointer rounded-lg hover:bg-[var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {loading ? "Đang gửi..." : `Send Invite (${emails.length})`}
+              {loading ? t("inviteModal.sending") : t("inviteModal.sendInvite", { count: emails.length })}
             </button>
           </div>
         </motion.div>

@@ -25,16 +25,16 @@ const Header = () => {
   });
 
   return (
-    <div className="w-full px-8 py-6 border-b bg-gradient-to-b from-slate-900 to-slate-950 border-slate-800">
+    <div className="w-full px-8 py-6 border-b bg-[var(--surface)] border-[var(--line)]">
       <div className="flex items-center justify-between">
         {/* Search Bar */}
         <div className="flex-1 max-w-md">
           <div className="relative">
-            <Search className="absolute w-5 h-5 transform -translate-y-1/2 left-4 top-1/2 text-slate-400" />
+            <Search className="absolute w-5 h-5 transform -translate-y-1/2 left-4 top-1/2 text-[var(--muted)]" />
             <input
               type="text"
               placeholder={t('dashboardHeader.searchPlaceholder')}
-              className="w-full py-3 pl-12 pr-4 transition-colors border rounded-full bg-gradient-to-r from-slate-800/50 to-slate-900/50 border-purple-500/50 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-purple-400"
+              className="w-full py-3 pl-12 pr-4 transition-colors border rounded-full bg-[var(--surface-2)] border-[var(--accent)]/50 text-[var(--content)] placeholder-[var(--faint)] focus:outline-none focus:border-[var(--accent-fg)]"
             />
           </div>
         </div>
@@ -43,18 +43,18 @@ const Header = () => {
         <div className="flex items-center gap-6 ml-8">
           {/* Time & Date */}
           <div className="text-right">
-            <div className="text-2xl font-bold text-white">{time}</div>
-            <div className="text-xs text-slate-400">{date}</div>
+            <div className="text-2xl font-bold text-[var(--content)]">{time}</div>
+            <div className="text-xs text-[var(--muted)]">{date}</div>
           </div>
 
           {/* Notification */}
-          <div className="relative p-2 transition-colors text-slate-400 hover:text-white">
+          <div className="relative p-2 transition-colors text-[var(--muted)] hover:text-[var(--content)]">
             <NotificationBell />
             {/* <span className="absolute w-2 h-2 bg-red-500 rounded-full top-1 right-1" /> */}
           </div>
 
           {isLoading ? (
-            <div className="w-10 h-10 rounded-full bg-slate-700/60 animate-pulse" />
+            <div className="w-10 h-10 rounded-full bg-[var(--overlay)] animate-pulse" />
           ) : avatarSrc ? (
             <img
               src={avatarSrc}
@@ -62,7 +62,7 @@ const Header = () => {
               alt="avatar"
             />
           ) : (
-            <div className="flex items-center justify-center w-10 h-10 text-2xl font-semibold text-white rounded-full select-none bg-gradient-to-br from-violet-400 to-pink-500">
+            <div className="flex items-center justify-center w-10 h-10 text-2xl font-semibold text-[var(--content)] rounded-full select-none bg-gradient-to-br from-[var(--accent-fg)] to-pink-500">
               {userData?.name?.[0]?.toUpperCase() ?? "U"}
             </div>
           )}

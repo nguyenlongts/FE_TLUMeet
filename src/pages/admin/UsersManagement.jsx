@@ -552,6 +552,21 @@ export default function UsersManagement() {
     inactive: usersData?.filter(u => u.isActive === false).length || 0,
   }
 
+  const exportExcel = () => {
+    const rows = (filtered ?? []).map(u => ({
+      ID: u.userId,
+      [t('admin.users.table.name', 'Tên')]: u.userName,
+      Email: u.email,
+      [t('admin.users.table.role', 'Vai trò')]: u.role,
+      [t('admin.users.table.status', 'Trạng thái')]: u.isActive ? 'Active' : 'Inactive',
+      [t('admin.users.export.registeredAt', 'Ngày đăng ký')]: u.registeredAt ? new Date(u.registeredAt).toLocaleString() : '',
+    }))
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length ? rows : [{}]), 'Users')
+    const ts = new Date().toISOString().slice(0, 10)
+    XLSX.writeFile(wb, `tlu-users-${ts}.xlsx`)
+  }
+
   if (isUsersLoading) return <Loading text={t('admin.users.loading')} />
 
   return (
@@ -604,6 +619,13 @@ export default function UsersManagement() {
           style={{ color: '#8b7bb5' }}>
           <FileSpreadsheet size={15} />
           {t('admin.users.importExcel')}
+        </button>
+
+        {/* Export Excel */}
+        <button onClick={exportExcel}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-colors">
+          <Download size={15} />
+          {t('admin.users.exportExcel', 'Xuất Excel')}
         </button>
 
         {/* Add single */}

@@ -65,13 +65,13 @@ const JoinLinkModal = ({ isOpen, onClose, pushRoomCode, handleWaiting }) => {
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md mx-4 bg-[#1a1d2e] border border-white/10 rounded-2xl p-6 shadow-2xl"
+        className="relative w-full max-w-md mx-4 bg-[var(--surface)] border border-[var(--line)] rounded-2xl p-6 shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-white font-semibold text-lg">{t('joinModal.title')}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+          <h3 className="text-[var(--content)] font-semibold text-lg">{t('joinModal.title')}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-[var(--content)] transition-colors">
             ✕
           </button>
         </div>
@@ -80,7 +80,7 @@ const JoinLinkModal = ({ isOpen, onClose, pushRoomCode, handleWaiting }) => {
         <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark={false}>
           <Form.Item
             label={
-              <span className="text-[11px] tracking-widest text-[#5a5478] font-medium">
+              <span className="text-[11px] tracking-widest text-[var(--faint)] font-medium">
                 {t('joinModal.roomCodeLabel')}
               </span>
             }
@@ -100,7 +100,7 @@ const JoinLinkModal = ({ isOpen, onClose, pushRoomCode, handleWaiting }) => {
               htmlType="submit"
               loading={isLoading}
               block
-              className="!h-11 !rounded-xl !font-medium !text-sm !bg-gradient-to-r !from-violet-600 !to-purple-500 !border-0 group"
+              className="!h-11 !rounded-xl !font-medium !text-sm !bg-gradient-to-r !from-[var(--accent)] !to-[var(--accent)] !border-0 group"
               icon={
                 !isLoading && (
                   <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
@@ -173,7 +173,7 @@ const Dashboard = () => {
     <div className="flex-1 overflow-auto">
       <div className="p-8 mx-auto max-w-7xl">
 
-        <h1 className="mb-8 text-3xl font-bold text-white">{t('dashboard.title')}</h1>
+        <h1 className="mb-8 text-3xl font-bold text-[var(--content)]">{t('dashboard.title')}</h1>
 
         {/* Stat Cards */}
         <div className="grid grid-cols-3 gap-6 mb-10">
@@ -189,7 +189,7 @@ const Dashboard = () => {
             label={t('dashboard.stats.rescheduled')}
             value={waitingCount}
             subtext={t('dashboard.stats.thisMonth')}
-            color="from-purple-500 to-pink-500"
+            color="from-[var(--accent)] to-pink-500"
           />
           <StatCard
             icon="🔴"
@@ -207,23 +207,23 @@ const Dashboard = () => {
               setType('now')
               setIsScheduleMeetingModalOpen(true)
             }}
-            className="flex items-center gap-3 px-6 py-4 font-semibold text-white transition-all transform bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-600 rounded-2xl hover:scale-105"
+            className="flex items-center gap-3 px-6 py-4 font-semibold text-[var(--content)] transition-all transform bg-gradient-to-r from-[var(--accent)] to-[var(--accent)] hover:from-[var(--accent)] hover:to-[var(--accent)] rounded-2xl hover:scale-105"
           >
             <Video className="w-6 h-6" />
             <div className="text-left">
               <div>{t('dashboard.actions.newMeeting')}</div>
-              <div className="text-xs font-normal text-purple-100">{t('dashboard.actions.newMeetingSubtext')}</div>
+              <div className="text-xs font-normal text-white/80">{t('dashboard.actions.newMeetingSubtext')}</div>
             </div>
           </button>
 
           <button
             onClick={handleJoinLink}
-            className="flex items-center gap-3 px-6 py-4 font-semibold text-white transition-all border border-purple-500/50 hover:border-purple-400 hover:bg-purple-500/10 rounded-2xl"
+            className="flex items-center gap-3 px-6 py-4 font-semibold text-[var(--content)] transition-all border border-[var(--accent)]/50 hover:border-[var(--accent-fg)] hover:bg-[var(--accent)]/10 rounded-2xl"
           >
             <Plus className="w-6 h-6" />
             <div className="text-left">
               <div>{t('dashboard.actions.joinMeeting')}</div>
-              <div className="text-xs font-normal text-slate-400">{t('dashboard.actions.joinMeetingSubtext')}</div>
+              <div className="text-xs font-normal text-[var(--muted)]">{t('dashboard.actions.joinMeetingSubtext')}</div>
             </div>
           </button>
 
@@ -232,34 +232,46 @@ const Dashboard = () => {
               setIsScheduleMeetingModalOpen(true)
               setType('schedule')
             }}
-            className="flex items-center gap-3 px-6 py-4 font-semibold text-white transition-all border border-purple-500/50 hover:border-purple-400 hover:bg-purple-500/10 rounded-2xl"
+            className="flex items-center gap-3 px-6 py-4 font-semibold text-[var(--content)] transition-all border border-[var(--accent)]/50 hover:border-[var(--accent-fg)] hover:bg-[var(--accent)]/10 rounded-2xl"
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-2.3-3.04c-.3-.4-.94-.5-1.42-.1-.48.4-.51 1.04-.1 1.42l3 4c.2.28.53.44.88.44.35 0 .68-.16.88-.44l3.85-5.15c.41-.54.34-1.3-.1-1.42-.44-.12-1.11.05-1.42.45z" />
             </svg>
             <div className="text-left">
               <div>{t('dashboard.actions.scheduleMeeting')}</div>
-              <div className="text-xs font-normal text-slate-400">{t('dashboard.actions.scheduleMeetingSubtext')}</div>
+              <div className="text-xs font-normal text-[var(--muted)]">{t('dashboard.actions.scheduleMeetingSubtext')}</div>
             </div>
           </button>
         </div>
 
         {/* Today's Meetings */}
         <div className="mb-8">
-          <h2 className="mb-2 text-lg font-semibold text-white">
+          <h2 className="mb-2 text-lg font-semibold text-[var(--content)]">
             {t('dashboard.todayTitle', { count: 6 })}
           </h2>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-[var(--muted)]">
             {t('dashboard.nextMeeting', { hours: 2 })}
           </p>
         </div>
 
         {/* Meetings Grid */}
         <div className="grid grid-cols-3 gap-6">
-          {meetings.map((meeting) => (
+          {meetings.slice(0, 6).map((meeting) => (
             <MeetingCard key={meeting.id} meeting={meeting} />
           ))}
         </div>
+
+        {meetings.length > 6 && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() => navigate('/meetings')}
+              className="flex items-center gap-2 px-6 py-3 font-medium text-[var(--content)] transition-all border border-[var(--accent)]/50 hover:border-[var(--accent-fg)] hover:bg-[var(--accent)]/10 rounded-2xl"
+            >
+              {t('dashboard.viewMore')}
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {isScheduleMeetingModalOpen && (

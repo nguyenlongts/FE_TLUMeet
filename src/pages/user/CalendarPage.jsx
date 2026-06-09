@@ -65,23 +65,23 @@ const CalendarPage = () => {
                 onClick={prevMonth}
                 className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
               >
-                <ChevronLeft className="w-5 h-5 text-slate-400" />
+                <ChevronLeft className="w-5 h-5 text-[var(--muted)]" />
               </button>
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-[var(--content)]">
                 {MONTHS[currentMonth]} {currentYear}
               </h1>
               <button
                 onClick={nextMonth}
                 className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
               >
-                <ChevronRight className="w-5 h-5 text-slate-400" />
+                <ChevronRight className="w-5 h-5 text-[var(--muted)]" />
               </button>
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-4 text-xs text-slate-400">
+            <div className="flex items-center gap-4 text-xs text-[var(--muted)]">
               <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block" />
+                <span className="w-2.5 h-2.5 rounded-full bg-violet-500 inline-block" />
                 {t("calendar.legend.mine")}
               </span>
               <span className="flex items-center gap-1.5">
@@ -98,7 +98,7 @@ const CalendarPage = () => {
               {DAYS.map((d) => (
                 <div
                   key={d}
-                  className="text-center text-xs font-semibold text-slate-400 py-2"
+                  className="text-center text-xs font-semibold text-[var(--muted)] py-2"
                 >
                   {d}
                 </div>
@@ -124,18 +124,18 @@ const CalendarPage = () => {
                     className={`
                       aspect-square flex flex-col items-center justify-start pt-1.5 rounded-xl
                       border cursor-pointer transition-all text-sm
-                      ${isToday(day) ? "border-purple-500 bg-purple-500/10" : "border-slate-700/30 hover:border-slate-600/50"}
-                      ${isSelected ? "ring-2 ring-purple-400" : ""}
+                      ${isToday(day) ? "border-[var(--accent)] bg-[var(--accent)]/10" : "border-slate-700/30 hover:border-slate-600/50"}
+                      ${isSelected ? "ring-2 ring-[var(--accent-fg)]" : ""}
                     `}
                   >
-                    <span className={`font-semibold ${isToday(day) ? "text-purple-300" : "text-white"}`}>
+                    <span className={`font-semibold ${isToday(day) ? "text-[var(--accent-fg)]" : "text-[var(--content)]"}`}>
                       {day}
                     </span>
 
                     {meetings.length > 0 && (
                       <div className="flex gap-0.5 mt-1 flex-wrap justify-center">
                         {hostCount > 0 && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
                         )}
                         {invitedCount > 0 && (
                           <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
@@ -144,7 +144,7 @@ const CalendarPage = () => {
                     )}
 
                     {meetings.length > 0 && (
-                      <span className="text-[10px] text-slate-400 mt-0.5">
+                      <span className="text-[10px] text-[var(--muted)] mt-0.5">
                         {meetings.length}
                       </span>
                     )}
@@ -158,18 +158,18 @@ const CalendarPage = () => {
         {/* Sidebar */}
         <div className="w-72 shrink-0">
           <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-4 sticky top-0">
-            <h2 className="text-sm font-semibold text-slate-300 mb-3">
+            <h2 className="text-sm font-semibold text-[var(--muted)] mb-3">
               {selectedDate
                 ? `${String(selectedDate).padStart(2, "0")} ${MONTHS[currentMonth]}`
                 : t("calendar.sidebar.selectPrompt")}
             </h2>
 
             {loading && (
-              <p className="text-slate-500 text-xs">{t("calendar.sidebar.loading")}</p>
+              <p className="text-[var(--faint)] text-xs">{t("calendar.sidebar.loading")}</p>
             )}
 
             {!loading && selectedDate && selectedMeetings.length === 0 && (
-              <p className="text-slate-500 text-xs">{t("calendar.sidebar.noMeetings")}</p>
+              <p className="text-[var(--faint)] text-xs">{t("calendar.sidebar.noMeetings")}</p>
             )}
 
             <div className="flex flex-col gap-2">
@@ -178,24 +178,24 @@ const CalendarPage = () => {
                   key={m.id}
                   className={`p-3 rounded-xl border text-sm ${
                     m.calendarType === "host"
-                      ? "border-purple-500/30 bg-purple-500/10"
+                      ? "border-violet-500/30 bg-violet-500/10"
                       : "border-blue-400/30 bg-blue-400/10"
                   }`}
                 >
                   <div className="flex items-center gap-1.5 mb-1">
                     <span
                       className={`w-2 h-2 rounded-full ${
-                        m.calendarType === "host" ? "bg-purple-500" : "bg-blue-400"
+                        m.calendarType === "host" ? "bg-violet-500" : "bg-blue-400"
                       }`}
                     />
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-[var(--muted)]">
                       {m.calendarType === "host"
                         ? t("calendar.sidebar.mine")
                         : t("calendar.sidebar.invited")}
                     </span>
                   </div>
-                  <p className="font-medium text-white truncate">{m.title}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="font-medium text-[var(--content)] truncate">{m.title}</p>
+                  <p className="text-xs text-[var(--muted)] mt-0.5">
                     {new Date(m.scheduledDateTime).toLocaleTimeString("vi-VN", {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -203,7 +203,7 @@ const CalendarPage = () => {
                     {" — "}
                     {t("calendar.sidebar.duration", { duration: m.duration })}
                   </p>
-                  <p className="text-xs text-slate-500 font-mono mt-0.5">{m.roomCode}</p>
+                  <p className="text-xs text-[var(--faint)] font-mono mt-0.5">{m.roomCode}</p>
                 </div>
               ))}
             </div>

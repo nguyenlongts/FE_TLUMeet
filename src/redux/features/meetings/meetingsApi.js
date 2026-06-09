@@ -50,12 +50,14 @@ const meetingsApi = createApi({
         url: `/meeting/${roomCode}/start`,
         method: "POST",
       }),
+      invalidatesTags: ["Meetings"],
     }),
     endMeeting: builders.mutation({
       query: (roomCode) => ({
         url: `/meeting/${roomCode}/end`,
         method: "POST",
       }),
+      invalidatesTags: ["Meetings"],
     }),
     joinMeeting: builders.mutation({
       query: (data) => ({
@@ -87,6 +89,7 @@ const meetingsApi = createApi({
         url: `/meeting/invited`,
         method: "GET",
       }),
+      providesTags: ["Meetings"],
     }),
   }),
 });

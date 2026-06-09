@@ -9,7 +9,6 @@ import {
   Users,
   BarChart3,
   Video,
-  Bell,
   Settings,
   LogOut,
   ChevronLeft,
@@ -31,7 +30,6 @@ export default function AdminLayout() {
   const [collapsed,    setCollapsed]    = useState(false)
   const [mobileOpen,   setMobileOpen]   = useState(false)
   const [searchQuery,  setSearchQuery]  = useState('')
-  const [notifCount]                    = useState(4)
 
   const NAV_ITEMS = [
     {
@@ -50,7 +48,6 @@ export default function AdminLayout() {
     {
       section: t('admin.nav.system'),
       items: [
-        { icon: Bell, label: t('admin.nav.notifications'), path: '/admin/notifications' },
         { icon: Settings, label: t('admin.nav.settings'), path: '/admin/settings' },
       ],
     },
@@ -257,22 +254,6 @@ export default function AdminLayout() {
                 </button>
               ))}
             </div>
-
-            {/* Notification bell */}
-            <button
-              className="relative w-9 h-9 flex items-center justify-center rounded-xl border border-[#2a2245] hover:bg-white/5 transition-colors"
-              style={{ background: '#0f0a1e' }}
-            >
-              <Bell size={16} style={{ color: '#8b7bb5' }} />
-              {notifCount > 0 && (
-                <span
-                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg, #a855f7, #7c3aed)' }}
-                >
-                  {notifCount}
-                </span>
-              )}
-            </button>
 
             {/* Divider */}
             <div className="w-px h-6 mx-1" style={{ background: '#2a2245' }} />

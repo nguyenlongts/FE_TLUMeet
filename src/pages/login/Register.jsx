@@ -116,15 +116,15 @@ function RegisterPage() {
   };
 
   const inputClass = (field) =>
-    `w-full py-3 pl-12 pr-4 border rounded-xl tracking-wide text-[#5a5478] placeholder-slate-500 focus:outline-none focus:border-violet-500 transition-colors ${
+    `w-full py-3 pl-12 pr-4 border rounded-xl tracking-wide text-[var(--faint)] placeholder-slate-500 focus:outline-none focus:border-[var(--accent)] transition-colors ${
       errors[field]
         ? "border-red-500/60 bg-red-500/5"
-        : "border-[#2a2245] bg-[#0f0a1e]"
+        : "border-[var(--line)] bg-[var(--bg)]"
     }`;
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#0b0919] py-8">
-      <div className="p-8 bg-[#150f2a] border border-[#2a2245] rounded-lg w-full max-w-md mx-4">
+    <div className="flex items-center justify-center min-h-screen bg-[var(--bg)] py-8">
+      <div className="p-8 bg-[var(--surface)] border border-[var(--line)] rounded-lg w-full max-w-md mx-4">
 
         {/* Language switcher */}
         <div className="flex justify-end gap-2 mb-4">
@@ -132,8 +132,8 @@ function RegisterPage() {
             onClick={() => i18n.changeLanguage("vi")}
             className={`text-xs px-2 py-1 rounded transition-colors ${
               i18n.language === "vi"
-                ? "bg-purple-600 text-white"
-                : "text-slate-400 hover:text-white"
+                ? "bg-[var(--accent)] text-[var(--content)]"
+                : "text-[var(--muted)] hover:text-[var(--content)]"
             }`}
           >
             VI
@@ -142,8 +142,8 @@ function RegisterPage() {
             onClick={() => i18n.changeLanguage("en")}
             className={`text-xs px-2 py-1 rounded transition-colors ${
               i18n.language === "en"
-                ? "bg-purple-600 text-white"
-                : "text-slate-400 hover:text-white"
+                ? "bg-[var(--accent)] text-[var(--content)]"
+                : "text-[var(--muted)] hover:text-[var(--content)]"
             }`}
           >
             EN
@@ -152,19 +152,19 @@ function RegisterPage() {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold text-white">{t("register.title")}</h1>
-          <p className="text-slate-400">{t("register.subtitle")}</p>
+          <h1 className="mb-2 text-4xl font-bold text-[var(--content)]">{t("register.title")}</h1>
+          <p className="text-[var(--muted)]">{t("register.subtitle")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
 
           {/* Full Name */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-white">
+            <label className="block mb-2 text-sm font-medium text-[var(--content)]">
               {t("register.fullNameLabel")}
             </label>
             <div className="relative">
-              <User className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+              <User className="absolute left-4 top-3.5 w-5 h-5 text-[var(--faint)]" />
               <input
                 type="text"
                 name="fullName"
@@ -181,11 +181,11 @@ function RegisterPage() {
 
           {/* Email */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-white">
+            <label className="block mb-2 text-sm font-medium text-[var(--content)]">
               {t("register.emailLabel")}
             </label>
             <div className="relative">
-              <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+              <Mail className="absolute left-4 top-3.5 w-5 h-5 text-[var(--faint)]" />
               <input
                 type="email"
                 name="email"
@@ -202,11 +202,11 @@ function RegisterPage() {
 
           {/* Password */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-white">
+            <label className="block mb-2 text-sm font-medium text-[var(--content)]">
               {t("register.passwordLabel")}
             </label>
             <div className="relative">
-              <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+              <Lock className="absolute left-4 top-3.5 w-5 h-5 text-[var(--faint)]" />
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
@@ -218,7 +218,7 @@ function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-3.5 text-slate-500 hover:text-slate-300 transition-colors"
+                className="absolute right-4 top-3.5 text-[var(--faint)] hover:text-[var(--muted)] transition-colors"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -226,12 +226,12 @@ function RegisterPage() {
             {formData.password && (
               <div className="mt-2">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-slate-500">{t("register.passwordStrength")}</span>
+                  <span className="text-xs text-[var(--faint)]">{t("register.passwordStrength")}</span>
                   <span className="text-xs font-medium" style={{ color: getPasswordStrengthColor() }}>
                     {getPasswordStrengthText()}
                   </span>
                 </div>
-                <div className="w-full bg-[#2a2245] rounded-full h-1.5">
+                <div className="w-full bg-[var(--line)] rounded-full h-1.5">
                   <div
                     className="h-1.5 rounded-full transition-all duration-300"
                     style={{
@@ -249,11 +249,11 @@ function RegisterPage() {
 
           {/* Confirm Password */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-white">
+            <label className="block mb-2 text-sm font-medium text-[var(--content)]">
               {t("register.confirmPasswordLabel")}
             </label>
             <div className="relative">
-              <Lock className="absolute left-4 top-3.5 w-5 h-5 text-slate-500" />
+              <Lock className="absolute left-4 top-3.5 w-5 h-5 text-[var(--faint)]" />
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
@@ -265,7 +265,7 @@ function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-3.5 text-slate-500 hover:text-slate-300 transition-colors"
+                className="absolute right-4 top-3.5 text-[var(--faint)] hover:text-[var(--muted)] transition-colors"
               >
                 {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -279,9 +279,9 @@ function RegisterPage() {
           <div className="flex items-start gap-2 text-sm">
             <input
               type="checkbox"
-              className="w-4 h-4 mt-0.5 border rounded cursor-pointer bg-slate-700 border-slate-600 accent-violet-500"
+              className="w-4 h-4 mt-0.5 border rounded cursor-pointer bg-slate-700 border-slate-600 accent-[var(--accent)]"
             />
-            <span className="text-slate-400">
+            <span className="text-[var(--muted)]">
               {t("register.terms")}{" "}
               <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors">
                 {t("register.termsLink")}
@@ -297,7 +297,7 @@ function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 font-semibold text-white transition-all duration-300 shadow-lg !bg-gradient-to-r !from-violet-600 !to-purple-500 rounded-xl hover:shadow-blue-500/50 hover:shadow-2xl cursor-pointer transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full py-3 font-semibold text-[var(--content)] transition-all duration-300 shadow-lg !bg-gradient-to-r !from-[var(--accent)] !to-[var(--accent)] rounded-xl hover:shadow-blue-500/50 hover:shadow-2xl cursor-pointer transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
@@ -318,7 +318,7 @@ function RegisterPage() {
               <div className="w-full border-t border-slate-700/50" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 text-white bg-[#150f2a]">
+              <span className="px-2 text-[var(--content)] bg-[var(--surface)]">
                 {t("register.orContinueWith")}
               </span>
             </div>
@@ -328,20 +328,20 @@ function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              className="py-3 font-medium text-white transition-all border bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 rounded-xl hover:border-slate-600/50"
+              className="py-3 font-medium text-[var(--content)] transition-all border bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 rounded-xl hover:border-slate-600/50"
             >
               Google
             </button>
             <button
               type="button"
-              className="py-3 font-medium text-white transition-all border bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 rounded-xl hover:border-slate-600/50"
+              className="py-3 font-medium text-[var(--content)] transition-all border bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 rounded-xl hover:border-slate-600/50"
             >
               Facebook
             </button>
           </div>
         </form>
 
-        <p className="mt-6 text-center text-slate-400">
+        <p className="mt-6 text-center text-[var(--muted)]">
           {t("register.hasAccount")}{" "}
           <button
             onClick={() => navigate("/login")}

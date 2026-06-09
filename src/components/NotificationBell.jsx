@@ -4,15 +4,27 @@ import { useNotification } from "../context/NotificationContext";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectAccessToken } from "../redux/features/auth/authSlice";
-import { acceptInvite, rejectInvite } from "../api/notificationApi";
+import { acceptInvite, rejectInvite, getMeetingStatus } from "../api/notificationApi";
+import { useTranslation } from "react-i18next";
 
-function timeAgo(dateStr) {
+function timeAgo(dateStr, t) {
   const normalized = dateStr.endsWith("Z") ? dateStr : dateStr + "Z";
   const diff = Math.floor((Date.now() - new Date(normalized).getTime()) / 1000);
-  if (diff < 60) return "Vừa xong";
-  if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-  return `${Math.floor(diff / 86400)} ngày trước`;
+  if (diff < 60) return t("notificationBell.timeAgo.justNow");
+  if (diff < 3600) return t("notificationBell.timeAgo.minutes", { count: Math.floor(diff / 60) });
+  if (diff < 86400) return t("notificationBell.timeAgo.hours", { count: Math.floor(diff / 3600) });
+  return t("notificationBell.timeAgo.days", { count: Math.floor(diff / 86400) });
+}
+
+// Sắp xếp notification mới nhất lên đầu (theo createdAt giảm dần).
+// Chuẩn hóa "Z" để noti từ DB (UTC, không có Z) và noti realtime so sánh nhất quán.
+function sortByNewest(list) {
+  const ts = (d) => {
+    if (!d) return 0;
+    const s = typeof d === "string" && !d.endsWith("Z") ? d + "Z" : d;
+    return new Date(s).getTime();
+  };
+  return [...list].sort((a, b) => ts(b.createdAt) - ts(a.createdAt));
 }
 
 function NotiIcon({ type }) {
@@ -20,13 +32,13 @@ function NotiIcon({ type }) {
     "w-9 h-9 rounded-full flex items-center justify-center text-sm flex-shrink-0";
   if (type === "MeetingInvite")
     return (
-      <div className={`${base} bg-purple-500/20 border border-purple-500/30`}>
+      <div className={`${base} bg-[var(--accent)]/20 border border-[var(--accent)]/30`}>
         📩
       </div>
     );
   if (type === "MeetingStarted")
     return (
-      <div className={`${base} bg-green-500/15 border border-green-500/25`}>
+      <div className={`${base} bg-[var(--accent)]/20 border border-[var(--accent)]/30`}>
         ▶️
       </div>
     );
@@ -37,20 +49,58 @@ function NotiIcon({ type }) {
       </div>
     );
   return (
-    <div className={`${base} bg-white/5 border border-white/10`}>🔔</div>
+    <div className={`${base} bg-[var(--overlay)] border border-[var(--line)]`}>🔔</div>
   );
 }
 
 function NotiActions({ noti, onClose }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const token = useSelector(selectAccessToken);
   const { markOneRead, fetchNotifications } = useNotification();
-  const [status, setStatus] = useState("idle");
+  const [status, setStatus] = useState(() => {
+    try {
+      const p = JSON.parse(noti.payload) ?? {};
+      const s = p.status ?? p.Status;
+      if (s === "Accepted") return "accepted";
+      if (s === "Rejected" || s === "Declined") return "rejected";
+    } catch {}
+    return "idle";
+  });
+
+  // Với thông báo "phòng đã bắt đầu", kiểm tra phòng còn hoạt động không
+  // để ẩn nút "Tham gia ngay" khi phòng đã kết thúc.
+  const [meetingEnded, setMeetingEnded] = useState(false);
+  useEffect(() => {
+    if (noti.type !== "MeetingStarted") return;
+    let roomCode;
+    try {
+      const p = JSON.parse(noti.payload) ?? {};
+      roomCode = p.roomCode ?? p.RoomCode;
+    } catch {}
+    if (!roomCode) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getMeetingStatus(roomCode, token);
+        if (!res.ok) return;
+        const json = await res.json();
+        const data = json?.data ?? json;
+        if (!cancelled && (data?.isEnded === true || data?.status === "Ended")) {
+          setMeetingEnded(true);
+        }
+      } catch { /* bỏ qua lỗi mạng, giữ nút như mặc định */ }
+    })();
+    return () => { cancelled = true; };
+  }, [noti, token]);
 
   if (noti.type === "MeetingStarted") {
+    if (meetingEnded) return null;
+
     let joinLink = "#";
     try {
-      joinLink = JSON.parse(noti.payload)?.joinLink ?? "#";
+      const parsed = JSON.parse(noti.payload) ?? {};
+      joinLink = parsed.joinLink ?? parsed.JoinLink ?? "#";
     } catch {}
     return (
       <button
@@ -59,10 +109,10 @@ function NotiActions({ noti, onClose }) {
           navigate(joinLink);
           onClose();
         }}
-        className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition"
+        className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--content)] text-xs font-semibold rounded-lg transition"
       >
         <Video className="w-3.5 h-3.5" />
-        Tham gia ngay
+        {t("notificationBell.joinNow")}
       </button>
     );
   }
@@ -72,19 +122,17 @@ function NotiActions({ noti, onClose }) {
     try {
       payload = JSON.parse(noti.payload) ?? {};
     } catch {}
-    // const inviteId = payload.InviteId??payload.inviteId;
-    const inviteId= payload.inviteId
-    console.log(payload, "invite payload") // xem payload trông như thế nào
+    const inviteId = payload.inviteId ?? payload.InviteId;
     if (status === "accepted")
       return (
         <span className="mt-2 inline-flex items-center gap-1 text-xs text-green-400 font-medium">
-          <Check className="w-3.5 h-3.5" /> Đã chấp nhận
+          <Check className="w-3.5 h-3.5" /> {t("notificationBell.accepted")}
         </span>
       );
     if (status === "rejected")
       return (
         <span className="mt-2 inline-flex items-center gap-1 text-xs text-red-400 font-medium">
-          <XCircle className="w-3.5 h-3.5" /> Đã từ chối
+          <XCircle className="w-3.5 h-3.5" /> {t("notificationBell.rejected")}
         </span>
       );
 
@@ -117,12 +165,12 @@ function NotiActions({ noti, onClose }) {
         <button
           onClick={handleAccept}
           disabled={isLoading}
-          className="flex items-center gap-1 px-3 py-1.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-lg transition"
+          className="flex items-center gap-1 px-3 py-1.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed text-[var(--content)] text-xs font-semibold rounded-lg transition"
         >
           {status === "loading-accept"
             ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
             : <Check className="w-3.5 h-3.5" />}
-          Đồng ý
+          {t("notificationBell.accept")}
         </button>
         <button
           onClick={handleReject}
@@ -132,7 +180,7 @@ function NotiActions({ noti, onClose }) {
           {status === "loading-reject"
             ? <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
             : <XCircle className="w-3.5 h-3.5" />}
-          Từ chối
+          {t("notificationBell.reject")}
         </button>
       </div>
     );
@@ -142,53 +190,56 @@ function NotiActions({ noti, onClose }) {
 }
 
 function NotiRow({ noti, onRead, onClose, expanded = false }) {
+  const { t } = useTranslation();
   return (
     <div
       onClick={() => { if (!noti.isRead) onRead(noti.notificationId); }}
       className={`flex items-start gap-3 px-4 py-3 cursor-pointer transition ${
         !noti.isRead
-          ? "bg-violet-500/[0.08] hover:bg-violet-500/[0.12]"
-          : "hover:bg-white/[0.04]"
+          ? "bg-[var(--accent)]/[0.08] hover:bg-[var(--accent)]/[0.12]"
+          : "hover:bg-[var(--overlay)]"
       }`}
     >
       <NotiIcon type={noti.type} />
       <div className="flex-1 min-w-0">
         <p
           className={`text-sm leading-snug ${
-            !noti.isRead ? "text-slate-100 font-medium" : "text-slate-400"
+            !noti.isRead ? "text-[var(--content)] font-medium" : "text-[var(--muted)]"
           }`}
         >
           {noti.title}
         </p>
-        <p className="text-xs text-slate-500 mt-0.5">{timeAgo(noti.createdAt)}</p>
+        <p className="text-xs text-[var(--faint)] mt-0.5">{timeAgo(noti.createdAt, t)}</p>
         {expanded && <NotiActions noti={noti} onClose={onClose} />}
       </div>
       {!noti.isRead && (
-        <span className="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0 mt-1.5" />
+        <span className="w-2 h-2 rounded-full bg-[var(--accent-fg)] flex-shrink-0 mt-1.5" />
       )}
     </div>
   );
 }
 
 function NotificationPanel({ onClose }) {
+  const { t } = useTranslation();
   const { notifications, unreadCount, markAllRead, markOneRead, refetch:fetchNotifications } = useNotification();
+  const sortedNotis = sortByNewest(notifications);
 
   return (
     <div className="fixed inset-0 z-[100] flex justify-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
       <div
-        className="relative z-10 w-full max-w-md h-full bg-[#1e2235] border-l border-white/[0.08] shadow-2xl flex flex-col"
+        className="relative z-10 w-full max-w-md h-full bg-[var(--surface)] border-l border-[var(--line)] shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
         style={{ animation: "slideInRight 0.22s cubic-bezier(.4,0,.2,1)" }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08] flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--line)] flex-shrink-0">
           <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-violet-400" />
-            <span className="font-semibold text-slate-100">Thông báo</span>
+            <Bell className="w-5 h-5 text-[var(--accent-fg)]" />
+            <span className="font-semibold text-[var(--content)]">{t("notificationBell.title")}</span>
             {unreadCount > 0 && (
-              <span className="px-2 py-0.5 bg-violet-500/25 text-violet-400 text-xs font-bold rounded-full border border-violet-500/30">
-                {unreadCount} mới
+              <span className="px-2 py-0.5 bg-[var(--accent)]/25 text-[var(--accent-fg)] text-xs font-bold rounded-full border border-[var(--accent)]/30">
+                {t("notificationBell.unreadBadge", { count: unreadCount })}
               </span>
             )}
           </div>
@@ -196,14 +247,14 @@ function NotificationPanel({ onClose }) {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-xs text-violet-400 hover:text-violet-300 transition"
+                className="text-xs text-[var(--accent-fg)] hover:text-[var(--accent-fg)] transition"
               >
-                Đánh dấu tất cả đã đọc
+                {t("notificationBell.markAllRead")}
               </button>
             )}
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-slate-200 transition"
+              className="p-1.5 rounded-lg hover:bg-[var(--overlay)] text-[var(--muted)] hover:text-[var(--content)] transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -211,14 +262,14 @@ function NotificationPanel({ onClose }) {
         </div>
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto divide-y divide-white/[0.06]">
+        <div className="flex-1 overflow-y-auto divide-y divide-[var(--line)]">
           {notifications.length === 0 ? (
-            <div className="py-16 flex flex-col items-center gap-3 text-slate-500">
+            <div className="py-16 flex flex-col items-center gap-3 text-[var(--faint)]">
               <Bell className="w-10 h-10 opacity-20" />
-              <span className="text-sm">Không có thông báo nào</span>
+              <span className="text-sm">{t("notificationBell.empty")}</span>
             </div>
           ) : (
-            notifications.map((noti) => (
+            sortedNotis.map((noti) => (
               <NotiRow
                 key={noti.notificationId}
                 noti={noti}
@@ -242,6 +293,7 @@ function NotificationPanel({ onClose }) {
 }
 
 export default function NotificationBell() {
+  const { t } = useTranslation();
   const { notifications, unreadCount, markAllRead, markOneRead, refetch:fetchNotifications } = useNotification();
   const [open, setOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -257,7 +309,7 @@ export default function NotificationBell() {
   }, []);
 
   const PREVIEW_COUNT = 5;
-  const previewNotis = notifications.slice(0, PREVIEW_COUNT);
+  const previewNotis = sortByNewest(notifications).slice(0, PREVIEW_COUNT);
 
   return (
     <>
@@ -265,12 +317,12 @@ export default function NotificationBell() {
         {/* Bell button */}
         <button
           onClick={() => setOpen((p) => !p)}
-          className="relative flex items-center justify-center w-10 h-10 rounded-lg border border-white/[0.08] bg-[#1e2235] text-slate-400 hover:text-violet-400 hover:border-violet-500/40 hover:bg-violet-500/10 transition"
-          aria-label="Thông báo"
+          className="relative flex items-center justify-center w-10 h-10 rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--accent-fg)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/10 transition"
+          aria-label={t("notificationBell.title")}
         >
           <Bell className="w-[18px] h-[18px]" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border-2 border-[#0f1117]">
+            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-[var(--content)] text-[9px] font-bold rounded-full flex items-center justify-center px-1 border-2 border-[var(--bg)]">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
@@ -278,33 +330,33 @@ export default function NotificationBell() {
 
         {/* Dropdown */}
         {open && (
-          <div className="absolute right-0 mt-2 w-80 bg-[#1e2235] rounded-xl border border-white/[0.08] z-50 overflow-hidden shadow-[0_20px_48px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.04)]">
+          <div className="absolute right-0 mt-2 w-80 bg-[var(--surface)] rounded-xl border border-[var(--line)] z-50 overflow-hidden shadow-[0_20px_48px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.04)]">
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--line)]">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-100 text-sm">Thông báo</span>
+                <span className="font-semibold text-[var(--content)] text-sm">{t("notificationBell.title")}</span>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 bg-violet-500/25 text-violet-400 text-[10px] font-bold rounded-full border border-violet-500/30">
-                    {unreadCount} mới
+                  <span className="px-2 py-0.5 bg-[var(--accent)]/25 text-[var(--accent-fg)] text-[10px] font-bold rounded-full border border-[var(--accent)]/30">
+                    {t("notificationBell.unreadBadge", { count: unreadCount })}
                   </span>
                 )}
               </div>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllRead}
-                  className="text-xs text-violet-400 hover:text-violet-300 transition"
+                  className="text-xs text-[var(--accent-fg)] hover:text-[var(--accent-fg)] transition"
                 >
-                  Đánh dấu tất cả đã đọc
+                  {t("notificationBell.markAllRead")}
                 </button>
               )}
             </div>
 
             {/* List */}
-            <div className="max-h-80 overflow-y-auto divide-y divide-white/[0.06]">
+            <div className="max-h-80 overflow-y-auto divide-y divide-[var(--line)]">
               {previewNotis.length === 0 ? (
-                <div className="py-10 flex flex-col items-center gap-2 text-slate-500">
+                <div className="py-10 flex flex-col items-center gap-2 text-[var(--faint)]">
                   <Bell className="w-8 h-8 opacity-20" />
-                  <span className="text-sm">Không có thông báo nào</span>
+                  <span className="text-sm">{t("notificationBell.empty")}</span>
                 </div>
               ) : (
                 previewNotis.map((noti) => (
@@ -320,9 +372,9 @@ export default function NotificationBell() {
             </div>
             <button
               onClick={() => { setOpen(false); setPanelOpen(true); }}
-              className="w-full flex items-center justify-center gap-1.5 px-4 py-3 border-t border-white/[0.08] text-sm text-violet-400 font-medium hover:bg-violet-500/10 transition"
+              className="w-full flex items-center justify-center gap-1.5 px-4 py-3 border-t border-[var(--line)] text-sm text-[var(--accent-fg)] font-medium hover:bg-[var(--accent)]/10 transition"
             >
-              Xem tất cả thông báo
+              {t("notificationBell.viewAll")}
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

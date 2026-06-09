@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '../../context/ThemeContext'
 import { Bell, Video, Mic, Globe, Moon, Shield, ChevronRight, KeyRound } from 'lucide-react'
 import {
   US,
@@ -65,13 +66,13 @@ const Toggle = ({ checked, onChange }) => (
     onClick={() => onChange(!checked)}
     className={`relative w-11 h-6 rounded-full border transition-all duration-200 flex-shrink-0 ${
       checked
-        ? 'bg-gradient-to-r from-violet-600 to-purple-500 border-transparent'
-        : 'bg-[#1e2139] border-purple-900/40'
+        ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent)] border-transparent'
+        : 'bg-[var(--surface-2)] border-[var(--accent)]/40'
     }`}
   >
     <span
       className={`absolute top-[3px] w-[18px] h-[18px] rounded-full transition-all duration-200 shadow-sm ${
-        checked ? 'left-[22px] bg-white' : 'left-[3px] bg-[#3d3d5c]'
+        checked ? 'left-[22px] bg-white' : 'left-[3px] bg-[var(--line)]'
       }`}
     />
   </button>
@@ -79,10 +80,10 @@ const Toggle = ({ checked, onChange }) => (
 
 // ─── Section wrapper ──────────────────────────────────────────────────────────
 const Section = ({ icon: Icon, title, children }) => (
-  <div className="bg-[#13162a] border border-purple-900/20 rounded-2xl p-5 mb-4">
+  <div className="bg-[var(--surface)] border border-[var(--accent)]/20 rounded-2xl p-5 mb-4">
     <div className="flex items-center gap-2 mb-4">
-      <Icon size={14} className="text-purple-400" />
-      <span className="text-[11px] tracking-widest font-semibold text-[#5a5478] uppercase">
+      <Icon size={14} className="text-[var(--accent-fg)]" />
+      <span className="text-[11px] tracking-widest font-semibold text-[var(--faint)] uppercase">
         {title}
       </span>
     </div>
@@ -92,10 +93,10 @@ const Section = ({ icon: Icon, title, children }) => (
 
 // ─── Setting row ─────────────────────────────────────────────────────────────
 const SettingRow = ({ label, desc, checked, onChange }) => (
-  <div className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
+  <div className="flex items-center justify-between py-3 border-b border-[var(--line)] last:border-0">
     <div>
-      <p className="text-sm font-medium text-slate-200">{label}</p>
-      {desc && <p className="text-xs text-[#5a5478] mt-0.5">{desc}</p>}
+      <p className="text-sm font-medium text-[var(--content)]">{label}</p>
+      {desc && <p className="text-xs text-[var(--faint)] mt-0.5">{desc}</p>}
     </div>
     <Toggle checked={checked} onChange={onChange} />
   </div>
@@ -105,6 +106,7 @@ const SettingRow = ({ label, desc, checked, onChange }) => (
 const SettingsPage = () => {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const { isDark, setTheme } = useTheme()
   const [selectedLang, setSelectedLang] = useState(i18n.language?.slice(0, 2) || 'en')
   const [saved, setSaved] = useState(false)
 
@@ -116,9 +118,6 @@ const SettingsPage = () => {
   const [video, setVideo] = useState({
     camera: true,
     mic: false,
-  })
-  const [appearance, setAppearance] = useState({
-    darkMode: true,
   })
 
   const handleSelectLang = (code) => {
@@ -137,22 +136,22 @@ const SettingsPage = () => {
     <div className="flex-1 overflow-auto">
       <div className="p-8 mx-auto max-w-3xl">
 
-        <h1 className="mb-8 text-3xl font-bold text-white">{t('settings.title', 'Settings')}</h1>
+        <h1 className="mb-8 text-3xl font-bold text-[var(--content)]">{t('settings.title', 'Settings')}</h1>
 
         {/* Language */}
         <Section icon={Globe} title={t('settings.language.sectionTitle', 'Language')}>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-sm font-medium text-slate-200">
+              <p className="text-sm font-medium text-[var(--content)]">
                 {t('settings.language.label', 'Display Language')}
               </p>
-              <p className="text-xs text-[#5a5478] mt-0.5">
+              <p className="text-xs text-[var(--faint)] mt-0.5">
                 {t('settings.language.desc', 'Change the interface language')}
               </p>
             </div>
-            <div className="flex items-center gap-1.5 bg-purple-900/20 border border-purple-500/30 rounded-full px-3 py-1">
+            <div className="flex items-center gap-1.5 bg-[var(--accent)]/20 border border-[var(--accent)]/30 rounded-full px-3 py-1">
               <span className="text-sm">{currentLang?.flag}</span>
-              <span className="text-xs font-medium text-purple-300">{currentLang?.native}</span>
+              <span className="text-xs font-medium text-[var(--accent-fg)]">{currentLang?.native}</span>
             </div>
           </div>
 
@@ -165,23 +164,23 @@ const SettingsPage = () => {
                 onClick={() => handleSelectLang(lang.code)}
                 className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition-all duration-150 ${
                   selectedLang === lang.code
-                    ? 'border-purple-500/60 bg-purple-900/25 shadow-[0_0_0_1px_rgba(139,92,246,0.25)]'
-                    : 'border-purple-900/20 bg-[#0d0f1c] hover:border-purple-500/40 hover:bg-purple-900/10'
+                    ? 'border-[var(--accent)]/60 bg-[var(--accent)]/25 shadow-[0_0_0_1px_rgba(139,92,246,0.25)]'
+                    : 'border-[var(--accent)]/20 bg-[var(--bg)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/10'
                 }`}
               >
                 <span className="text-lg leading-none">{lang.flag}</span>
                 <div className="flex flex-col min-w-0">
                   <span
                     className={`text-sm font-semibold truncate ${
-                      selectedLang === lang.code ? 'text-purple-200' : 'text-slate-300'
+                      selectedLang === lang.code ? 'text-[var(--accent-fg)]' : 'text-[var(--muted)]'
                     }`}
                   >
                     {lang.native}
                   </span>
-                  <span className="text-[10px] text-[#5a5478] truncate">{lang.label}</span>
+                  <span className="text-[10px] text-[var(--faint)] truncate">{lang.label}</span>
                 </div>
                 {selectedLang === lang.code && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-purple-400 flex-shrink-0" />
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--accent-fg)] flex-shrink-0" />
                 )}
               </button>
             )))}}
@@ -196,8 +195,8 @@ const SettingsPage = () => {
                         onClick={() => handleSelectLang(lang.code)}
                         className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition-all duration-150 ${
                         selectedLang === lang.code
-                            ? "border-purple-500/60 bg-purple-900/25 shadow-[0_0_0_1px_rgba(139,92,246,0.25)]"
-                            : "border-purple-900/20 bg-[#0d0f1c] hover:border-purple-500/40 hover:bg-purple-900/10"
+                            ? "border-[var(--accent)]/60 bg-[var(--accent)]/25 shadow-[0_0_0_1px_rgba(139,92,246,0.25)]"
+                            : "border-[var(--accent)]/20 bg-[var(--bg)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/10"
                         }`}
                     >
                     <Flag className="w-6 h-4 rounded-sm flex-shrink-0" />
@@ -206,20 +205,20 @@ const SettingsPage = () => {
                     <span
                         className={`text-sm font-semibold truncate ${
                         selectedLang === lang.code
-                            ? "text-purple-200"
-                            : "text-slate-300"
+                            ? "text-[var(--accent-fg)]"
+                            : "text-[var(--muted)]"
                         }`}
                     >
                         {lang.native}
                     </span>
 
-                    <span className="text-[10px] text-[#5a5478] truncate">
+                    <span className="text-[10px] text-[var(--faint)] truncate">
                         {lang.label}
                     </span>
         </div>
 
                 {selectedLang === lang.code && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-purple-400 flex-shrink-0" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--accent-fg)] flex-shrink-0" />
                 )}
             </button>
             );
@@ -270,8 +269,8 @@ const SettingsPage = () => {
           <SettingRow
             label={t('settings.appearance.darkMode', 'Dark mode')}
             desc={t('settings.appearance.darkModeDesc', 'Use dark theme across the app')}
-            checked={appearance.darkMode}
-            onChange={(v) => setAppearance((p) => ({ ...p, darkMode: v }))}
+            checked={isDark}
+            onChange={(v) => setTheme(v ? 'dark' : 'light')}
           />
         </Section>
 
@@ -279,23 +278,23 @@ const SettingsPage = () => {
         <Section icon={Shield} title={t('settingsSecurity.sectionTitle')}>
           <button
             onClick={() => navigate('/change-password')}
-            className="flex items-center justify-between w-full py-3 border-b border-white/5 last:border-0 text-left hover:bg-white/[0.02] -mx-2 px-2 rounded-lg transition-colors"
+            className="flex items-center justify-between w-full py-3 border-b border-[var(--line)] last:border-0 text-left hover:bg-[var(--overlay)] -mx-2 px-2 rounded-lg transition-colors"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg flex items-center justify-center"
                 style={{ background: 'rgba(168,85,247,.15)' }}>
-                <KeyRound size={15} className="text-purple-400" />
+                <KeyRound size={15} className="text-[var(--accent-fg)]" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-200">
+                <p className="text-sm font-medium text-[var(--content)]">
                   {t('settingsSecurity.changePassword')}
                 </p>
-                <p className="text-xs text-[#5a5478] mt-0.5">
+                <p className="text-xs text-[var(--faint)] mt-0.5">
                   {t('settingsSecurity.changePasswordDesc')}
                 </p>
               </div>
             </div>
-            <ChevronRight size={16} className="text-slate-500" />
+            <ChevronRight size={16} className="text-[var(--faint)]" />
           </button>
         </Section>
 
@@ -304,8 +303,8 @@ const SettingsPage = () => {
           onClick={handleSave}
           className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 ${
             saved
-              ? 'bg-gradient-to-r from-emerald-600 to-green-500 text-white'
-              : 'bg-gradient-to-r from-violet-600 to-purple-500 hover:from-violet-500 hover:to-purple-400 text-white hover:scale-[1.01]'
+              ? 'bg-gradient-to-r from-emerald-600 to-green-500 text-[var(--content)]'
+              : 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent)] hover:from-[var(--accent)] hover:to-[var(--accent-fg)] text-[var(--content)] hover:scale-[1.01]'
           }`}
         >
           {saved

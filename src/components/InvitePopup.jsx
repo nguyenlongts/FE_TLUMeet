@@ -7,9 +7,11 @@ import { selectAccessToken } from "../redux/features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Video, X, Check, Clock, Hash } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const POPUP_THRESHOLD_MS = 10_000;
 export default function InvitePopup() {
+  const { t } = useTranslation();
   const { notifications } = useNotification();
   const token = useSelector(selectAccessToken);
   const navigate = useNavigate();
@@ -129,9 +131,9 @@ export default function InvitePopup() {
     try {
       const res = await acceptInvite(inv.parsedPayload.inviteId, token);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      toast.success("Đã chấp nhận! Bạn sẽ được thông báo khi phòng bắt đầu.");
+      toast.success(t("invitePopup.toast.accepted"));
     } catch (err) {
-      toast.error("Không thể chấp nhận lời mời: " + err.message);
+      toast.error(t("invitePopup.toast.acceptError", { error: err.message }));
     }
   };
 
@@ -139,7 +141,7 @@ export default function InvitePopup() {
     dismiss(inv.notificationId);
     try {
       await rejectInvite(inv.parsedPayload.inviteId, token);
-      toast("Đã từ chối lời mời.");
+      toast(t("invitePopup.toast.rejected"));
     } catch (err) {
       console.error("rejectInvite error:", err);
     }
@@ -156,7 +158,7 @@ export default function InvitePopup() {
             inv.parsedPayload.hostEmail ||
             "—";
           const hostInitial = hostLabel.charAt(0).toUpperCase();
-          const title = inv.parsedPayload.title || inv.title || "Cuộc họp";
+          const title = inv.parsedPayload.title || inv.title || t("invitePopup.defaultMeeting");
           const roomCode = inv.parsedPayload.roomCode;
           const expiresAt = inv.parsedPayload.expiresAt;
 
@@ -168,11 +170,11 @@ export default function InvitePopup() {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 80, scale: 0.95 }}
               transition={{ duration: 0.22, type: "spring", stiffness: 420, damping: 36 }}
-              className="pointer-events-auto w-[340px] rounded-2xl overflow-hidden border border-[#2a2245]"
-              style={{ background: "#150f2a" }}
+              className="pointer-events-auto w-[340px] rounded-2xl overflow-hidden border border-[var(--line)]"
+              style={{ background: "var(--surface)" }}
             >
               {/* Progress bar */}
-              <div className="h-[3px] w-full" style={{ background: "#2a2245" }}>
+              <div className="h-[3px] w-full" style={{ background: "var(--line)" }}>
                 <div
                   className="h-full transition-all duration-1000 ease-linear"
                   style={{
@@ -192,22 +194,22 @@ export default function InvitePopup() {
                     <Video size={15} color="white" />
                   </div>
                   <div>
-                    <p className="text-white text-xs font-semibold leading-tight">
-                      Lời mời họp
+                    <p className="text-[var(--content)] text-xs font-semibold leading-tight">
+                      {t("invitePopup.title")}
                     </p>
-                    <p className="text-[11px] leading-tight" style={{ color: "#8b7bb5" }}>
-                      Meeting invitation
+                    <p className="text-[11px] leading-tight" style={{ color: "var(--muted)" }}>
+                      {t("invitePopup.subtitle")}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs tabular-nums" style={{ color: "#8b7bb5" }}>
+                  <span className="text-xs tabular-nums" style={{ color: "var(--muted)" }}>
                     {countdown}s
                   </span>
                   <button
                     onClick={() => dismiss(inv.notificationId)}
-                    className="w-6 h-6 rounded-full flex items-center justify-center transition-colors hover:bg-white/10"
-                    style={{ color: "#8b7bb5" }}
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-colors hover:bg-[var(--overlay)]"
+                    style={{ color: "var(--muted)" }}
                   >
                     <X size={13} />
                   </button>
@@ -216,30 +218,30 @@ export default function InvitePopup() {
 
               {/* Body */}
               <div
-                className="mx-4 mb-3 rounded-xl p-3 border border-[#2a2245]"
-                style={{ background: "#0f0a1e" }}
+                className="mx-4 mb-3 rounded-xl p-3 border border-[var(--line)]"
+                style={{ background: "var(--bg)" }}
               >
                 {/* Meeting title */}
-                <p className="text-white text-sm font-medium line-clamp-1 mb-2.5">
+                <p className="text-[var(--content)] text-sm font-medium line-clamp-1 mb-2.5">
                   {title}
                 </p>
 
                 {/* Host row */}
                 <div className="flex items-center gap-2 mb-2">
                   <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shrink-0"
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-[var(--content)] shrink-0"
                     style={{ background: "linear-gradient(135deg, #f97316, #ef4444)" }}
                   >
                     {hostInitial}
                   </div>
-                  <span className="text-xs truncate" style={{ color: "#8b7bb5" }}>
+                  <span className="text-xs truncate" style={{ color: "var(--muted)" }}>
                     {hostLabel}
                   </span>
                   <span
                     className="ml-auto text-[10px] px-1.5 py-0.5 rounded-md shrink-0"
-                    style={{ background: "#2a2245", color: "#a78bfa" }}
+                    style={{ background: "var(--line)", color: "var(--accent-fg)" }}
                   >
-                    Host
+                    {t("invitePopup.host")}
                   </span>
                 </div>
 
@@ -247,16 +249,16 @@ export default function InvitePopup() {
                 <div className="flex items-center gap-3 flex-wrap">
                   {roomCode && (
                     <div className="flex items-center gap-1">
-                      <Hash size={11} style={{ color: "#8b7bb5" }} />
-                      <span className="text-[11px] font-mono" style={{ color: "#8b7bb5" }}>
+                      <Hash size={11} style={{ color: "var(--muted)" }} />
+                      <span className="text-[11px] font-mono" style={{ color: "var(--muted)" }}>
                         {roomCode}
                       </span>
                     </div>
                   )}
                   {expiresAt && (
                     <div className="flex items-center gap-1">
-                      <Clock size={11} style={{ color: "#8b7bb5" }} />
-                      <span className="text-[11px]" style={{ color: "#8b7bb5" }}>
+                      <Clock size={11} style={{ color: "var(--muted)" }} />
+                      <span className="text-[11px]" style={{ color: "var(--muted)" }}>
                         {new Date(expiresAt).toLocaleTimeString("vi-VN", {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -271,18 +273,18 @@ export default function InvitePopup() {
               <div className="flex gap-2 px-4 pb-4">
                 <button
                   onClick={() => handleReject(inv)}
-                  className="flex-1 py-2 rounded-xl text-xs font-medium border border-[#2a2245] transition-colors hover:bg-white/5"
+                  className="flex-1 py-2 rounded-xl text-xs font-medium border border-[var(--line)] transition-colors hover:bg-[var(--overlay)]"
                   style={{ color: "#ef4444" }}
                 >
-                  Từ chối
+                  {t("invitePopup.reject")}
                 </button>
                 <button
                   onClick={() => handleAccept(inv)}
-                  className="flex-[1.6] py-2 rounded-xl text-xs font-medium text-white flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90"
+                  className="flex-[1.6] py-2 rounded-xl text-xs font-medium text-[var(--content)] flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90"
                   style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)" }}
                 >
                   <Check size={13} />
-                  Chấp nhận
+                  {t("invitePopup.accept")}
                 </button>
               </div>
             </motion.div>

@@ -6,7 +6,7 @@ const Loading = ({ text = "Loading..." }) => {
       {/* Spinner */}
       <div className="relative w-14 h-14">
         {/* Outer ring */}
-        <div className="absolute inset-0 rounded-full border-2 border-white/8" />
+        <div className="absolute inset-0 rounded-full border-2 border-[var(--line)]" />
         {/* Spinning arc */}
         <div className="absolute inset-0 rounded-full border-2 border-transparent animate-spin"
           style={{ borderTopColor: "#a855f7", borderRightColor: "#7c3aed" }} />
@@ -42,7 +42,7 @@ const Loading = ({ text = "Loading..." }) => {
       </div>
 
       {/* Text */}
-      <p className="text-white/40 text-sm tracking-wide">{text}</p>
+      <p className="text-[var(--content)]/40 text-sm tracking-wide">{text}</p>
     </div>
   );
 };
