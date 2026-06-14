@@ -94,6 +94,13 @@ const authApi = createApi({
         body: { email },
       }),
     }),
+
+    getUsers: builders.query({
+      query: () => ({
+        url: "/Auth/users",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -108,5 +115,6 @@ export const {
   useChangePasswordMutation,
   useVerifyEmailMutation,
   useResendVerificationMutation,
+  useGetUsersQuery,
 } = authApi;
 export default authApi;

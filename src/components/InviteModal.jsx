@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Mail, UserPlus } from "lucide-react";
+import { X, UserPlus } from "lucide-react";
+import { Select } from "antd";
 import { sendInvites } from "../api/notificationApi";
 import { useSelector } from "react-redux";
-import { selectAccessToken } from "../redux/features/auth/authSlice";
+import {
+  selectAccessToken,
+  selectCurrentUser,
+} from "../redux/features/auth/authSlice";
+import { useGetUsersQuery } from "../redux/features/auth/authApi";
 import toast from "react-hot-toast";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
@@ -11,47 +16,47 @@ import { useTranslation } from "react-i18next";
 export default function InviteModal({ open, onClose, roomCode }) {
   const { t } = useTranslation();
   const token = useSelector(selectAccessToken);
-  const [input, setInput] = useState("");
-  const [emails, setEmails] = useState([]);
+  const currentUser = useSelector(selectCurrentUser);
+  const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Chỉ tải danh sách user khi modal mở
+  const { data: usersResp, isLoading: usersLoading } = useGetUsersQuery(undefined, {
+    skip: !open,
+  });
+
+  // Bỏ chính mình ra khỏi danh sách mời (API trả ApiResponse → lấy .data)
+  const options = useMemo(() => {
+    const users = usersResp?.data || [];
+    const myEmail = currentUser?.email?.toLowerCase();
+    return users
+      .filter((u) => u.email && u.email.toLowerCase() !== myEmail)
+      .map((u) => ({
+        label: u.name ? `${u.name} (${u.email})` : u.email,
+        value: u.email,
+      }));
+  }, [usersResp, currentUser]);
 
   if (!open) return null;
 
-  const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-
-  const handleAddEmail = () => {
-    const value = input.trim().toLowerCase();
-    if (!value) return;
-    if (!isValidEmail(value)) {
-      toast.error(t("inviteModal.emailInvalid"));
-      return;
-    }
-    if (emails.includes(value)) {
-      toast.error(t("inviteModal.emailDuplicate"));
-      return;
-    }
-    setEmails((prev) => [...prev, value]);
-    setInput("");
-  };
-
-  const handleRemove = (email) =>
-    setEmails((prev) => prev.filter((e) => e !== email));
-
   const handleSubmit = async () => {
-    if (emails.length === 0) return;
+    if (selected.length === 0) {
+      toast.error(t("inviteModal.selectAtLeastOne", "Vui lòng chọn ít nhất một người"));
+      return;
+    }
     if (!roomCode) {
       toast.error(t("inviteModal.noRoomCode"));
       return;
     }
     try {
       setLoading(true);
-      const res = await sendInvites(roomCode, emails, token);
+      const res = await sendInvites(roomCode, selected, token);
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(body?.message || t("inviteModal.errorStatus", { status: res.status }));
       }
-      toast.success(t("inviteModal.sendSuccess", { count: emails.length }));
-      setEmails([]);
+      toast.success(t("inviteModal.sendSuccess", { count: selected.length }));
+      setSelected([]);
       onClose();
     } catch (err) {
       toast.error(err.message);
@@ -61,8 +66,7 @@ export default function InviteModal({ open, onClose, roomCode }) {
   };
 
   const handleClose = () => {
-    setInput("");
-    setEmails([]);
+    setSelected([]);
     onClose();
   };
 
@@ -99,45 +103,29 @@ export default function InviteModal({ open, onClose, roomCode }) {
             </div>
           </div>
 
-          {/* Input */}
-          <div className="flex gap-2">
-            <div className="flex items-center flex-1 bg-[var(--overlay)] px-3 rounded-lg border border-[var(--line)]">
-              <Mail size={14} className="text-[var(--content)]/40" />
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleAddEmail()}
-                placeholder={t("inviteModal.emailPlaceholder")}
-                className="bg-transparent outline-none px-2 py-2 text-sm flex-1"
-              />
-            </div>
-            <button
-              onClick={handleAddEmail}
-              className="px-3 py-2 bg-[var(--accent)] rounded-lg text-sm cursor-pointer hover:bg-[var(--accent)] transition"
-            >
-              {t("inviteModal.add")}
-            </button>
-          </div>
-
-          {/* Email tags */}
-          {emails.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {emails.map((email) => (
-                <div
-                  key={email}
-                  className="flex items-center gap-1.5 bg-indigo-500/20 border border-indigo-500/30 px-2 py-1 rounded-full text-xs"
-                >
-                  <span>{email}</span>
-                  <button
-                    onClick={() => handleRemove(email)}
-                    className="text-[var(--content)]/50 hover:text-[var(--content)]"
-                  >
-                    <X size={11} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* Chọn người mời (multi-select, tìm theo tên/email) */}
+          <Select
+            mode="multiple"
+            allowClear
+            showSearch
+            style={{ width: "100%" }}
+            placeholder={t("inviteModal.selectPlaceholder", "Chọn người để mời…")}
+            value={selected}
+            onChange={setSelected}
+            options={options}
+            loading={usersLoading}
+            optionFilterProp="label"
+            filterOption={(input, option) =>
+              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            }
+            // dropdown phải nổi trên overlay modal (z-[9999])
+            dropdownStyle={{ zIndex: 10050 }}
+            notFoundContent={
+              usersLoading
+                ? t("inviteModal.loading", "Đang tải…")
+                : t("inviteModal.noUsers", "Không có người dùng")
+            }
+          />
 
           {/* Actions */}
           <div className="flex justify-end mt-5 gap-2">
@@ -149,10 +137,10 @@ export default function InviteModal({ open, onClose, roomCode }) {
             </button>
             <button
               onClick={handleSubmit}
-              disabled={loading || emails.length === 0}
+              disabled={loading || selected.length === 0}
               className="px-4 py-1.5 bg-[var(--accent)] text-sm cursor-pointer rounded-lg hover:bg-[var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {loading ? t("inviteModal.sending") : t("inviteModal.sendInvite", { count: emails.length })}
+              {loading ? t("inviteModal.sending") : t("inviteModal.sendInvite", { count: selected.length })}
             </button>
           </div>
         </motion.div>
