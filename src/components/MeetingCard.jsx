@@ -201,14 +201,17 @@ import {
   Pencil,
   Trash2,
   UserPlus,
+  Download,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import InviteModal from "./InviteModal";
 import ScheduleMeetingModal from "../pages/meetings/ScheduleMeetingModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { useTranslation } from "react-i18next";
 import { getActiveMeeting } from "../utils/activeMeeting";
+import { selectAccessToken } from "../redux/features/auth/authSlice";
 
 const AVATAR_COLORS = [
   "from-[var(--accent)] to-[var(--accent)]",
@@ -240,9 +243,61 @@ const MeetingCard = ({ meeting, onDelete }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+  const token = useSelector(selectAccessToken);
   const [isEdit, setIsEdit] = useState(false);
   const [isDeleteConfirmModalOpen, setIsDeleteConfirmModalOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  // Xuất danh sách điểm danh (CSV) — chỉ host, sau khi họp kết thúc
+  const handleExportAttendance = async () => {
+    try {
+      setExporting(true);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/meeting/${meeting.roomCode}/attendance`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(body?.message || t("meetingCard.exportError", "Không thể xuất điểm danh"));
+        return;
+      }
+      const rows = body.data || [];
+      if (rows.length === 0) {
+        toast(t("meetingCard.noAttendance", "Chưa có ai tham gia"));
+        return;
+      }
+      const fmt = (d) =>
+        d
+          ? new Date(d.endsWith("Z") ? d : d + "Z").toLocaleString("vi-VN", {
+              timeZone: "Asia/Ho_Chi_Minh",
+            })
+          : "";
+      const header = ["Tên", "Email", "Vào lúc", "Rời lúc", "Số phút"];
+      const lines = rows.map((r) => [
+        r.displayName,
+        r.userEmail || "",
+        fmt(r.joinedAt),
+        fmt(r.leftAt),
+        r.durationMinutes,
+      ]);
+      const csv = [header, ...lines]
+        .map((row) => row.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+      // BOM để Excel đọc đúng tiếng Việt
+      const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `diem-danh-${meeting.roomCode}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error(t("meetingCard.exportError", "Không thể xuất điểm danh"));
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleJoinMeeting = () => {
     const active = getActiveMeeting();
@@ -347,6 +402,17 @@ const MeetingCard = ({ meeting, onDelete }) => {
         >
           <Video size={13} /> {t('meetingCard.joinNow')}
         </button>
+        {isHost && isEnded && (
+          <button
+            onClick={handleExportAttendance}
+            disabled={exporting}
+            title={t('meetingCard.exportAttendance', 'Xuất điểm danh')}
+            className="pointer-events-auto flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-[var(--line)] text-[var(--content)]/70 hover:text-[var(--accent-fg)] hover:bg-[var(--accent)]/10 transition-colors disabled:opacity-50"
+          >
+            <Download size={13} />
+            {exporting ? t('meetingCard.exporting', 'Đang xuất…') : t('meetingCard.export', 'Xuất điểm danh')}
+          </button>
+        )}
         {!isInvited && (
           <>
             <button

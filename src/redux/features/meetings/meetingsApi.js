@@ -76,6 +76,13 @@ const meetingsApi = createApi({
         },
       }),
     }),
+    leaveMeeting: builders.mutation({
+      query: (joinToken) => ({
+        url: `/meeting/leave`,
+        method: "POST",
+        body: { joinToken },
+      }),
+    }),
     deleteMeetingApi: builders.mutation({
       query: (id) => ({
         url: `/meeting/${id}`,
@@ -104,7 +111,7 @@ const meetingsApi = createApi({
 export const { useScheduleMeetingMutation,useGetAllMeetingByEmailQuery,
   useGetInvitedMeetingsQuery,
   useCheckRoomCodeQuery,useGetStatusMeetingQuery,useEndMeetingMutation,
-  useJoinMeetingMutation,useStartMeetingMutation,
+  useJoinMeetingMutation,useLeaveMeetingMutation,useStartMeetingMutation,
   useLazyCheckRoomCodeQuery,
   useLazyGetStatusMeetingQuery,
   useDeleteMeetingApiMutation,

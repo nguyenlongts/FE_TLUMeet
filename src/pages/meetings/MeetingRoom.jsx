@@ -6,7 +6,7 @@ import {
   selectCurrentUser,
 } from "../../redux/features/auth/authSlice";
 import { useGenerateJaasTokenMutation } from "../../redux/features/jass/jaasApi";
-import { useEndMeetingMutation } from "../../redux/features/meetings/meetingsApi";
+import { useEndMeetingMutation, useLeaveMeetingMutation } from "../../redux/features/meetings/meetingsApi";
 import { useTranslation } from "react-i18next";
 import {
   setActiveMeeting,
@@ -57,6 +57,7 @@ export default function MeetingRoom() {
   const authHeader = { Authorization: `Bearer ${token ? token : tokenGuest}` };
   const [generateJaasToken] = useGenerateJaasTokenMutation();
   const [endMeeting] = useEndMeetingMutation();
+  const [leaveMeeting] = useLeaveMeetingMutation();
 
   useEffect(() => {
     (async () => {
@@ -292,11 +293,19 @@ export default function MeetingRoom() {
         });
 
         apiRef.current.addEventListener("videoConferenceLeft", async () => {
-          // Host rời → end meeting (qua RTK để invalidate cache "Meetings")
           if (isModerator) {
+            // Host rời → end meeting (qua RTK để invalidate cache "Meetings")
             await endMeeting(roomName)
               .unwrap()
               .catch(() => {});
+          } else {
+            // Người tham gia rời → cập nhật LeftAt (điểm danh)
+            const joinToken = sessionStorage.getItem("joinToken");
+            if (joinToken) {
+              await leaveMeeting(joinToken)
+                .unwrap()
+                .catch(() => {});
+            }
           }
           goHome();
         });
@@ -323,6 +332,21 @@ export default function MeetingRoom() {
       apiRef.current = null;
       clearActiveMeeting();
     };
+  }, []);
+
+  // Đóng tab / refresh → cập nhật LeftAt qua sendBeacon (vẫn gửi được khi trang đang đóng)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const joinToken = sessionStorage.getItem("joinToken");
+      if (!joinToken) return;
+      // POST không body + tham số trên query → "simple request", không bị CORS preflight
+      // (preflight không kịp hoàn tất khi trang đang đóng)
+      navigator.sendBeacon(
+        `${import.meta.env.VITE_API_URL}/meeting/leave-beacon?joinToken=${encodeURIComponent(joinToken)}`,
+      );
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
   const goHome = () => {
