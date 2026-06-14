@@ -22,6 +22,7 @@ import SettingsPage from "../pages/settings/SettingsPage";
 import ForgotPasswordPage from "../components/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/login/ResetPasswordPage";
 import ChangePasswordPage from "../pages/login/ChangePasswordPage";
+import VerifyEmailPage from "../pages/login/VerifyEmailPage";
 import PublicRoute from "./PublicRote";
 
 const router = createBrowserRouter([
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
       { path: "/register", element: <PublicRoute><Register /></PublicRoute> },
       { path: "/forgot-password", element: <PublicRoute><ForgotPasswordPage /></PublicRoute> },
       { path: "/reset-password", element: <PublicRoute><ResetPasswordPage /></PublicRoute> },
+      { path: "/verify-email", element: <PublicRoute><VerifyEmailPage /></PublicRoute> },
       { path: "/waiting-room", element: <WaitingRoom /> },
       { path: "/meet/:roomName", element: <MeetingRoom /> },
 

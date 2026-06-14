@@ -116,7 +116,7 @@ function RegisterPage() {
         password: formData.password,
       }).unwrap();
       console.log(response);
-      toast.success(t("register.toast.success"));
+      toast.success(response?.message || t("register.toast.success"));
       navigate("/login");
     } catch (error) {
       console.error("Error:", error);

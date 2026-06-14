@@ -78,6 +78,22 @@ const authApi = createApi({
         body: { currentPassword, newPassword },
       }),
     }),
+
+    verifyEmail: builders.mutation({
+      query: (token) => ({
+        url: "/Auth/verify-email",
+        method: "POST",
+        body: { token },
+      }),
+    }),
+
+    resendVerification: builders.mutation({
+      query: (email) => ({
+        url: "/Auth/resend-verification",
+        method: "POST",
+        body: { email },
+      }),
+    }),
   }),
 });
 
@@ -90,5 +106,7 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useChangePasswordMutation,
+  useVerifyEmailMutation,
+  useResendVerificationMutation,
 } = authApi;
 export default authApi;
