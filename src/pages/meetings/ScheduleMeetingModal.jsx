@@ -1,17 +1,26 @@
 import { useState, useEffect } from "react";
 import { Video, X, Calendar, Clock, User, Pencil } from "lucide-react";
-import { useScheduleMeetingMutation, useUpdateMeetingApiMutation } from "../../redux/features/meetings/meetingsApi";
+import {
+  useScheduleMeetingMutation,
+  useUpdateMeetingApiMutation,
+} from "../../redux/features/meetings/meetingsApi";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
-const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) => {
+const ScheduleMeetingModal = ({
+  isOpen,
+  onClose,
+  hostEmail,
+  type,
+  editMeeting,
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const optionsRequireHostToStart = [
-    { value: true,  label: t('scheduleMeetingModal.requireHostYes') },
-    { value: false, label: t('scheduleMeetingModal.requireHostNo') },
+    { value: true, label: t("scheduleMeetingModal.requireHostYes") },
+    { value: false, label: t("scheduleMeetingModal.requireHostNo") },
   ];
   const [formData, setFormData] = useState({
     title: "",
@@ -22,13 +31,17 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
   });
   const [errors, setErrors] = useState({});
   const [scheduleMeeting, { isLoading }] = useScheduleMeetingMutation();
-  const [updateMeeting, { isLoading: isUpdating }] = useUpdateMeetingApiMutation();
+  const [updateMeeting, { isLoading: isUpdating }] =
+    useUpdateMeetingApiMutation();
   const isSubmitting = isLoading || isUpdating;
 
   useEffect(() => {
     if (type === "now") {
-      const date = new Date(Date.now()); 
-      setFormData((prev) => ({ ...prev, scheduledDateTime: date.toISOString() }));
+      const date = new Date(Date.now());
+      setFormData((prev) => ({
+        ...prev,
+        scheduledDateTime: date.toISOString(),
+      }));
     }
   }, [type]);
 
@@ -49,13 +62,17 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
   const validate = () => {
     const newErrors = {};
     if (!formData.title.trim()) {
-      newErrors.title = t('scheduleMeetingModal.errorTitleRequired');
+      newErrors.title = t("scheduleMeetingModal.errorTitleRequired");
     }
     if (type !== "now") {
       if (!formData.scheduledDateTime) {
-        newErrors.scheduledDateTime = t('scheduleMeetingModal.errorDateTimeRequired');
+        newErrors.scheduledDateTime = t(
+          "scheduleMeetingModal.errorDateTimeRequired",
+        );
       } else if (new Date(formData.scheduledDateTime) <= new Date()) {
-        newErrors.scheduledDateTime = t('scheduleMeetingModal.errorDateTimePast');
+        newErrors.scheduledDateTime = t(
+          "scheduleMeetingModal.errorDateTimePast",
+        );
       }
     }
     setErrors(newErrors);
@@ -64,8 +81,8 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
 
   const handleSubmit = async () => {
     if (!validate()) return;
-
-    const localDate = new Date(formData.scheduledDateTime);
+    const localDate =
+      type === "now" ? new Date() : new Date(formData.scheduledDateTime);
     const payload = {
       hostEmail,
       title: formData.title,
@@ -76,46 +93,57 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
     };
 
     try {
-    if (type === "edit") {
-      // Gửi id của meeting cần update
-      await updateMeeting({ id: editMeeting.id,roomCode:editMeeting.roomCode, ...payload }).unwrap();
-      toast.success(t('scheduleMeetingModal.updateSuccess'));
-    } else {
-      const res = await scheduleMeeting(payload).unwrap();
-      toast.success(t('scheduleMeetingModal.scheduleSuccess'));
-      if (type === "now" && res?.data?.meetingLink) navigate(res.data.meetingLink);
+      if (type === "edit") {
+        // Gửi id của meeting cần update
+        await updateMeeting({
+          id: editMeeting.id,
+          roomCode: editMeeting.roomCode,
+          ...payload,
+        }).unwrap();
+        toast.success(t("scheduleMeetingModal.updateSuccess"));
+      } else {
+        const res = await scheduleMeeting(payload).unwrap();
+        toast.success(t("scheduleMeetingModal.scheduleSuccess"));
+        if (type === "now" && res?.data?.meetingLink)
+          navigate(res.data.meetingLink);
+      }
+      onClose();
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.data?.message || t("scheduleMeetingModal.error"));
     }
-    onClose();
-  } catch (err) {
-    console.error(err);
-    toast.error(err?.data?.message || t('scheduleMeetingModal.error'));
-  }
   };
 
   const handleClose = () => {
     onClose();
-    setFormData({ title: "", description: "", scheduledDateTime: "", duration: 60, requireHostToStart: false });
+    setFormData({
+      title: "",
+      description: "",
+      scheduledDateTime: "",
+      duration: 60,
+      requireHostToStart: false,
+    });
     setErrors({});
   };
 
   useEffect(() => {
-  if (type === "edit" && editMeeting) {
-    setFormData({
-      title: editMeeting.title || "",
-      description: editMeeting.description || "",
-      scheduledDateTime: editMeeting.scheduledDateTime
-        ? (() => {
-            // datetime-local hiển thị theo giờ local, nên bù timezone offset
-            const d = new Date(editMeeting.scheduledDateTime);
-            return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-              .toISOString()
-              .slice(0, 16);
-          })()
-        : "",
-      duration: editMeeting.duration || 60,
-      requireHostToStart: editMeeting.requireHostToStart ?? false,
-    });
-  }
+    if (type === "edit" && editMeeting) {
+      setFormData({
+        title: editMeeting.title || "",
+        description: editMeeting.description || "",
+        scheduledDateTime: editMeeting.scheduledDateTime
+          ? (() => {
+              // datetime-local hiển thị theo giờ local, nên bù timezone offset
+              const d = new Date(editMeeting.scheduledDateTime);
+              return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+            })()
+          : "",
+        duration: editMeeting.duration || 60,
+        requireHostToStart: editMeeting.requireHostToStart ?? false,
+      });
+    }
   }, [type, editMeeting]);
 
   if (!isOpen) return null;
@@ -140,12 +168,14 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
             <div>
               <p className="text-[var(--content)] text-sm font-medium">
                 {isEdit
-                  ? t('scheduleMeetingModal.editTitle')
+                  ? t("scheduleMeetingModal.editTitle")
                   : type === "schedule"
-                    ? t('scheduleMeetingModal.scheduleTitle')
-                    : t('scheduleMeetingModal.nowTitle')}
+                    ? t("scheduleMeetingModal.scheduleTitle")
+                    : t("scheduleMeetingModal.nowTitle")}
               </p>
-              <p className="text-[var(--content)]/70 text-xs">{t('scheduleMeetingModal.subtitle')}</p>
+              <p className="text-[var(--content)]/70 text-xs">
+                {t("scheduleMeetingModal.subtitle")}
+              </p>
             </div>
           </div>
           <button
@@ -160,12 +190,14 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
         <div className="flex flex-col gap-4 p-6">
           {/* Title */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs uppercase tracking-wider text-[var(--content)]/50">{t('scheduleMeetingModal.title')}</label>
+            <label className="text-xs uppercase tracking-wider text-[var(--content)]/50">
+              {t("scheduleMeetingModal.title")}
+            </label>
             <input
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder={t('scheduleMeetingModal.titlePlaceholder')}
+              placeholder={t("scheduleMeetingModal.titlePlaceholder")}
               className={`w-full rounded-lg px-3.5 py-2.5 text-sm text-[var(--content)] placeholder:text-[var(--muted)] border outline-none transition-colors ${
                 errors.title
                   ? "border-red-500 focus:border-red-500"
@@ -180,17 +212,21 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
 
           {/* Description */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs uppercase tracking-wider text-[var(--content)]/50">{t('scheduleMeetingModal.description')}</label>
+            <label className="text-xs uppercase tracking-wider text-[var(--content)]/50">
+              {t("scheduleMeetingModal.description")}
+            </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder={t('scheduleMeetingModal.descriptionPlaceholder')}
+              placeholder={t("scheduleMeetingModal.descriptionPlaceholder")}
               rows={3}
               className="w-full rounded-lg px-3.5 py-2.5 text-sm text-[var(--content)] placeholder:text-[var(--muted)] border border-[var(--line)] outline-none focus:border-[var(--accent)] transition-colors resize-none"
               style={{ background: "var(--bg)" }}
             />
-            {errors.description && <p className="text-xs text-red-400">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-xs text-red-400">{errors.description}</p>
+            )}
           </div>
 
           {/* Date & Duration */}
@@ -199,7 +235,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               <div className="flex-1 flex flex-col gap-1.5">
                 <label className="text-xs uppercase tracking-wider text-[var(--content)]/50 flex items-center gap-1.5">
                   <Calendar size={11} />
-                  {t('scheduleMeetingModal.dateTime')}
+                  {t("scheduleMeetingModal.dateTime")}
                 </label>
                 <input
                   type="datetime-local"
@@ -215,14 +251,16 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
                   style={{ background: "var(--bg)" }}
                 />
                 {errors.scheduledDateTime && (
-                  <span className="text-xs text-red-400">{errors.scheduledDateTime}</span>
+                  <span className="text-xs text-red-400">
+                    {errors.scheduledDateTime}
+                  </span>
                 )}
               </div>
             )}
             <div className="flex-1 flex flex-col gap-1.5">
               <label className="text-xs uppercase tracking-wider text-[var(--content)]/50 flex items-center gap-1.5">
                 <Clock size={11} />
-                {t('scheduleMeetingModal.duration')}
+                {t("scheduleMeetingModal.duration")}
               </label>
               <select
                 name="duration"
@@ -232,7 +270,9 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
                 style={{ background: "var(--surface)" }}
               >
                 {[30, 60, 90, 120].map((m) => (
-                  <option key={m} value={m}>{t('scheduleMeetingModal.minutes', { count: m })}</option>
+                  <option key={m} value={m}>
+                    {t("scheduleMeetingModal.minutes", { count: m })}
+                  </option>
                 ))}
               </select>
             </div>
@@ -242,7 +282,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
           <div className="flex flex-col gap-1.5">
             <label className="text-xs uppercase tracking-wider text-[var(--content)]/50 flex items-center gap-1.5">
               <User size={11} />
-              {t('scheduleMeetingModal.host')}
+              {t("scheduleMeetingModal.host")}
             </label>
             <div
               className="flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 border border-[var(--line)]"
@@ -250,16 +290,20 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
             >
               <div
                 className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium text-[var(--content)] shrink-0"
-                style={{ background: "linear-gradient(135deg, #f97316, #ef4444)" }}
+                style={{
+                  background: "linear-gradient(135deg, #f97316, #ef4444)",
+                }}
               >
                 {hostEmail?.charAt(0).toUpperCase()}
               </div>
-              <span className="text-[var(--content)] text-sm flex-1 truncate">{hostEmail}</span>
+              <span className="text-[var(--content)] text-sm flex-1 truncate">
+                {hostEmail}
+              </span>
               <span
                 className="text-[var(--content)]/40 text-xs px-2 py-0.5 rounded-full"
                 style={{ background: "var(--overlay)" }}
               >
-                {t('scheduleMeetingModal.hostBadge')}
+                {t("scheduleMeetingModal.hostBadge")}
               </span>
             </div>
           </div>
@@ -268,7 +312,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
           {type !== "now" && (
             <div className="flex flex-col gap-2">
               <label className="text-xs uppercase tracking-wider text-[var(--content)]/50">
-                {t('scheduleMeetingModal.requireHostToStart')}
+                {t("scheduleMeetingModal.requireHostToStart")}
               </label>
               <div
                 className="flex flex-col gap-2 rounded-lg px-3.5 py-3 border border-[var(--line)]"
@@ -285,7 +329,10 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
                         name="requireHostToStart"
                         checked={formData.requireHostToStart === option.value}
                         onChange={() =>
-                          setFormData((prev) => ({ ...prev, requireHostToStart: option.value }))
+                          setFormData((prev) => ({
+                            ...prev,
+                            requireHostToStart: option.value,
+                          }))
                         }
                         className="sr-only"
                       />
@@ -316,7 +363,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               onClick={handleClose}
               className="flex-1 cursor-pointer py-3 rounded-lg text-sm text-[var(--content)]/70 border border-[var(--line)] hover:border-[var(--line)] transition-colors"
             >
-              {t('scheduleMeetingModal.cancel')}
+              {t("scheduleMeetingModal.cancel")}
             </button>
             <button
               onClick={handleSubmit}
@@ -326,16 +373,16 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
             >
               {isEdit ? <Pencil size={16} /> : <Video size={16} />}
               {isSubmitting
-                ? t('scheduleMeetingModal.loading')
+                ? t("scheduleMeetingModal.loading")
                 : isEdit
-                  ? t('scheduleMeetingModal.saveChanges')
-                  : t('scheduleMeetingModal.createMeeting')}
+                  ? t("scheduleMeetingModal.saveChanges")
+                  : t("scheduleMeetingModal.createMeeting")}
             </button>
           </div>
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 
