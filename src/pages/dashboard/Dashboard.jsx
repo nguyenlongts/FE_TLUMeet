@@ -222,9 +222,9 @@ const Dashboard = () => {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-8 mx-auto max-w-7xl">
+      <div className="p-4 sm:p-8 mx-auto max-w-7xl">
 
-        <h1 className="mb-8 text-3xl font-bold text-[var(--content)]">{t('dashboard.title')}</h1>
+        <h1 className="mb-8 text-2xl sm:text-3xl font-bold text-[var(--content)]">{t('dashboard.title')}</h1>
 
         {/* Stat Cards */}
         <div className="flex flex-wrap gap-6 mb-10">
@@ -252,7 +252,7 @@ const Dashboard = () => {
         </div>
 
 
-        <div className="grid grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <button
             onClick={() => {
               setType('now')
@@ -313,7 +313,7 @@ const Dashboard = () => {
             {t('dashboard.noSearchResults', { query: search })}
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {(q ? filteredMeetings : filteredMeetings.slice(0, 6)).map((meeting) => (
               <MeetingCard key={meeting.id} meeting={meeting} />
             ))}

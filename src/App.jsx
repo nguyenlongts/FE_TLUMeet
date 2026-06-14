@@ -1,27 +1,23 @@
-import React, { useEffect } from "react";
-import AppRoutes from "./routes/router";
-import { Toaster } from "react-hot-toast";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./pages/dashboard/Sidebar";
 import Header from "./pages/dashboard/Header";
-import InvitePopup from "./components/InvitePopup";
 import { SearchProvider } from "./context/SearchContext";
 
 function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <>
-      {/* <InvitePopup /> */}
-      {/* <Toaster position="top-right" reverseOrder={false} /> */}
-      <SearchProvider>
-        <div className="flex w-full h-screen">
-          <Sidebar />
-          <div className="flex flex-col w-full bg-[var(--surface)]">
-            <Header />
-            <Outlet />
-          </div>
+    <SearchProvider>
+      <div className="flex w-full h-screen">
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        {/* min-w-0 cho phép cột nội dung co lại trên màn nhỏ (tránh tràn ngang) */}
+        <div className="flex flex-col flex-1 min-w-0 bg-[var(--surface)]">
+          <Header onMenuClick={() => setSidebarOpen(true)} />
+          <Outlet />
         </div>
-      </SearchProvider>
-    </>
+      </div>
+    </SearchProvider>
   );
 }
 

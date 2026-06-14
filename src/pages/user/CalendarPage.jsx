@@ -67,7 +67,7 @@ const CalendarPage = () => {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-8 mx-auto max-w-7xl flex gap-6">
+      <div className="p-4 sm:p-8 mx-auto max-w-7xl flex flex-col lg:flex-row gap-6">
         {/* Calendar */}
         <div className="flex-1">
           {/* Header */}
@@ -168,7 +168,7 @@ const CalendarPage = () => {
         </div>
 
         {/* Sidebar */}
-        <div className="w-72 shrink-0">
+        <div className="w-full lg:w-72 shrink-0">
           <div className="bg-[var(--surface)] border border-[var(--line)] rounded-2xl p-4 sticky top-0">
             <h2 className="text-sm font-semibold text-[var(--muted)] mb-3">
               {selectedDate
