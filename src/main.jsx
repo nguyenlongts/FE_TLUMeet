@@ -10,6 +10,9 @@ import { Toaster } from "react-hot-toast";
 import './configs/i18n.config.js'
 import { ConfigProvider, theme as antdTheme } from "antd";
 import { ThemeProvider, useTheme } from "./context/ThemeContext.jsx";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 // Cầu nối: antd dùng dark/light algorithm theo theme hiện tại
 function AntdThemeBridge({ children }) {
@@ -27,14 +30,16 @@ function AntdThemeBridge({ children }) {
 }
 
 createRoot(document.getElementById('root')).render(
-  <Provider store={store} >
-    <ThemeProvider>
-      <AntdThemeBridge>
-        <AuthProvider>
-          <Toaster position="top-right" reverseOrder={false} />
-          <RouterProvider router={router}/>
-        </AuthProvider>
-      </AntdThemeBridge>
-    </ThemeProvider>
-  </Provider>
+  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <Provider store={store} >
+      <ThemeProvider>
+        <AntdThemeBridge>
+          <AuthProvider>
+            <Toaster position="top-right" reverseOrder={false} />
+            <RouterProvider router={router}/>
+          </AuthProvider>
+        </AntdThemeBridge>
+      </ThemeProvider>
+    </Provider>
+  </GoogleOAuthProvider>
 );

@@ -13,6 +13,7 @@ import { useRegisterNewUserMutation } from "../../redux/features/auth/authApi";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import GoogleAuthButton from "../../components/GoogleAuthButton";
 
 function RegisterPage() {
   const { t, i18n } = useTranslation();
@@ -334,21 +335,8 @@ function RegisterPage() {
             </div>
           </div>
 
-          {/* Social Buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              className="py-3 font-medium text-[var(--content)] transition-all border bg-[var(--surface)] border-[var(--line)] hover:bg-[var(--accent)]/10 rounded-xl hover:border-[var(--accent)]/50"
-            >
-              Google
-            </button>
-            <button
-              type="button"
-              className="py-3 font-medium text-[var(--content)] transition-all border bg-[var(--surface)] border-[var(--line)] hover:bg-[var(--accent)]/10 rounded-xl hover:border-[var(--accent)]/50"
-            >
-              Facebook
-            </button>
-          </div>
+          {/* Google sign-in */}
+          <GoogleAuthButton />
         </form>
 
         <p className="mt-6 text-center text-[var(--muted)]">
