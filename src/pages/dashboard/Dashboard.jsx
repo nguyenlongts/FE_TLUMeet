@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next'
 import Loading from '../../components/Loading'
 import { getActiveMeeting } from '../../utils/activeMeeting'
 import { useSearch } from '../../context/SearchContext'
+import toast from 'react-hot-toast'
 
 // ─── JoinLinkModal ────────────────────────────────────────────────────────────
 const JoinLinkModal = ({ isOpen, onClose, pushRoomCode, handleWaiting }) => {

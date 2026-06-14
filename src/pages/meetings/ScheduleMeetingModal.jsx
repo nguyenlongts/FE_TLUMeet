@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { getActiveMeeting } from "../../utils/activeMeeting";
 
 const ScheduleMeetingModal = ({
   isOpen,
@@ -81,6 +82,11 @@ const ScheduleMeetingModal = ({
 
   const handleSubmit = async () => {
     if (!validate()) return;
+    // "Họp ngay" sẽ vào thẳng phòng → chặn nếu đang ở trong một cuộc họp khác
+    if (type === "now" && getActiveMeeting()) {
+      toast.error(t("common.alreadyInMeeting"));
+      return;
+    }
     const localDate =
       type === "now" ? new Date() : new Date(formData.scheduledDateTime);
     const payload = {
