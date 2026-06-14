@@ -7,6 +7,7 @@ import WaitingRoom from "../meetings/WaitingRoom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../context/ThemeContext";
+import { getActiveMeeting } from "../../utils/activeMeeting";
 
 
 export default function Home() {
@@ -26,6 +27,10 @@ export default function Home() {
     setShowWaitingRoom(false);
   };
   const handleJoinMeeting = async ({ roomCode, guestName }) => {
+    if (getActiveMeeting()) {
+      toast.error(t('common.alreadyInMeeting'));
+      return;
+    }
     try {
       const resCheckRoomCode=await checkRoomCode(roomCode).unwrap()
       if (!resCheckRoomCode?.data) {

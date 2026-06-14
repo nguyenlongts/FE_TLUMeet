@@ -8,8 +8,8 @@ const StatCard=({
   color,
 }) =>{
   return (
-    <div className="flex flex-1 min-w-[220px] items-center gap-4 p-6 border bg-slate-800/50 backdrop-blur border-slate-700/50 rounded-xl">
-      <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${color} flex items-center justify-center text-3xl`}>
+    <div className="flex flex-1 min-w-[220px] items-center gap-4 p-6 border bg-[var(--surface)] border-[var(--line)] rounded-xl">
+      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shrink-0`}>
         {icon}
       </div>
       <div>

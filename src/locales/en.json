@@ -3,7 +3,8 @@
     "loading": "Loading...",
     "save": "Save Changes",
     "cancel": "Cancel",
-    "notUpdated": "Not set"
+    "notUpdated": "Not set",
+    "alreadyInMeeting": "You are already in another meeting. Please leave the current meeting first."
   },
   "login": {
     "welcome": "Welcome Back",
@@ -84,7 +85,8 @@
     },
     "todayTitle": "You have {{count}} meetings today!",
     "nextMeeting": "{{hours}} hours left for the next meeting",
-    "viewMore": "View more"
+    "viewMore": "View more",
+    "noSearchResults": "No meetings found matching \"{{query}}\""
   },
   "joinModal": {
     "title": "Join a Meeting",
@@ -271,6 +273,7 @@
     "status": {
       "Scheduled": "Scheduled",
       "WaitingForHost": "Waiting for host",
+      "WaitingToStart": "Waiting to start",
       "Live": "Live",
       "Ended": "Ended"
     }
@@ -286,6 +289,8 @@
     "rejected": "Declined",
     "accept": "Accept",
     "reject": "Decline",
+    "inviteExpired": "Invite is invalid or has expired.",
+    "actionFailed": "Action failed. Please try again.",
     "timeAgo": {
       "justNow": "Just now",
       "minutes": "{{count}}m ago",

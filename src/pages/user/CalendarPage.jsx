@@ -11,6 +11,18 @@ function buildCalendarDays(year, month) {
   return { daysInMonth, startOffset };
 }
 
+// Backend trả status dạng số hoặc chuỗi → chuẩn hóa về nhãn chuỗi (như MeetingCard).
+const STATUS_BY_CODE = { 0: "Scheduled", 1: "WaitingForHost", 2: "Live", 3: "Ended" };
+const normalizeStatus = (status) =>
+  typeof status === "number" ? STATUS_BY_CODE[status] ?? "Scheduled" : status ?? "Scheduled";
+
+const STATUS_COLOR = {
+  Scheduled: "text-[var(--accent-fg)] bg-[var(--accent)]/15",
+  WaitingForHost: "text-yellow-700 dark:text-yellow-300 bg-yellow-500/15",
+  Live: "text-emerald-700 dark:text-emerald-300 bg-emerald-500/15",
+  Ended: "text-red-700 dark:text-red-300 bg-red-500/15",
+};
+
 const CalendarPage = () => {
   const { t } = useTranslation();
   const today = new Date();
@@ -63,7 +75,7 @@ const CalendarPage = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={prevMonth}
-                className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-[var(--surface-hover,var(--surface))] transition-colors"
               >
                 <ChevronLeft className="w-5 h-5 text-[var(--muted)]" />
               </button>
@@ -72,7 +84,7 @@ const CalendarPage = () => {
               </h1>
               <button
                 onClick={nextMonth}
-                className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-[var(--surface-hover,var(--surface))] transition-colors"
               >
                 <ChevronRight className="w-5 h-5 text-[var(--muted)]" />
               </button>
@@ -92,7 +104,7 @@ const CalendarPage = () => {
           </div>
 
           {/* Grid */}
-          <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-5">
+          <div className="bg-[var(--surface)] border border-[var(--line)] rounded-2xl p-5">
             {/* Day headers */}
             <div className="grid grid-cols-7 mb-3">
               {DAYS.map((d) => (
@@ -124,7 +136,7 @@ const CalendarPage = () => {
                     className={`
                       aspect-square flex flex-col items-center justify-start pt-1.5 rounded-xl
                       border cursor-pointer transition-all text-sm
-                      ${isToday(day) ? "border-[var(--accent)] bg-[var(--accent)]/10" : "border-slate-700/30 hover:border-slate-600/50"}
+                      ${isToday(day) ? "border-[var(--accent)] bg-[var(--accent)]/10" : "border-[var(--line)] hover:border-[var(--accent)]/40"}
                       ${isSelected ? "ring-2 ring-[var(--accent-fg)]" : ""}
                     `}
                   >
@@ -157,7 +169,7 @@ const CalendarPage = () => {
 
         {/* Sidebar */}
         <div className="w-72 shrink-0">
-          <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-4 sticky top-0">
+          <div className="bg-[var(--surface)] border border-[var(--line)] rounded-2xl p-4 sticky top-0">
             <h2 className="text-sm font-semibold text-[var(--muted)] mb-3">
               {selectedDate
                 ? `${String(selectedDate).padStart(2, "0")} ${MONTHS[currentMonth]}`
@@ -193,6 +205,23 @@ const CalendarPage = () => {
                         ? t("calendar.sidebar.mine")
                         : t("calendar.sidebar.invited")}
                     </span>
+                    {(() => {
+                      const status = normalizeStatus(m.status);
+                      // Host thấy "Chờ bắt đầu", người được mời thấy "Chờ chủ phòng"
+                      const displayStatus =
+                        status === "WaitingForHost" && m.calendarType === "host"
+                          ? "WaitingToStart"
+                          : status;
+                      return (
+                        <span
+                          className={`ml-auto text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                            STATUS_COLOR[status] || "text-[var(--content)]/50 bg-[var(--overlay)]"
+                          }`}
+                        >
+                          {t(`meetingCard.status.${displayStatus}`, displayStatus)}
+                        </span>
+                      );
+                    })()}
                   </div>
                   <p className="font-medium text-[var(--content)] truncate">{m.title}</p>
                   <p className="text-xs text-[var(--muted)] mt-0.5">

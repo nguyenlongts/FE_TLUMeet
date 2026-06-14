@@ -208,6 +208,7 @@ import InviteModal from "./InviteModal";
 import ScheduleMeetingModal from "../pages/meetings/ScheduleMeetingModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { useTranslation } from "react-i18next";
+import { getActiveMeeting } from "../utils/activeMeeting";
 
 const AVATAR_COLORS = [
   "from-[var(--accent)] to-[var(--accent)]",
@@ -244,6 +245,11 @@ const MeetingCard = ({ meeting, onDelete }) => {
   const [inviteOpen, setInviteOpen] = useState(false);
 
   const handleJoinMeeting = () => {
+    const active = getActiveMeeting();
+    if (active && active !== meeting.roomCode) {
+      toast.error(t('common.alreadyInMeeting'));
+      return;
+    }
     navigate(`${meeting.meetingLink}`);
   };
 
@@ -252,6 +258,15 @@ const MeetingCard = ({ meeting, onDelete }) => {
   const canModify = status !== "Live";
   // Cuộc họp được mời (không phải mình tổ chức) → chỉ cho tham gia
   const isInvited = meeting._source === "invited";
+  // Người tổ chức xem chính cuộc họp của mình
+  const isHost =
+    meeting._source === "owned" ||
+    meeting._source === "hosted" ||
+    meeting.hostName === user?.email ||
+    meeting.hostEmail === user?.email;
+  // Trạng thái chờ: host thấy "Chờ bắt đầu", người khác thấy "Chờ chủ phòng"
+  const displayStatus =
+    status === "WaitingForHost" && isHost ? "WaitingToStart" : status;
 
   const statusColor = {
     Scheduled: "text-[var(--accent-fg)] bg-[var(--accent)]/15",
@@ -290,7 +305,7 @@ const MeetingCard = ({ meeting, onDelete }) => {
               statusColor[status] || "text-[var(--content)]/50 bg-[var(--overlay)]"
             }`}
           >
-            {t(`meetingCard.status.${status}`, status)}
+            {t(`meetingCard.status.${displayStatus}`, displayStatus)}
           </span>
         </div>
 

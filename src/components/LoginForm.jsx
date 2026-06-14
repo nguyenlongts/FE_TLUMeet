@@ -120,7 +120,8 @@ const LoginForm = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('login.passwordPlaceholder')}
-                className="w-full py-3 pl-12 pr-4 focus:border-[var(--accent)] outline-none border tracking-widest text-[var(--faint)] rounded-xl placeholder-slate-500"
+                autoComplete="current-password"
+                className="w-full py-3 pl-12 pr-4 focus:border-[var(--accent)] outline-none border tracking-widest text-[var(--faint)] rounded-xl placeholder-slate-500 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden"
               />
               <button
                 type="button"
@@ -137,7 +138,7 @@ const LoginForm = () => {
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                className="w-4 h-4 border rounded cursor-pointer bg-slate-700 border-slate-600 accent-blue-500"
+                className="w-4 h-4 border rounded cursor-pointer border-[var(--line)] accent-[var(--accent)]"
               />
               <span className="text-[var(--muted)]">{t('login.rememberMe')}</span>
             </label>
@@ -165,10 +166,10 @@ const LoginForm = () => {
           {/* Divider */}
           <div className="relative py-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-700/50"></div>
+              <div className="w-full border-t border-[var(--line)]"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 text-[var(--content)] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+              <span className="px-2 text-[var(--muted)] bg-[var(--surface)]">
                 {t('login.orContinueWith')}
               </span>
             </div>
@@ -178,13 +179,13 @@ const LoginForm = () => {
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              className="py-3 font-medium text-[var(--content)] transition-all border bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 rounded-xl hover:border-slate-600/50"
+              className="py-3 font-medium text-[var(--content)] transition-all border bg-[var(--surface)] border-[var(--line)] hover:bg-[var(--accent)]/10 rounded-xl hover:border-[var(--accent)]/50"
             >
               Google
             </button>
             <button
               type="button"
-              className="py-3 font-medium text-[var(--content)] transition-all border bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 rounded-xl hover:border-slate-600/50"
+              className="py-3 font-medium text-[var(--content)] transition-all border bg-[var(--surface)] border-[var(--line)] hover:bg-[var(--accent)]/10 rounded-xl hover:border-[var(--accent)]/50"
             >
               Facebook
             </button>

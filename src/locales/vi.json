@@ -3,7 +3,8 @@
     "loading": "Đang tải...",
     "save": "Lưu thay đổi",
     "cancel": "Hủy",
-    "notUpdated": "Chưa cập nhật"
+    "notUpdated": "Chưa cập nhật",
+    "alreadyInMeeting": "Bạn đang trong một cuộc họp khác. Vui lòng rời cuộc họp hiện tại trước."
   },
   "login": {
     "welcome": "Chào Mừng Trở Lại",
@@ -84,7 +85,8 @@
     },
     "todayTitle": "Bạn có {{count}} cuộc họp hôm nay!",
     "nextMeeting": "Còn {{hours}} giờ đến cuộc họp tiếp theo",
-    "viewMore": "Xem thêm"
+    "viewMore": "Xem thêm",
+    "noSearchResults": "Không tìm thấy cuộc họp nào khớp với \"{{query}}\""
   },
   "joinModal": {
     "title": "Tham gia phòng họp",
@@ -271,6 +273,7 @@
     "status": {
       "Scheduled": "Đã lên lịch",
       "WaitingForHost": "Chờ chủ phòng",
+      "WaitingToStart": "Chờ bắt đầu",
       "Live": "Đang diễn ra",
       "Ended": "Đã kết thúc"
     }
@@ -286,6 +289,8 @@
     "rejected": "Đã từ chối",
     "accept": "Đồng ý",
     "reject": "Từ chối",
+    "inviteExpired": "Lời mời không hợp lệ hoặc đã hết hạn.",
+    "actionFailed": "Thao tác thất bại. Vui lòng thử lại.",
     "timeAgo": {
       "justNow": "Vừa xong",
       "minutes": "{{count}} phút trước",

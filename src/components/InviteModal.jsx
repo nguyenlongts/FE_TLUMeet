@@ -48,14 +48,13 @@ export default function InviteModal({ open, onClose, roomCode }) {
       const res = await sendInvites(roomCode, emails, token);
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
         throw new Error(body?.message || t("inviteModal.errorStatus", { status: res.status }));
       }
       toast.success(t("inviteModal.sendSuccess", { count: emails.length }));
       setEmails([]);
       onClose();
     } catch (err) {
-      toast.error(t("inviteModal.sendError", { error: err.message }));
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }

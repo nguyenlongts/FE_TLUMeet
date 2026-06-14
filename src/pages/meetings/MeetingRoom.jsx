@@ -5,6 +5,12 @@ import { selectAccessToken, selectCurrentUser } from "../../redux/features/auth/
 import { useGenerateJaasTokenMutation } from "../../redux/features/jass/jaasApi";
 import { useEndMeetingMutation } from "../../redux/features/meetings/meetingsApi";
 import { useTranslation } from "react-i18next";
+import { setActiveMeeting, clearActiveMeeting } from "../../utils/activeMeeting";
+import * as signalR from "@microsoft/signalr";
+import WaitingForHost from "./WaitingForHost";
+
+// Hub thông báo nằm ở /hubs/notification (không thuộc /api của VITE_API_URL)
+const HUB_URL = `${import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "")}/hubs/notification`;
 
 const JAAS_CONFIG = {
   appId:          "vpaas-magic-cookie-xxxxxxx",
@@ -35,14 +41,13 @@ export default function MeetingRoom() {
   const [isModerator,   setIsModerator]   = useState(false);
   const [jitsiReady,    setJitsiReady]    = useState(false);
   const [hostEnded,     setHostEnded]     = useState(false);
-  const [hasJoined, setHasJoined]= useState(false);
 
-  const containerRef    = useRef(null); 
-  const apiRef          = useRef(null); 
+  const containerRef    = useRef(null);
+  const apiRef          = useRef(null);
   const initialized     = useRef(false);
   const navigated       = useRef(false);
-  const pollRef         = useRef(null); 
-  const hostPollRef     = useRef(null); 
+  const connRef         = useRef(null);   // kết nối SignalR cho sự kiện vòng đời phòng
+  const isModeratorRef  = useRef(false);  // đọc trạng thái host mới nhất trong handler SignalR
 
   const tokenGuest=sessionStorage.getItem("joinToken")
   const authHeader = { Authorization: `Bearer ${token?token:tokenGuest}`};
@@ -70,6 +75,7 @@ export default function MeetingRoom() {
         console.log(data, "datatv")
 
         setIsModerator(isHost);
+        isModeratorRef.current = isHost;
 
         // Host chưa start → gọi API start
         if (isHost && !isStarted) {
@@ -93,56 +99,67 @@ export default function MeetingRoom() {
     })();
   }, [roomName]);
 
-  //cho bam start
+  // Realtime vòng đời phòng (bắt đầu/kết thúc) qua SignalR — thay cho polling.
+  // Tham gia group "meeting:{roomCode}" để nhận sự kiện dù là khách hay người được mời.
   useEffect(() => {
-    if (!status.needsHost) return;
+    if (!roomName) return;
 
-    pollRef.current = setInterval(async () => {
-      try {
-        const res    = await fetch(`${JAAS_CONFIG.meetingUrl}/${roomName}/status`, {
-          headers: authHeader,
-        });
-        const { data } = await res.json();
-        if (data?.status === "Live" || data?.isStarted) {
-          clearInterval(pollRef.current);
-          setStatus(s => ({ ...s, started: true, needsHost: false }));
-        }
-      } catch (_) {}
-    }, 3000);
+    const conn = new signalR.HubConnectionBuilder()
+      .withUrl(HUB_URL, token ? { accessTokenFactory: () => token } : {})
+      .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Warning)
+      .build();
+    connRef.current = conn;
 
-    return () => clearInterval(pollRef.current);
-  }, [status.needsHost, roomName]);
+    const handleEnded = () => {
+      if (isModeratorRef.current) return; // host tự kết thúc → không cần xử lý
+      setHostEnded(true);
+      apiRef.current?.dispose();
+      apiRef.current = null;
+      setTimeout(() => goHome(), 2000);
+    };
 
-  // detect khi host end meeting
-  useEffect(() => {
-    if (isModerator || !hasJoined) return;
-    let failCount=0;
-    const MAX_FAIL=3; 
-    hostPollRef.current = setInterval(async () => {
-      try {
-        const res    = await fetch(`${JAAS_CONFIG.meetingUrl}/${roomName}/status`, {
-          headers: authHeader,
-        });
-        const { data } = await res.json();
-        const stillLive = data?.status === "Live" || data?.isStarted;
+    conn.on("MeetingStarted", (data) => {
+      if (data?.roomCode && data.roomCode !== roomName) return;
+      setStatus((s) => ({ ...s, loading: false, started: true, needsHost: false }));
+    });
 
-        if (!stillLive) {
-          failCount++;
-          if(failCount>= MAX_FAIL){
-            clearInterval(hostPollRef.current);
-            setHostEnded(true);
-            apiRef.current?.dispose();
-            apiRef.current = null;
-            setTimeout(() => goHome(), 2000);
-          }
-        }else{
-          failCount=0;
-        }
-      } catch (_) {}
-    }, 2000);
+    conn.on("MeetingEnded", (data) => {
+      if (data?.roomCode && data.roomCode !== roomName) return;
+      handleEnded();
+    });
 
-    return () => clearInterval(hostPollRef.current);
-  }, [isModerator,hasJoined, roomName]);
+    const joinGroup = () =>
+      conn.invoke("JoinMeetingGroup", roomName).catch(() => {});
+
+    // Sau khi reconnect phải join lại group (group membership mất khi rớt kết nối)
+    conn.onreconnected(joinGroup);
+
+    conn
+      .start()
+      .then(async () => {
+        await joinGroup();
+        // Bắt kịp trạng thái nếu phòng đổi giữa lúc fetch ban đầu và lúc join group
+        try {
+          const res = await fetch(`${JAAS_CONFIG.meetingUrl}/${roomName}/status`, {
+            headers: authHeader,
+          });
+          const { data } = await res.json();
+          if (data?.status === "Ended") handleEnded();
+          else if (data?.status === "Live" || data?.isStarted)
+            setStatus((s) => ({ ...s, loading: false, started: true, needsHost: false }));
+        } catch (_) {}
+      })
+      .catch((err) =>
+        console.warn("[MeetingRoom] Kết nối hub thất bại:", err),
+      );
+
+    return () => {
+      conn.invoke("LeaveMeetingGroup", roomName).catch(() => {});
+      conn.stop();
+      connRef.current = null;
+    };
+  }, [roomName, token]);
 
   //load script jitsi, fetch token va init
   useEffect(() => {
@@ -223,7 +240,7 @@ export default function MeetingRoom() {
         // 3) Events
         apiRef.current.addEventListener("videoConferenceJoined", () => {
           setJitsiReady(true);
-          setHasJoined(true);
+          setActiveMeeting(roomName);
           try {
             apiRef.current?.executeCommand("overwriteConfig", {
               inviteUrl: `${window.location.origin}/meet/${roomName}`,
@@ -257,14 +274,16 @@ export default function MeetingRoom() {
     return () => {
       apiRef.current?.dispose();
       apiRef.current = null;
+      clearActiveMeeting();
     };
   }, []);
 
   const goHome = () => {
     if (navigated.current) return;
     navigated.current = true;
-    sessionStorage.removeItem("guestName"); 
-    sessionStorage.removeItem("joinToken"); 
+    sessionStorage.removeItem("guestName");
+    sessionStorage.removeItem("joinToken");
+    clearActiveMeeting();
     navigate(user ? "/dashboard" : "/");
   };
 
@@ -278,9 +297,7 @@ export default function MeetingRoom() {
 
 
   if (status.needsHost) return (
-    <div className="h-screen flex items-center justify-center">
-      <p className="text-gray-500">{t('meetingRoom.waitingHost')}</p>
-    </div>
+    <WaitingForHost roomCode={roomName} userName={userName} onLeave={goHome} />
   );
 
 

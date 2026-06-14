@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { Bell, X, ChevronRight, Check, XCircle, Video, Loader2, ChevronDown, Hash, Clock, User } from "lucide-react";
 import { useNotification } from "../context/NotificationContext";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { selectAccessToken } from "../redux/features/auth/authSlice";
 import { acceptInvite, rejectInvite, getMeetingStatus } from "../api/notificationApi";
+import meetingsApi from "../redux/features/meetings/meetingsApi";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 
 function timeAgo(dateStr, t) {
   const normalized = dateStr.endsWith("Z") ? dateStr : dateStr + "Z";
@@ -54,13 +56,13 @@ function NotiIcon({ type }) {
 }
 
 function NotiActions({ noti, onClose, status, setStatus }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const token = useSelector(selectAccessToken);
-  const { markOneRead } = useNotification();
+  const { markOneRead, refetch } = useNotification();
 
   if (noti.type === "MeetingStarted") {
-    if (meetingEnded) return null;
-
     let joinLink = "#";
     try {
       const parsed = JSON.parse(noti.payload) ?? {};
@@ -84,16 +86,27 @@ function NotiActions({ noti, onClose, status, setStatus }) {
   if (noti.type === "MeetingInvite") {
     let payload = {};
     try {
-      payload = JSON.parse(noti.payload) ?? {};
+      payload = typeof noti.payload === "string"
+        ? JSON.parse(noti.payload) ?? {}
+        : noti.payload ?? {};
     } catch {}
-    const inviteId = payload.inviteId ?? payload.InviteId;
-    if (status === "accepted")
+    const inviteId = payload.inviteId ?? payload.InviteId ?? payload.id ?? payload.Id;
+    // Trạng thái đã phản hồi được lưu trong payload (backend cập nhật khi accept/decline).
+    // Dùng nó để sau khi đóng/mở lại bell vẫn hiển thị đúng, không hiện lại nút.
+    const persisted = String(payload.status ?? payload.Status ?? "").toLowerCase();
+    const display =
+      status === "accepted" || persisted === "accepted"
+        ? "accepted"
+        : status === "rejected" || persisted === "declined" || persisted === "rejected"
+        ? "rejected"
+        : status;
+    if (display === "accepted")
       return (
         <span className="mt-2 inline-flex items-center gap-1 text-xs text-green-400 font-medium">
           <Check className="w-3.5 h-3.5" /> {t("notificationBell.accepted")}
         </span>
       );
-    if (status === "rejected")
+    if (display === "rejected")
       return (
         <span className="mt-2 inline-flex items-center gap-1 text-xs text-red-400 font-medium">
           <XCircle className="w-3.5 h-3.5" /> {t("notificationBell.rejected")}
@@ -102,24 +115,40 @@ function NotiActions({ noti, onClose, status, setStatus }) {
 
     const handleAccept = async (e) => {
       e.stopPropagation();
-      if (!inviteId) return;
+      if (!inviteId) { toast.error(t("notificationBell.inviteExpired")); return; }
       setStatus("loading-accept");
       try {
         const res = await acceptInvite(inviteId, token);
-        if (res.ok) { setStatus("accepted"); markOneRead(noti.notificationId);}
-        else setStatus("idle");
-      } catch { setStatus("idle"); }
+        const body = await res.json().catch(() => ({}));
+        if (res.ok) {
+          setStatus("accepted");
+          markOneRead(noti.notificationId);
+          refetch();
+          // Làm mới danh sách cuộc họp để cuộc họp vừa nhận lời mời hiện ra ngay (không cần F5)
+          dispatch(meetingsApi.util.invalidateTags(["Meetings"]));
+        } else {
+          setStatus("idle");
+          toast.error(body?.message || t("notificationBell.actionFailed"));
+        }
+      } catch { setStatus("idle"); toast.error(t("notificationBell.actionFailed")); }
     };
 
     const handleReject = async (e) => {
       e.stopPropagation();
-      if (!inviteId) return;
+      if (!inviteId) { toast.error(t("notificationBell.inviteExpired")); return; }
       setStatus("loading-reject");
       try {
         const res = await rejectInvite(inviteId, token);
-        if (res.ok) { setStatus("rejected"); markOneRead(noti.notificationId); }
-        else setStatus("idle");
-      } catch { setStatus("idle"); }
+        const body = await res.json().catch(() => ({}));
+        if (res.ok) {
+          setStatus("rejected");
+          markOneRead(noti.notificationId);
+          refetch();
+        } else {
+          setStatus("idle");
+          toast.error(body?.message || t("notificationBell.actionFailed"));
+        }
+      } catch { setStatus("idle"); toast.error(t("notificationBell.actionFailed")); }
     };
 
     const isLoading = status === "loading-accept" || status === "loading-reject";
@@ -155,7 +184,11 @@ function NotiActions({ noti, onClose, status, setStatus }) {
 
 function NotiDetail({ noti }) {
   let payload = {};
-  try { payload = JSON.parse(noti.payload) ?? {}; } catch {}
+  try {
+    payload = typeof noti.payload === "string"
+      ? JSON.parse(noti.payload) ?? {}
+      : noti.payload ?? {};
+  } catch {}
 
   const title = payload.title || payload.meetingTitle;
   const host = payload.hostName || payload.hostEmail;
@@ -166,24 +199,24 @@ function NotiDetail({ noti }) {
   if (!title && !host && !roomCode && !scheduledAt) return null;
 
   return (
-    <div className="mt-2 rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2.5 flex flex-col gap-1.5">
+    <div className="mt-2 rounded-lg border border-[var(--line)] bg-[var(--overlay)] px-3 py-2.5 flex flex-col gap-1.5">
       {title && (
-        <p className="text-xs font-medium text-slate-200 truncate">{title}</p>
+        <p className="text-xs font-medium text-[var(--content)] truncate">{title}</p>
       )}
       {host && (
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+        <div className="flex items-center gap-1.5 text-[11px] text-[var(--muted)]">
           <User className="w-3 h-3 shrink-0" />
           <span className="truncate">{host}</span>
         </div>
       )}
       {roomCode && (
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+        <div className="flex items-center gap-1.5 text-[11px] text-[var(--muted)]">
           <Hash className="w-3 h-3 shrink-0" />
           <span className="font-mono tracking-wider">{roomCode}</span>
         </div>
       )}
       {scheduledAt && (
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+        <div className="flex items-center gap-1.5 text-[11px] text-[var(--muted)]">
           <Clock className="w-3 h-3 shrink-0" />
           <span>
             {new Date(scheduledAt).toLocaleString("vi-VN", {
@@ -199,6 +232,7 @@ function NotiDetail({ noti }) {
 }
 
 function NotiRow({ noti, onRead, onClose }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [actionStatus, setActionStatus] = useState("idle");
 
@@ -226,7 +260,14 @@ function NotiRow({ noti, onRead, onClose }) {
           {noti.title}
         </p>
         <p className="text-xs text-[var(--faint)] mt-0.5">{timeAgo(noti.createdAt, t)}</p>
-        {expanded && <NotiActions noti={noti} onClose={onClose} />}
+        {open && (
+          <NotiActions
+            noti={noti}
+            onClose={onClose}
+            status={actionStatus}
+            setStatus={setActionStatus}
+          />
+        )}
       </div>
       {!noti.isRead && (
         <span className="w-2 h-2 rounded-full bg-[var(--accent-fg)] flex-shrink-0 mt-1.5" />

@@ -124,7 +124,7 @@ function RegisterPage() {
   };
 
   const inputClass = (field) =>
-    `w-full py-3 pl-12 pr-4 border rounded-xl tracking-wide text-[var(--faint)] placeholder-slate-500 focus:outline-none focus:border-[var(--accent)] transition-colors ${
+    `w-full py-3 pl-12 pr-4 border rounded-xl tracking-wide text-[var(--faint)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)] transition-colors ${
       errors[field]
         ? "border-red-500/60 bg-red-500/5"
         : "border-[var(--line)] bg-[var(--bg)]"
@@ -221,7 +221,8 @@ function RegisterPage() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder={t("register.passwordPlaceholder")}
-                className={`${inputClass("password")} pr-12`}
+                autoComplete="new-password"
+                className={`${inputClass("password")} pr-12 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden`}
               />
               <button
                 type="button"
@@ -268,7 +269,8 @@ function RegisterPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder={t("register.confirmPasswordPlaceholder")}
-                className={`${inputClass("confirmPassword")} pr-12`}
+                autoComplete="new-password"
+                className={`${inputClass("confirmPassword")} pr-12 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden`}
               />
               <button
                 type="button"
@@ -287,7 +289,7 @@ function RegisterPage() {
           <div className="flex items-start gap-2 text-sm">
             <input
               type="checkbox"
-              className="w-4 h-4 mt-0.5 border rounded cursor-pointer bg-slate-700 border-slate-600 accent-[var(--accent)]"
+              className="w-4 h-4 mt-0.5 border rounded cursor-pointer border-[var(--line)] accent-[var(--accent)]"
             />
             <span className="text-[var(--muted)]">
               {t("register.terms")}{" "}
@@ -323,7 +325,7 @@ function RegisterPage() {
           {/* Divider */}
           <div className="relative py-2">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-700/50" />
+              <div className="w-full border-t border-[var(--line)]" />
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 text-[var(--content)] bg-[var(--surface)]">
@@ -336,13 +338,13 @@ function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              className="py-3 font-medium text-[var(--content)] transition-all border bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 rounded-xl hover:border-slate-600/50"
+              className="py-3 font-medium text-[var(--content)] transition-all border bg-[var(--surface)] border-[var(--line)] hover:bg-[var(--accent)]/10 rounded-xl hover:border-[var(--accent)]/50"
             >
               Google
             </button>
             <button
               type="button"
-              className="py-3 font-medium text-[var(--content)] transition-all border bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 rounded-xl hover:border-slate-600/50"
+              className="py-3 font-medium text-[var(--content)] transition-all border bg-[var(--surface)] border-[var(--line)] hover:bg-[var(--accent)]/10 rounded-xl hover:border-[var(--accent)]/50"
             >
               Facebook
             </button>

@@ -6,6 +6,32 @@ import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import authApi, { useChangePasswordMutation, useLogoutUserMutation } from '../../redux/features/auth/authApi'
 
+const inputBase =
+  'w-full py-3 pl-12 pr-12 border rounded-xl tracking-wide text-[var(--accent-fg)] placeholder-slate-500 bg-[var(--bg)] focus:outline-none focus:border-[var(--accent)] transition-colors'
+
+const Field = ({ label, name, value, onChange, showPassword, onToggleShow, placeholder, error }) => (
+  <div>
+    <label className="block mb-2 text-sm font-medium text-[var(--content)]">{label}</label>
+    <div className="relative">
+      <KeyRound className="absolute left-4 top-3.5 w-5 h-5 text-[var(--faint)]" />
+      <input
+        type={showPassword ? 'text' : 'password'}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        autoComplete="new-password"
+        className={`${inputBase} ${error ? 'border-red-500/60' : 'border-[var(--line)]'} [&::-ms-reveal]:hidden [&::-ms-clear]:hidden`}
+      />
+      <button type="button" onClick={onToggleShow}
+        className="absolute right-4 top-3.5 text-[var(--faint)] hover:text-[var(--muted)] transition-colors">
+        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+      </button>
+    </div>
+    {error && <p className="mt-1.5 text-xs text-red-400">{error}</p>}
+  </div>
+)
+
 export default function ChangePasswordPage() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -60,30 +86,6 @@ export default function ChangePasswordPage() {
     }
   }
 
-  const inputBase =
-    'w-full py-3 pl-12 pr-12 border rounded-xl tracking-wide text-[var(--accent-fg)] placeholder-slate-500 bg-[var(--bg)] focus:outline-none focus:border-[var(--accent)] transition-colors'
-
-  const Field = ({ label, name, showKey, placeholder, error }) => (
-    <div>
-      <label className="block mb-2 text-sm font-medium text-[var(--content)]">{label}</label>
-      <div className="relative">
-        <KeyRound className="absolute left-4 top-3.5 w-5 h-5 text-[var(--faint)]" />
-        <input
-          type={show[showKey] ? 'text' : 'password'}
-          name={name}
-          value={form[name]}
-          onChange={onChange}
-          placeholder={placeholder}
-          className={`${inputBase} ${error ? 'border-red-500/60' : 'border-[var(--line)]'}`}
-        />
-        <button type="button" onClick={() => setShow((s) => ({ ...s, [showKey]: !s[showKey] }))}
-          className="absolute right-4 top-3.5 text-[var(--faint)] hover:text-[var(--muted)] transition-colors">
-          {show[showKey] ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-        </button>
-      </div>
-      {error && <p className="mt-1.5 text-xs text-red-400">{error}</p>}
-    </div>
-  )
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[var(--bg)] py-8">
@@ -115,21 +117,30 @@ export default function ChangePasswordPage() {
           <Field
             label={t('changePassword.currentLabel')}
             name="currentPassword"
-            showKey="current"
+            value={form.currentPassword}
+            onChange={onChange}
+            showPassword={show.current}
+            onToggleShow={() => setShow((s) => ({ ...s, current: !s.current }))}
             placeholder={t('changePassword.currentPlaceholder')}
             error={errors.currentPassword}
           />
           <Field
             label={t('changePassword.newLabel')}
             name="newPassword"
-            showKey="new"
+            value={form.newPassword}
+            onChange={onChange}
+            showPassword={show.new}
+            onToggleShow={() => setShow((s) => ({ ...s, new: !s.new }))}
             placeholder={t('changePassword.newPlaceholder')}
             error={errors.newPassword}
           />
           <Field
             label={t('changePassword.confirmLabel')}
             name="confirmPassword"
-            showKey="confirm"
+            value={form.confirmPassword}
+            onChange={onChange}
+            showPassword={show.confirm}
+            onToggleShow={() => setShow((s) => ({ ...s, confirm: !s.confirm }))}
             placeholder={t('changePassword.confirmPlaceholder')}
             error={errors.confirmPassword}
           />

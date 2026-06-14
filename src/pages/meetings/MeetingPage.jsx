@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Video, Plus } from "lucide-react";
+import { Video, Plus } from "lucide-react";
 import {
   useDeleteMeetingApiMutation,
   useGetAllMeetingByEmailQuery,
@@ -11,6 +11,7 @@ import MeetingCard from "../../components/MeetingCard";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { useSearch } from "../../context/SearchContext";
 
 const MeetingPage = () => {
   const { t } = useTranslation();
@@ -25,7 +26,7 @@ const MeetingPage = () => {
     useGetMeetingInvitedQuery();
 
   const [deleteMeeting] = useDeleteMeetingApiMutation();
-  const [search, setSearch] = useState("");
+  const { search } = useSearch(); // dùng chung ô tìm kiếm toàn cục ở Header
   const [activeTab, setActiveTab] = useState("all"); // all | owned | invited
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
@@ -53,9 +54,14 @@ const MeetingPage = () => {
     { key: "invited", label: t("meetingsPage.tabInvited"), count: invitedCount },
   ];
 
+  const q = search.trim().toLowerCase();
   const filtered = meetings.filter((m) => {
     const matchTab = activeTab === "all" || m._source === activeTab;
-    const matchSearch = m.title.toLowerCase().includes(search.toLowerCase());
+    const matchSearch =
+      !q ||
+      [m.title, m.description, m.roomCode]
+        .filter(Boolean)
+        .some((f) => String(f).toLowerCase().includes(q));
     return matchTab && matchSearch;
   });
 
@@ -98,33 +104,10 @@ const MeetingPage = () => {
         <button
           onClick={() => setScheduleOpen(true)}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--content)] self-start sm:self-auto cursor-pointer hover:opacity-90 transition-opacity"
-          style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)" }}
+          style={{ background: "var(--accent)" }}
         >
           <Plus size={16} /> {t('meetingsPage.newMeeting')}
         </button>
-      </div>
-
-      {/* Search */}
-      <div className="relative mb-6">
-        <Search
-          size={16}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--content)]/30"
-        />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t('meetingsPage.searchPlaceholder')}
-          className="w-full rounded-xl pl-11 pr-4 py-3 text-sm text-[var(--content)] placeholder-white/30 border border-[var(--line)] outline-none focus:border-[var(--accent)] transition-colors"
-          style={{ background: "var(--surface)" }}
-        />
-        {search && (
-          <button
-            onClick={() => setSearch("")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--content)]/30 hover:text-[var(--content)]/60 transition-colors text-xs"
-          >
-            ✕
-          </button>
-        )}
       </div>
 
       {/* Tabs */}
@@ -140,7 +123,7 @@ const MeetingPage = () => {
             }`}
             style={
               activeTab === tab.key
-                ? { background: "linear-gradient(135deg, #a855f7, #7c3aed)" }
+                ? { background: "var(--accent)" }
                 : { background: "var(--surface)" }
             }
           >

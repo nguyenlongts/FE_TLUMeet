@@ -105,19 +105,22 @@ export const NotificationProvider = ({ children }) => {
       );
     });
     conn.on("ReceiveInviteResponse", (payload) => {
+      console.log("[SignalR] ReceiveInviteResponse payload:", payload);
       const statusLabel =
         payload.status === "Accepted" ? "chấp nhận" : "từ chối";
+      const title = `${payload.inviteeEmail} đã ${statusLabel} lời mời — Phòng ${payload.roomCode}`;
       setNotifications((prev) => [
         {
           notificationId: Date.now(),
           type: "MeetingInviteResponse",
-          title: `${payload.inviteeEmail} đã ${statusLabel} lời mời — Phòng ${payload.roomCode}`,
+          title,
           payload: JSON.stringify(payload),
           isRead: false,
           createdAt: new Date().toISOString(),
         },
         ...prev,
       ]);
+      toast(title, { duration: 6000, icon: payload.status === "Accepted" ? "✅" : "❌" });
     });
 
     conn

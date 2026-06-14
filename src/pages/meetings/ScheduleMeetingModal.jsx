@@ -21,33 +21,9 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
     requireHostToStart: false,
   });
   const [errors, setErrors] = useState({});
-
-  const [errors, setErrors] = useState({});
   const [scheduleMeeting, { isLoading }] = useScheduleMeetingMutation();
   const [updateMeeting, { isLoading: isUpdating }] = useUpdateMeetingApiMutation();
   const isSubmitting = isLoading || isUpdating;
-
-  const validate = () => {
-    const errs = {};
-    if (!formData.title.trim())
-      errs.title = t('scheduleMeetingModal.validation.titleRequired');
-    else if (formData.title.trim().length < 3)
-      errs.title = t('scheduleMeetingModal.validation.titleMin');
-    else if (formData.title.trim().length > 100)
-      errs.title = t('scheduleMeetingModal.validation.titleMax');
-
-    if (formData.description.length > 500)
-      errs.description = t('scheduleMeetingModal.validation.descriptionMax');
-
-    if (type !== "now") {
-      if (!formData.scheduledDateTime)
-        errs.scheduledDateTime = t('scheduleMeetingModal.validation.dateRequired');
-      else if (new Date(formData.scheduledDateTime) < new Date())
-        errs.scheduledDateTime = t('scheduleMeetingModal.validation.pastDate');
-    }
-
-    return errs;
-  };
 
   useEffect(() => {
     if (type === "now") {
@@ -155,7 +131,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
         {/* Header */}
         <div
           className="flex items-center justify-between px-6 py-5"
-          style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)" }}
+          style={{ background: "var(--accent)" }}
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center">
@@ -190,12 +166,12 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               value={formData.title}
               onChange={handleChange}
               placeholder={t('scheduleMeetingModal.titlePlaceholder')}
-              className={`w-full rounded-lg px-3.5 py-2.5 text-sm text-[var(--content)] placeholder-white/30 border outline-none transition-colors ${
+              className={`w-full rounded-lg px-3.5 py-2.5 text-sm text-[var(--content)] placeholder:text-[var(--muted)] border outline-none transition-colors ${
                 errors.title
                   ? "border-red-500 focus:border-red-500"
                   : "border-[var(--line)] focus:border-[var(--accent)]"
               }`}
-              style={{ background: "rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--bg)" }}
             />
             {errors.title && (
               <span className="text-xs text-red-400">{errors.title}</span>
@@ -211,8 +187,8 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               onChange={handleChange}
               placeholder={t('scheduleMeetingModal.descriptionPlaceholder')}
               rows={3}
-              className="w-full rounded-lg px-3.5 py-2.5 text-sm text-[var(--content)] placeholder-white/30 border border-[var(--line)] outline-none focus:border-[var(--accent)] transition-colors resize-none"
-              style={{ background: "rgba(255,255,255,0.06)" }}
+              className="w-full rounded-lg px-3.5 py-2.5 text-sm text-[var(--content)] placeholder:text-[var(--muted)] border border-[var(--line)] outline-none focus:border-[var(--accent)] transition-colors resize-none"
+              style={{ background: "var(--bg)" }}
             />
             {errors.description && <p className="text-xs text-red-400">{errors.description}</p>}
           </div>
@@ -236,7 +212,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
                       ? "border-red-500 focus:border-red-500"
                       : "border-[var(--line)] focus:border-[var(--accent)]"
                   }`}
-                  style={{ background: "rgba(255,255,255,0.06)", colorScheme: "dark" }}
+                  style={{ background: "var(--bg)" }}
                 />
                 {errors.scheduledDateTime && (
                   <span className="text-xs text-red-400">{errors.scheduledDateTime}</span>
@@ -270,7 +246,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
             </label>
             <div
               className="flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 border border-[var(--line)]"
-              style={{ background: "rgba(255,255,255,0.06)" }}
+              style={{ background: "var(--bg)" }}
             >
               <div
                 className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium text-[var(--content)] shrink-0"
@@ -281,7 +257,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               <span className="text-[var(--content)] text-sm flex-1 truncate">{hostEmail}</span>
               <span
                 className="text-[var(--content)]/40 text-xs px-2 py-0.5 rounded-full"
-                style={{ background: "rgba(255,255,255,0.08)" }}
+                style={{ background: "var(--overlay)" }}
               >
                 {t('scheduleMeetingModal.hostBadge')}
               </span>
@@ -296,7 +272,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               </label>
               <div
                 className="flex flex-col gap-2 rounded-lg px-3.5 py-3 border border-[var(--line)]"
-                style={{ background: "rgba(255,255,255,0.06)" }}
+                style={{ background: "var(--bg)" }}
               >
                 {optionsRequireHostToStart.map((option) => (
                   <label
@@ -346,7 +322,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, hostEmail, type,editMeeting }) 
               onClick={handleSubmit}
               disabled={isSubmitting}
               className="flex-[2] cursor-pointer py-3 rounded-lg text-sm font-medium text-[var(--content)] flex items-center justify-center gap-2 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
-              style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)" }}
+              style={{ background: "var(--accent)" }}
             >
               {isEdit ? <Pencil size={16} /> : <Video size={16} />}
               {isSubmitting

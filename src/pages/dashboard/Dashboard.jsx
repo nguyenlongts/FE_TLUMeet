@@ -1,10 +1,10 @@
-import { Video, Plus, ArrowRight } from 'lucide-react'
+import { Video, Plus, ArrowRight, CalendarDays, Clock, VideoOff } from 'lucide-react'
 import MeetingCard from '../../components/MeetingCard'
 import StatCard from '../../components/StatCard'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '../../redux/features/auth/authSlice'
 import { useEffect, useState } from 'react'
-import { useDeleteMeetingApiMutation, useGetAllMeetingByEmailQuery, useJoinMeetingMutation, useLazyCheckRoomCodeQuery } from '../../redux/features/meetings/meetingsApi'
+import { useDeleteMeetingApiMutation, useGetAllMeetingByEmailQuery, useGetMeetingInvitedQuery, useJoinMeetingMutation, useLazyCheckRoomCodeQuery } from '../../redux/features/meetings/meetingsApi'
 import ScheduleMeetingModal from '../meetings/ScheduleMeetingModal'
 import { Form, Input, Button } from 'antd'
 import WaitingRoom from '../meetings/WaitingRoom'
@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom'
 import DeleteConfirmModal from '../../components/DeleteConfirmModal'
 import { useTranslation } from 'react-i18next'
 import Loading from '../../components/Loading'
+import { getActiveMeeting } from '../../utils/activeMeeting'
+import { useSearch } from '../../context/SearchContext'
 
 // ─── JoinLinkModal ────────────────────────────────────────────────────────────
 const JoinLinkModal = ({ isOpen, onClose, pushRoomCode, handleWaiting }) => {
@@ -24,6 +26,11 @@ const JoinLinkModal = ({ isOpen, onClose, pushRoomCode, handleWaiting }) => {
   const [joinMeeting, { error }] = useJoinMeetingMutation()
 
   const handleSubmit = async ({ roomCode }) => {
+    const active = getActiveMeeting();
+    if (active) {
+      toast.error(t('common.alreadyInMeeting'));
+      return;
+    }
     setIsLoading(true)
     setRoomCode(roomCode)
     handleWaiting()
@@ -138,11 +145,35 @@ const Dashboard = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const user = useSelector(selectCurrentUser)
+  const { search } = useSearch()
   const [type, setType] = useState('')
-  const { data: meetingsRaw, isLoading: isMeetingsLoading } = useGetAllMeetingByEmailQuery(user?.email, { skip: !user?.email })
-  const meetings = [...(meetingsRaw?.data || [])].sort(
+  // refetchOnMountOrArgChange: mỗi lần vào lại dashboard (vd. sau khi bị host end meeting
+  // và bị đưa về đây) sẽ tải lại trạng thái mới nhất thay vì dùng cache cũ.
+  const { data: meetingsRaw, isLoading: isMeetingsLoading } = useGetAllMeetingByEmailQuery(user?.email, { skip: !user?.email, refetchOnMountOrArgChange: true })
+  const { data: invitedRaw, isLoading: isInvitedLoading } = useGetMeetingInvitedQuery(undefined, { skip: !user?.email, refetchOnMountOrArgChange: true })
+
+  // Gộp cuộc họp mình tổ chức + cuộc họp được mời (đã chấp nhận).
+  // Đánh dấu _source để MeetingCard ẩn nút sửa/xóa/mời với cuộc họp được mời.
+  // Dedupe theo id, ưu tiên "hosted" để giữ quyền chủ phòng nếu trùng.
+  const hosted = (meetingsRaw?.data || []).map((m) => ({ ...m, _source: 'hosted' }))
+  const invited = (invitedRaw?.data || []).map((m) => ({ ...m, _source: 'invited' }))
+  const byId = new Map()
+  for (const m of [...hosted, ...invited]) {
+    if (!byId.has(m.id)) byId.set(m.id, m)
+  }
+  const meetings = [...byId.values()].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   )
+
+  // Lọc theo từ khóa tìm kiếm ở Header (tiêu đề / mô tả / mã phòng).
+  const q = search.trim().toLowerCase()
+  const filteredMeetings = q
+    ? meetings.filter((m) =>
+        [m.title, m.description, m.roomCode]
+          .filter(Boolean)
+          .some((f) => String(f).toLowerCase().includes(q))
+      )
+    : meetings
   console.log(meetings, 'meetings')
 
   const numberOfMeetings = meetings?.length || 0
@@ -186,7 +217,7 @@ const Dashboard = () => {
     navigate(`/meet/${roomCode}`)
   }
 
-  if (isMeetingsLoading) return <Loading text={t('dashboard.loading')} />
+  if (isMeetingsLoading || isInvitedLoading) return <Loading text={t('dashboard.loading')} />
 
   return (
     <div className="flex-1 overflow-auto">
@@ -197,21 +228,21 @@ const Dashboard = () => {
         {/* Stat Cards */}
         <div className="flex flex-wrap gap-6 mb-10">
           <StatCard
-            icon="🔴"
+            icon={<CalendarDays size={28} className="text-white" />}
             label={t('dashboard.stats.numberOfMeetings')}
             value={numberOfMeetings}
             subtext={t('dashboard.stats.thisMonth')}
             color="from-orange-400 to-red-500"
           />
           <StatCard
-            icon="🟣"
+            icon={<Clock size={28} className="text-white" />}
             label={t('dashboard.stats.rescheduled')}
             value={waitingCount}
             subtext={t('dashboard.stats.thisMonth')}
             color="from-[var(--accent)] to-pink-500"
           />
           <StatCard
-            icon="🔴"
+            icon={<VideoOff size={28} className="text-white" />}
             label={t('dashboard.stats.cancelled')}
             value={expiredMeetings}
             subtext={t('dashboard.stats.thisMonth')}
@@ -266,21 +297,29 @@ const Dashboard = () => {
         {/* Today's Meetings */}
         <div className="mb-8">
           <h2 className="mb-2 text-lg font-semibold text-[var(--content)]">
-            {t('dashboard.todayTitle', { count: 6 })}
+            {t('dashboard.todayTitle', { count: todayCount })}
           </h2>
-          <p className="text-sm text-[var(--muted)]">
-            {t('dashboard.nextMeeting', { hours: 2 })}
-          </p>
+          {hoursUntilNext !== null && (
+            <p className="text-sm text-[var(--muted)]">
+              {t('dashboard.nextMeeting', { hours: hoursUntilNext })}
+            </p>
+          )}
         </div>
 
-        {/* Meetings Grid */}
-        <div className="grid grid-cols-3 gap-6">
-          {meetings.slice(0, 6).map((meeting) => (
-            <MeetingCard key={meeting.id} meeting={meeting} />
-          ))}
-        </div>
+        {/* Meetings Grid — khi tìm kiếm hiển thị tất cả kết quả, ngược lại chỉ 6 cuộc gần nhất */}
+        {q && filteredMeetings.length === 0 ? (
+          <div className="py-16 text-center text-[var(--muted)]">
+            {t('dashboard.noSearchResults', { query: search })}
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-6">
+            {(q ? filteredMeetings : filteredMeetings.slice(0, 6)).map((meeting) => (
+              <MeetingCard key={meeting.id} meeting={meeting} />
+            ))}
+          </div>
+        )}
 
-        {meetings.length > 6 && (
+        {!q && meetings.length > 6 && (
           <div className="flex justify-center mt-8">
             <button
               onClick={() => navigate('/meetings')}

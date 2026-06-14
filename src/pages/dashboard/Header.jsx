@@ -4,9 +4,11 @@ import { useSelector } from "react-redux";
 import { useGetProfileQuery } from "../../redux/features/user/userApi";
 import { selectCurrentUser } from "../../redux/features/auth/authSlice";
 import { useTranslation } from "react-i18next";
+import { useSearch } from "../../context/SearchContext";
 
 const Header = () => {
   const { t, i18n } = useTranslation();
+  const { search, setSearch } = useSearch();
   const data=useSelector(selectCurrentUser)
   const {data:userData,isLoading}=useGetProfileQuery(data?.id, { skip: !data?.id })
   const avatarSrc=userData?.avatarUrl ?? null;
@@ -33,6 +35,8 @@ const Header = () => {
             <Search className="absolute w-5 h-5 transform -translate-y-1/2 left-4 top-1/2 text-[var(--muted)]" />
             <input
               type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder={t('dashboardHeader.searchPlaceholder')}
               className="w-full py-3 pl-12 pr-4 transition-colors border rounded-full bg-[var(--surface-2)] border-[var(--accent)]/50 text-[var(--content)] placeholder-[var(--faint)] focus:outline-none focus:border-[var(--accent-fg)]"
             />
