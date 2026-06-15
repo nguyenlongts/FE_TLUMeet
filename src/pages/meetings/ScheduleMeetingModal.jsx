@@ -159,12 +159,12 @@ const ScheduleMeetingModal = ({
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 bg-black/60">
       <div
-        className="w-full max-w-lg rounded-2xl overflow-hidden border border-[var(--line)]"
+        className="w-full max-w-lg rounded-2xl border border-[var(--line)]"
         style={{ background: "var(--surface)" }}
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-6 py-5"
+          className="flex items-center justify-between px-6 py-5 rounded-t-2xl"
           style={{ background: "var(--accent)" }}
         >
           <div className="flex items-center gap-3">

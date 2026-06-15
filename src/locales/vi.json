@@ -105,8 +105,29 @@
   },
   "calendar": {
     "loading": "Đang tải lịch...",
-    "days": ["T2", "T3", "T4", "T5", "T6", "T7", "CN"],
-    "months": ["THÁNG 1", "THÁNG 2", "THÁNG 3", "THÁNG 4", "THÁNG 5", "THÁNG 6", "THÁNG 7", "THÁNG 8", "THÁNG 9", "THÁNG 10", "THÁNG 11", "THÁNG 12"],
+    "days": [
+      "T2",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7",
+      "CN"
+    ],
+    "months": [
+      "THÁNG 1",
+      "THÁNG 2",
+      "THÁNG 3",
+      "THÁNG 4",
+      "THÁNG 5",
+      "THÁNG 6",
+      "THÁNG 7",
+      "THÁNG 8",
+      "THÁNG 9",
+      "THÁNG 10",
+      "THÁNG 11",
+      "THÁNG 12"
+    ],
     "legend": {
       "mine": "Của tôi",
       "invited": "Được mời"
@@ -185,7 +206,10 @@
     "error": "Đổi mật khẩu thất bại"
   },
   "home": {
-    "header": { "signIn": "Đăng nhập", "signUp": "Đăng ký" },
+    "header": {
+      "signIn": "Đăng nhập",
+      "signUp": "Đăng ký"
+    },
     "hero": {
       "title1": "Họp trực tuyến",
       "title2": "Đơn giản & Nhanh chóng",
@@ -270,6 +294,9 @@
     "joinNow": "Tham gia ngay",
     "invitePeople": "Mời người khác",
     "minutes": "{{count}} phút",
+    "export": "Xuất người tham gia",
+    "exporting": "Đang xuất…",
+    "exportAttendance": "Xuất người tham gia",
     "status": {
       "Scheduled": "Đã lên lịch",
       "WaitingForHost": "Chờ chủ phòng",
@@ -605,6 +632,38 @@
     "toast": {
       "success": "Cập nhật thành công!",
       "error": "Cập nhật thất bại"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "saveButton": "Lưu thay đổi",
+    "savedButton": "Đã lưu!",
+    "savedMessage": "Tùy chọn của bạn đã được cập nhật",
+    "language": {
+      "sectionTitle": "Ngôn ngữ",
+      "label": "Ngôn ngữ hiển thị",
+      "desc": "Thay đổi ngôn ngữ giao diện"
+    },
+    "notifications": {
+      "sectionTitle": "Thông báo",
+      "reminder": "Nhắc nhở cuộc họp",
+      "reminderDesc": "Thông báo trước khi cuộc họp bắt đầu",
+      "email": "Thông báo qua email",
+      "emailDesc": "Gửi tóm tắt vào hộp thư của bạn",
+      "sound": "Cảnh báo âm thanh",
+      "soundDesc": "Phát âm thanh khi chủ phòng tham gia"
+    },
+    "video": {
+      "sectionTitle": "Video & Âm thanh",
+      "camera": "Bật camera mặc định",
+      "cameraDesc": "Bật camera khi tham gia",
+      "mic": "Bật mic mặc định",
+      "micDesc": "Bỏ tắt tiếng microphone khi tham gia"
+    },
+    "appearance": {
+      "sectionTitle": "Giao diện",
+      "darkMode": "Chế độ tối",
+      "darkModeDesc": "Sử dụng giao diện tối trong toàn bộ ứng dụng"
     }
   }
 }

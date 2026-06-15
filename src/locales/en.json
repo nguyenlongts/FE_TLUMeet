@@ -105,8 +105,29 @@
   },
   "calendar": {
     "loading": "Loading calendar...",
-    "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    "months": ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"],
+    "days": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun"
+    ],
+    "months": [
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER"
+    ],
     "legend": {
       "mine": "My meetings",
       "invited": "Invited"
@@ -185,7 +206,10 @@
     "error": "Change password failed"
   },
   "home": {
-    "header": { "signIn": "Sign in", "signUp": "Sign up" },
+    "header": {
+      "signIn": "Sign in",
+      "signUp": "Sign up"
+    },
     "hero": {
       "title1": "Online meetings",
       "title2": "Simple & Fast",
@@ -270,6 +294,9 @@
     "joinNow": "Join Now",
     "invitePeople": "Invite people",
     "minutes": "{{count}} minutes",
+    "export": "Export participants",
+    "exporting": "Exporting…",
+    "exportAttendance": "Export participants",
     "status": {
       "Scheduled": "Scheduled",
       "WaitingForHost": "Waiting for host",
@@ -605,6 +632,38 @@
     "toast": {
       "success": "Profile updated successfully!",
       "error": "Failed to update profile"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "saveButton": "Save Changes",
+    "savedButton": "Saved!",
+    "savedMessage": "Your preferences have been updated",
+    "language": {
+      "sectionTitle": "Language",
+      "label": "Display Language",
+      "desc": "Change the interface language"
+    },
+    "notifications": {
+      "sectionTitle": "Notifications",
+      "reminder": "Meeting reminders",
+      "reminderDesc": "Notify before meetings start",
+      "email": "Email notifications",
+      "emailDesc": "Send recap to your inbox",
+      "sound": "Sound alerts",
+      "soundDesc": "Play audio when host joins"
+    },
+    "video": {
+      "sectionTitle": "Video & Audio",
+      "camera": "Camera on by default",
+      "cameraDesc": "Enable camera when joining",
+      "mic": "Mic on by default",
+      "micDesc": "Unmute microphone on join"
+    },
+    "appearance": {
+      "sectionTitle": "Appearance",
+      "darkMode": "Dark mode",
+      "darkModeDesc": "Use dark theme across the app"
     }
   }
 }

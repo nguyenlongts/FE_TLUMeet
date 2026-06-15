@@ -9,6 +9,7 @@
   Thêm class `.light` lên <html> để chuyển sang sáng (trắng + xanh nước biển).
 */
 :root {
+  color-scheme: dark;
   --bg: #0b0919;          /* nền trang */
   --surface: #150f2a;     /* thẻ/panel */
   --surface-2: #0e0c1e;   /* input/inset/elevated */
@@ -25,6 +26,7 @@
 }
 
 :root.light {
+  color-scheme: light;
   --bg: #eef3fa;          /* trắng ngả xanh nhạt */
   --surface: #ffffff;
   --surface-2: #e7eef8;

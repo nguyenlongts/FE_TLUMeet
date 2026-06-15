@@ -136,17 +136,17 @@ const SettingsPage = () => {
     <div className="flex-1 overflow-auto">
       <div className="p-8 mx-auto max-w-3xl">
 
-        <h1 className="mb-8 text-3xl font-bold text-[var(--content)]">{t('settings.title', 'Settings')}</h1>
+        <h1 className="mb-8 text-3xl font-bold text-[var(--content)]">{t('settings.title')}</h1>
 
         {/* Language */}
-        <Section icon={Globe} title={t('settings.language.sectionTitle', 'Language')}>
+        <Section icon={Globe} title={t('settings.language.sectionTitle')}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-sm font-medium text-[var(--content)]">
-                {t('settings.language.label', 'Display Language')}
+                {t('settings.language.label')}
               </p>
               <p className="text-xs text-[var(--faint)] mt-0.5">
-                {t('settings.language.desc', 'Change the interface language')}
+                {t('settings.language.desc')}
               </p>
             </div>
             <div className="flex items-center gap-1.5 bg-[var(--accent)]/20 border border-[var(--accent)]/30 rounded-full px-3 py-1">
@@ -227,48 +227,48 @@ const SettingsPage = () => {
     </Section>
 
         {/* Notifications */}
-        <Section icon={Bell} title={t('settings.notifications.sectionTitle', 'Notifications')}>
+        <Section icon={Bell} title={t('settings.notifications.sectionTitle')}>
           <SettingRow
-            label={t('settings.notifications.reminder', 'Meeting reminders')}
-            desc={t('settings.notifications.reminderDesc', 'Notify before meetings start')}
+            label={t('settings.notifications.reminder')}
+            desc={t('settings.notifications.reminderDesc')}
             checked={notifications.reminder}
             onChange={(v) => setNotifications((p) => ({ ...p, reminder: v }))}
           />
           <SettingRow
-            label={t('settings.notifications.email', 'Email notifications')}
-            desc={t('settings.notifications.emailDesc', 'Send recap to your inbox')}
+            label={t('settings.notifications.email')}
+            desc={t('settings.notifications.emailDesc')}
             checked={notifications.email}
             onChange={(v) => setNotifications((p) => ({ ...p, email: v }))}
           />
           <SettingRow
-            label={t('settings.notifications.sound', 'Sound alerts')}
-            desc={t('settings.notifications.soundDesc', 'Play audio when host joins')}
+            label={t('settings.notifications.sound')}
+            desc={t('settings.notifications.soundDesc')}
             checked={notifications.sound}
             onChange={(v) => setNotifications((p) => ({ ...p, sound: v }))}
           />
         </Section>
 
         {/* Video & Audio */}
-        <Section icon={Video} title={t('settings.video.sectionTitle', 'Video & Audio')}>
+        <Section icon={Video} title={t('settings.video.sectionTitle')}>
           <SettingRow
-            label={t('settings.video.camera', 'Camera on by default')}
-            desc={t('settings.video.cameraDesc', 'Enable camera when joining')}
+            label={t('settings.video.camera')}
+            desc={t('settings.video.cameraDesc')}
             checked={video.camera}
             onChange={(v) => setVideo((p) => ({ ...p, camera: v }))}
           />
           <SettingRow
-            label={t('settings.video.mic', 'Mic on by default')}
-            desc={t('settings.video.micDesc', 'Unmute microphone on join')}
+            label={t('settings.video.mic')}
+            desc={t('settings.video.micDesc')}
             checked={video.mic}
             onChange={(v) => setVideo((p) => ({ ...p, mic: v }))}
           />
         </Section>
 
         {/* Appearance */}
-        <Section icon={Moon} title={t('settings.appearance.sectionTitle', 'Appearance')}>
+        <Section icon={Moon} title={t('settings.appearance.sectionTitle')}>
           <SettingRow
-            label={t('settings.appearance.darkMode', 'Dark mode')}
-            desc={t('settings.appearance.darkModeDesc', 'Use dark theme across the app')}
+            label={t('settings.appearance.darkMode')}
+            desc={t('settings.appearance.darkModeDesc')}
             checked={isDark}
             onChange={(v) => setTheme(v ? 'dark' : 'light')}
           />
@@ -308,14 +308,14 @@ const SettingsPage = () => {
           }`}
         >
           {saved
-            ? `✓ ${t('settings.savedButton', 'Saved!')}`
-            : t('settings.saveButton', 'Save Changes')}
+            ? `✓ ${t('settings.savedButton')}`
+            : t('settings.saveButton')}
         </button>
 
         {saved && (
           <p className="text-center text-xs text-emerald-400 mt-2 flex items-center justify-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-            {t('settings.savedMessage', 'Your preferences have been updated')}
+            {t('settings.savedMessage')}
           </p>
         )}
       </div>

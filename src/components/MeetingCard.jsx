@@ -224,7 +224,7 @@ const formatDate = (dt) => {
   const d = new Date(dt + "Z");
   return d.toLocaleDateString("en-GB", {
     day: "2-digit",
-    month: "short",
+    month: "2-digit",
     year: "numeric",
   });
 };
@@ -334,9 +334,7 @@ const MeetingCard = ({ meeting, onDelete }) => {
 
   return (
     <div
-      className={`rounded-2xl border border-[var(--line)] overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5 relative ${
-        isEnded ? "opacity-50 pointer-events-none" : ""
-      }`}
+      className="rounded-2xl border border-[var(--line)] overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5 relative"
       style={{ background: "var(--surface)" }}
     >
       <div
@@ -349,7 +347,7 @@ const MeetingCard = ({ meeting, onDelete }) => {
         }}
       />
 
-      <div className="flex flex-col gap-3 p-5 flex-1">
+      <div className={`flex flex-col gap-3 p-5 flex-1 ${isEnded ? "opacity-50" : ""}`}>
         {/* Title + Status */}
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-[var(--content)] text-sm font-medium leading-snug flex-1">
@@ -395,47 +393,53 @@ const MeetingCard = ({ meeting, onDelete }) => {
 
       {/* Actions */}
       <div className="flex items-center gap-2 px-5 py-3.5">
-        <button
-          onClick={handleJoinMeeting}
-          className="flex-1 py-2 rounded-lg text-xs font-medium text-white flex items-center justify-center gap-1.5"
-          style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-hover))" }}
-        >
-          <Video size={13} /> {t('meetingCard.joinNow')}
-        </button>
-        {isHost && isEnded && (
-          <button
-            onClick={handleExportAttendance}
-            disabled={exporting}
-            title={t('meetingCard.exportAttendance', 'Xuất điểm danh')}
-            className="pointer-events-auto flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-[var(--line)] text-[var(--content)]/70 hover:text-[var(--accent-fg)] hover:bg-[var(--accent)]/10 transition-colors disabled:opacity-50"
-          >
-            <Download size={13} />
-            {exporting ? t('meetingCard.exporting', 'Đang xuất…') : t('meetingCard.export', 'Xuất điểm danh')}
-          </button>
-        )}
-        {!isInvited && (
+        {isEnded ? (
+          isHost && (
+            <button
+              onClick={handleExportAttendance}
+              disabled={exporting}
+              title={t('meetingCard.exportAttendance', 'Xuất người tham gia')}
+              className="flex-1 py-2 rounded-lg text-xs font-bold text-white flex items-center justify-center gap-1.5 disabled:opacity-50"
+              style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-hover))" }}
+            >
+              <Download size={13} />
+              {exporting ? t('meetingCard.exporting', 'Đang xuất…') : t('meetingCard.export', 'Xuất người tham gia')}
+            </button>
+          )
+        ) : (
           <>
             <button
-              onClick={() => setInviteOpen(true)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--content)]/50 hover:text-[var(--accent-fg)] hover:bg-[var(--accent)]/10 transition-colors border border-[var(--line)]"
-              title={t('meetingCard.invitePeople')}
+              onClick={handleJoinMeeting}
+              className="flex-1 py-2 rounded-lg text-xs font-medium text-white flex items-center justify-center gap-1.5"
+              style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-hover))" }}
             >
-              <UserPlus size={13} />
+              <Video size={13} /> {t('meetingCard.joinNow')}
             </button>
-            {canModify && (
+            {!isInvited && (
               <>
                 <button
-                  onClick={() => setIsEdit(true)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-sky-400/50 hover:text-sky-600 hover:bg-[var(--accent)]/10 transition-colors border border-[var(--line)]"
+                  onClick={() => setInviteOpen(true)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--content)]/50 hover:text-[var(--accent-fg)] hover:bg-[var(--accent)]/10 transition-colors border border-[var(--line)]"
+                  title={t('meetingCard.invitePeople')}
                 >
-                  <Pencil size={13} />
+                  <UserPlus size={13} />
                 </button>
-                <button
-                  onClick={() => setIsDeleteConfirmModalOpen(true)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-400/50 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-[var(--line)]"
-                >
-                  <Trash2 size={13} />
-                </button>
+                {canModify && (
+                  <>
+                    <button
+                      onClick={() => setIsEdit(true)}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-sky-400/50 hover:text-sky-600 hover:bg-[var(--accent)]/10 transition-colors border border-[var(--line)]"
+                    >
+                      <Pencil size={13} />
+                    </button>
+                    <button
+                      onClick={() => setIsDeleteConfirmModalOpen(true)}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-400/50 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-[var(--line)]"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </>
+                )}
               </>
             )}
           </>
